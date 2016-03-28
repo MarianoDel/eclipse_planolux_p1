@@ -2,6 +2,7 @@
 *.hex
 *.map
 *.bin
+*.elf
 *.o
 
 dimmer_model.*
