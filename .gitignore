@@ -1,3 +1,9 @@
+*.bin
+*.elf
+*.hex
+*.map
+*.o
+*.lst
 dimmer_model.*
 rdm_responder.*
 transceiver.*
