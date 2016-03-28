@@ -1,0 +1,1032 @@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1	@ Tag_ABI_FP_denormal
+   4              		.eabi_attribute 21, 1	@ Tag_ABI_FP_exceptions
+   5              		.eabi_attribute 23, 3	@ Tag_ABI_FP_number_model
+   6              		.eabi_attribute 24, 1	@ Tag_ABI_align8_needed
+   7              		.eabi_attribute 25, 1	@ Tag_ABI_align8_preserved
+   8              		.eabi_attribute 26, 1	@ Tag_ABI_enum_size
+   9              		.eabi_attribute 30, 6	@ Tag_ABI_optimization_goals
+  10              		.eabi_attribute 34, 0	@ Tag_CPU_unaligned_access
+  11              		.eabi_attribute 18, 4	@ Tag_ABI_PCS_wchar_t
+  12              		.file	"synchro.c"
+  13              	@ GNU C (GNU Tools for ARM Embedded Processors) version 4.7.4 20130613 (release) [ARM/embedded-4_7-
+  14              	@	compiled by GNU C version 4.2.1-sjlj (mingw32-2), GMP version 4.3.2, MPFR version 2.4.2, MPC vers
+  15              	@ GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+  16              	@ options passed:  -I . -I .\src -I .\cmsis_boot -I .\cmsis_core
+  17              	@ -I ..\STM32F0xx_StdPeriph_Lib_V1.3.1\Libraries\STM32F0xx_StdPeriph_Driver\inc
+  18              	@ -I .\inc -I .\cmsis_boot -imultilib armv6-m
+  19              	@ -iprefix c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../lib/gcc/arm-none-eabi/4.
+  20              	@ -isysroot c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../arm-none-eabi
+  21              	@ -MD .\src\synchro.d -MF .dep\synchro.o.d -MP -MQ .\src\synchro.o
+  22              	@ -D__USES_INITFINI__ -D RUN_FROM_FLASH=1 .\src\synchro.c -mcpu=cortex-m0
+  23              	@ -mthumb -auxbase-strip .\src\synchro.o -g -gdwarf-2 -O0 -Wall
+  24              	@ -fomit-frame-pointer -fdata-sections -ffunction-sections -fverbose-asm
+  25              	@ options enabled:  -fauto-inc-dec -fbranch-count-reg -fcommon
+  26              	@ -fdata-sections -fdebug-types-section -fdelete-null-pointer-checks
+  27              	@ -fdwarf2-cfi-asm -fearly-inlining -feliminate-unused-debug-types
+  28              	@ -ffunction-cse -ffunction-sections -fgcse-lm -fgnu-runtime -fident
+  29              	@ -finline-atomics -fira-hoist-pressure -fira-share-save-slots
+  30              	@ -fira-share-spill-slots -fivopts -fkeep-static-consts
+  31              	@ -fleading-underscore -fmath-errno -fmerge-debug-strings
+  32              	@ -fmove-loop-invariants -fomit-frame-pointer -fpeephole
+  33              	@ -fprefetch-loop-arrays -freg-struct-return
+  34              	@ -fsched-critical-path-heuristic -fsched-dep-count-heuristic
+  35              	@ -fsched-group-heuristic -fsched-interblock -fsched-last-insn-heuristic
+  36              	@ -fsched-rank-heuristic -fsched-spec -fsched-spec-insn-heuristic
+  37              	@ -fsched-stalled-insns-dep -fshow-column -fsigned-zeros
+  38              	@ -fsplit-ivs-in-unroller -fstrict-volatile-bitfields -ftrapping-math
+  39              	@ -ftree-cselim -ftree-forwprop -ftree-loop-if-convert -ftree-loop-im
+  40              	@ -ftree-loop-ivcanon -ftree-loop-optimize -ftree-parallelize-loops=
+  41              	@ -ftree-phiprop -ftree-pta -ftree-reassoc -ftree-scev-cprop
+  42              	@ -ftree-slp-vectorize -ftree-vect-loop-version -funit-at-a-time
+  43              	@ -fverbose-asm -fzero-initialized-in-bss -mlittle-endian -msched-prolog
+  44              	@ -mthumb -mvectorize-with-neon-quad
+  45              	
+  46              		.text
+  47              	.Ltext0:
+  48              		.cfi_sections	.debug_frame
+  49              		.section	.text.UpdateIGrid,"ax",%progbits
+  50              		.align	2
+  51              		.global	UpdateIGrid
+  52              		.code	16
+  53              		.thumb_func
+  54              		.type	UpdateIGrid, %function
+  55              	UpdateIGrid:
+  56              	.LFB20:
+  57              		.file 1 ".\\src\\synchro.c"
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 2
+
+
+   1:.\src/synchro.c **** /*
+   2:.\src/synchro.c ****  * synchro.c
+   3:.\src/synchro.c ****  *
+   4:.\src/synchro.c ****  *  Created on: 02/12/2015
+   5:.\src/synchro.c ****  *      Author: Mariano
+   6:.\src/synchro.c ****  */
+   7:.\src/synchro.c **** 
+   8:.\src/synchro.c **** #include "synchro.h"
+   9:.\src/synchro.c **** #include "hard.h"
+  10:.\src/synchro.c **** //#include "dsp.h"
+  11:.\src/synchro.c **** #include "stm32f0xx_gpio.h"
+  12:.\src/synchro.c **** #include "adc.h"
+  13:.\src/synchro.c **** #include "stm32f0xx.h"
+  14:.\src/synchro.c **** #include "stm32f0xx_adc.h"
+  15:.\src/synchro.c **** 
+  16:.\src/synchro.c **** /*
+  17:.\src/synchro.c **** extern volatile unsigned short adc_ch [4];
+  18:.\src/synchro.c **** extern volatile unsigned char need_to_sync;
+  19:.\src/synchro.c **** extern volatile unsigned char freq_ready;
+  20:.\src/synchro.c **** extern volatile unsigned short lastC0V;
+  21:.\src/synchro.c **** extern volatile unsigned char zero_cross;
+  22:.\src/synchro.c **** extern volatile unsigned char slips_state;
+  23:.\src/synchro.c **** 
+  24:.\src/synchro.c **** // ------- para determinar vgrid -------
+  25:.\src/synchro.c **** extern unsigned short max_vgrid_last;
+  26:.\src/synchro.c **** extern unsigned short max_vgrid;
+  27:.\src/synchro.c **** extern unsigned short min_vgrid_last;
+  28:.\src/synchro.c **** extern unsigned short min_vgrid;
+  29:.\src/synchro.c **** extern unsigned short v_vgrid [4];
+  30:.\src/synchro.c **** extern unsigned short vgrid_update_samples;
+  31:.\src/synchro.c **** */
+  32:.\src/synchro.c **** // ------- para determinar igrid -------
+  33:.\src/synchro.c **** extern unsigned short max_igrid_last;
+  34:.\src/synchro.c **** extern unsigned short max_igrid;
+  35:.\src/synchro.c **** extern unsigned short min_igrid_last;
+  36:.\src/synchro.c **** extern unsigned short min_igrid;
+  37:.\src/synchro.c **** extern unsigned short igrid_update_samples;
+  38:.\src/synchro.c **** extern volatile unsigned char igrid_timer;
+  39:.\src/synchro.c **** /*
+  40:.\src/synchro.c **** // ------- para determinar frecuencia -------
+  41:.\src/synchro.c **** extern unsigned short fgrid_mean;
+  42:.\src/synchro.c **** extern unsigned short v_fgrid [32];	//largo del filtro para MA32
+  43:.\src/synchro.c **** //extern unsigned short v_fgrid [4];	//largo del filtro con fast es justo
+  44:.\src/synchro.c **** //unsigned short v_fgrid [8];	//largo del filtro para MA8
+  45:.\src/synchro.c **** 
+  46:.\src/synchro.c **** // ------- para determinar ruidos de cruce -------
+  47:.\src/synchro.c **** extern volatile unsigned short timer_zero_cross;
+  48:.\src/synchro.c **** extern unsigned char noise_z3;
+  49:.\src/synchro.c **** extern unsigned char noise_z2;
+  50:.\src/synchro.c **** extern unsigned char noise_z1;
+  51:.\src/synchro.c **** extern unsigned char noise;
+  52:.\src/synchro.c **** extern unsigned short total_noise;
+  53:.\src/synchro.c **** 
+  54:.\src/synchro.c **** // ------- para determinar vin -------
+  55:.\src/synchro.c **** unsigned short vin_mean;
+  56:.\src/synchro.c **** unsigned short v_vin [8];
+  57:.\src/synchro.c **** */
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 3
+
+
+  58:.\src/synchro.c **** 
+  59:.\src/synchro.c **** /*
+  60:.\src/synchro.c **** unsigned char CheckVGrid (void)
+  61:.\src/synchro.c **** {
+  62:.\src/synchro.c **** 	unsigned short medida;
+  63:.\src/synchro.c **** 
+  64:.\src/synchro.c **** 	if (max_vgrid_last > min_vgrid_last)
+  65:.\src/synchro.c **** 	{
+  66:.\src/synchro.c **** 		medida = max_vgrid_last - min_vgrid_last;	//valor de tension pico a pico
+  67:.\src/synchro.c **** 
+  68:.\src/synchro.c **** 		if ((medida > VGRID_MIN) && (medida < VGRID_MAX))
+  69:.\src/synchro.c **** 			return GOOD;
+  70:.\src/synchro.c **** 	}
+  71:.\src/synchro.c **** 	return BAD;
+  72:.\src/synchro.c **** }
+  73:.\src/synchro.c **** 
+  74:.\src/synchro.c **** unsigned char CheckFGrid (void)
+  75:.\src/synchro.c **** {
+  76:.\src/synchro.c **** 	if ((fgrid_mean < GRID_FREQ_MIN) && (fgrid_mean > GRID_FREQ_MAX))	//cambia la inecuacion porque so
+  77:.\src/synchro.c **** 	//if (fgrid_mean > GRID_FREQ_MAX)
+  78:.\src/synchro.c **** 		return GOOD;
+  79:.\src/synchro.c **** 	else
+  80:.\src/synchro.c **** 		return BAD;
+  81:.\src/synchro.c **** }
+  82:.\src/synchro.c **** 
+  83:.\src/synchro.c **** unsigned char CheckFGridFast (unsigned short f)
+  84:.\src/synchro.c **** {
+  85:.\src/synchro.c **** 	if ((f < GRID_FREQ_MIN_REALLY_GOOD) && (f > GRID_FREQ_MAX_REALLY_GOOD))	//cambia la inecuacion por
+  86:.\src/synchro.c **** 	{
+  87:.\src/synchro.c **** 		return REALLY_GOOD;
+  88:.\src/synchro.c **** 	}
+  89:.\src/synchro.c **** 	else if ((f < GRID_FREQ_MIN) && (f > GRID_FREQ_MAX))	//cambia la inecuacion porque son tiempos
+  90:.\src/synchro.c **** 	{
+  91:.\src/synchro.c **** 		return GOOD;
+  92:.\src/synchro.c **** 	}
+  93:.\src/synchro.c **** 	return BAD;
+  94:.\src/synchro.c **** }
+  95:.\src/synchro.c **** 
+  96:.\src/synchro.c **** unsigned char CheckGridNoise (void)
+  97:.\src/synchro.c **** {
+  98:.\src/synchro.c **** 	//tuve que haber tenido mas de 48 cruces, sino ni contesto
+  99:.\src/synchro.c **** 	if (total_noise == 50)
+ 100:.\src/synchro.c **** 		return REALLY_GOOD;
+ 101:.\src/synchro.c **** 
+ 102:.\src/synchro.c **** 	if ((total_noise > 48) && (total_noise < 52))	//desde 49 a 51
+ 103:.\src/synchro.c **** 		return GOOD;
+ 104:.\src/synchro.c **** 
+ 105:.\src/synchro.c **** 	if ((total_noise > 46) && (total_noise < 54))	//desde 47 a 53
+ 106:.\src/synchro.c **** 		return REGULAR;
+ 107:.\src/synchro.c **** 
+ 108:.\src/synchro.c **** 	return BAD;
+ 109:.\src/synchro.c **** }
+ 110:.\src/synchro.c **** 
+ 111:.\src/synchro.c **** unsigned char CheckVin (void)
+ 112:.\src/synchro.c **** {
+ 113:.\src/synchro.c **** 	if ((vin_mean < VIN_MAX) && (vin_mean > VIN_MIN))
+ 114:.\src/synchro.c **** 	{
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 4
+
+
+ 115:.\src/synchro.c **** 		return GOOD;
+ 116:.\src/synchro.c **** 	}
+ 117:.\src/synchro.c **** 	return BAD;
+ 118:.\src/synchro.c **** }
+ 119:.\src/synchro.c **** 
+ 120:.\src/synchro.c **** void UpdateVGrid (void)
+ 121:.\src/synchro.c **** {
+ 122:.\src/synchro.c **** 	unsigned short medida;
+ 123:.\src/synchro.c **** 
+ 124:.\src/synchro.c **** 	//miro la ultima medicion
+ 125:.\src/synchro.c **** 	//promedio 4 mediciones para evitar problemas de ruido
+ 126:.\src/synchro.c **** 	medida = MAFilterFast(V_GRID_SENSE, v_vgrid);
+ 127:.\src/synchro.c **** 	//medida = V_GRID_SENSE;
+ 128:.\src/synchro.c **** 
+ 129:.\src/synchro.c **** 	if (vgrid_update_samples < VGRID_SAMPLES_RESET)	//512 es toda la senoidal 576 es un ciclo y un oct
+ 130:.\src/synchro.c **** 	{
+ 131:.\src/synchro.c **** 		//reviso si es un maximo
+ 132:.\src/synchro.c **** 		if (medida > max_vgrid)
+ 133:.\src/synchro.c **** 			max_vgrid = medida;
+ 134:.\src/synchro.c **** 
+ 135:.\src/synchro.c **** 		//reviso si es un minimo
+ 136:.\src/synchro.c **** 		if (medida < min_vgrid)
+ 137:.\src/synchro.c **** 			min_vgrid = medida;
+ 138:.\src/synchro.c **** 
+ 139:.\src/synchro.c **** 		vgrid_update_samples++;
+ 140:.\src/synchro.c **** 	}
+ 141:.\src/synchro.c **** 	else
+ 142:.\src/synchro.c **** 	{
+ 143:.\src/synchro.c **** 		//if (LED2)
+ 144:.\src/synchro.c **** 		//	LED2_OFF;
+ 145:.\src/synchro.c **** 		//else
+ 146:.\src/synchro.c **** 		//	LED2_ON;
+ 147:.\src/synchro.c **** 
+ 148:.\src/synchro.c **** 		//paso un ciclo y un octavo completo, seguro tengo maximo y minimos cargados
+ 149:.\src/synchro.c **** 		max_vgrid_last = max_vgrid;
+ 150:.\src/synchro.c **** 		min_vgrid_last = min_vgrid;
+ 151:.\src/synchro.c **** 		max_vgrid = 2048;
+ 152:.\src/synchro.c **** 		min_vgrid = 2048;
+ 153:.\src/synchro.c **** 		vgrid_update_samples = 0;
+ 154:.\src/synchro.c **** 	}
+ 155:.\src/synchro.c **** }
+ 156:.\src/synchro.c **** 
+ 157:.\src/synchro.c **** void UpdateFGrid (void)
+ 158:.\src/synchro.c **** {
+ 159:.\src/synchro.c **** 	//miro la ultima medicion
+ 160:.\src/synchro.c **** 	if (freq_ready)
+ 161:.\src/synchro.c **** 	{
+ 162:.\src/synchro.c **** 		freq_ready = 0;
+ 163:.\src/synchro.c **** 		fgrid_mean = MAFilter32(lastC0V, v_fgrid);		//TODO: Demora 12us
+ 164:.\src/synchro.c **** 		//fgrid_mean = MAFilterFast(lastC0V, v_fgrid);
+ 165:.\src/synchro.c **** 		//fgrid_mean = MAFilter8(lastC0V, v_fgrid);
+ 166:.\src/synchro.c **** 		//fgrid_mean = lastC0V;
+ 167:.\src/synchro.c **** 
+ 168:.\src/synchro.c **** 		//if (LED2)
+ 169:.\src/synchro.c **** 		//	LED2_OFF;
+ 170:.\src/synchro.c **** 		//else
+ 171:.\src/synchro.c **** 		//	LED2_ON;
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 5
+
+
+ 172:.\src/synchro.c **** 	}
+ 173:.\src/synchro.c **** }
+ 174:.\src/synchro.c **** 
+ 175:.\src/synchro.c **** void UpdateSyncNoise (void)
+ 176:.\src/synchro.c **** {
+ 177:.\src/synchro.c **** 	//miro la ultima medicion
+ 178:.\src/synchro.c **** 	if (!timer_zero_cross)
+ 179:.\src/synchro.c **** 	{
+ 180:.\src/synchro.c **** 		noise_z3 = noise_z2;
+ 181:.\src/synchro.c **** 		noise_z2 = noise_z1;
+ 182:.\src/synchro.c **** 		noise_z1 = noise;
+ 183:.\src/synchro.c **** 		noise = zero_cross;
+ 184:.\src/synchro.c **** 
+ 185:.\src/synchro.c **** 		zero_cross = 0;
+ 186:.\src/synchro.c **** 
+ 187:.\src/synchro.c **** 		total_noise = noise + noise_z1 + noise_z2 + noise_z3;
+ 188:.\src/synchro.c **** 
+ 189:.\src/synchro.c **** 		timer_zero_cross = 250;		//250ms
+ 190:.\src/synchro.c **** 	}
+ 191:.\src/synchro.c **** }
+ 192:.\src/synchro.c **** 
+ 193:.\src/synchro.c **** void UpdateVin (unsigned short v)
+ 194:.\src/synchro.c **** {
+ 195:.\src/synchro.c **** 	//miro la ultima medicion
+ 196:.\src/synchro.c **** 	vin_mean = MAFilter8 (v, v_vin);
+ 197:.\src/synchro.c **** }
+ 198:.\src/synchro.c **** 
+ 199:.\src/synchro.c **** */
+ 200:.\src/synchro.c **** 
+ 201:.\src/synchro.c **** void UpdateIGrid (void)
+ 202:.\src/synchro.c **** {
+  58              		.loc 1 202 0
+  59              		.cfi_startproc
+  60 0000 10B5     		push	{r4, lr}	@
+  61              	.LCFI0:
+  62              		.cfi_def_cfa_offset 8
+  63              		.cfi_offset 4, -8
+  64              		.cfi_offset 14, -4
+  65 0002 82B0     		sub	sp, sp, #8	@,,
+  66              	.LCFI1:
+  67              		.cfi_def_cfa_offset 16
+ 203:.\src/synchro.c **** 	unsigned short medida = 0;
+  68              		.loc 1 203 0
+  69 0004 6B46     		mov	r3, sp	@ tmp142,
+  70 0006 0633     		add	r3, r3, #6	@ tmp142,
+  71 0008 0022     		mov	r2, #0	@ tmp143,
+  72 000a 1A80     		strh	r2, [r3]	@ tmp144, medida
+ 204:.\src/synchro.c **** 
+ 205:.\src/synchro.c **** 	if (!igrid_timer)
+  73              		.loc 1 205 0
+  74 000c 244B     		ldr	r3, .L6	@ tmp145,
+  75 000e 1B78     		ldrb	r3, [r3]	@ tmp146, igrid_timer
+  76 0010 DBB2     		uxtb	r3, r3	@ igrid_timer.4, tmp146
+  77 0012 002B     		cmp	r3, #0	@ igrid_timer.4,
+  78 0014 41D1     		bne	.L1	@,
+ 206:.\src/synchro.c **** 	{
+ 207:.\src/synchro.c **** 		igrid_timer = 1;
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 6
+
+
+  79              		.loc 1 207 0
+  80 0016 224B     		ldr	r3, .L6	@ tmp147,
+  81 0018 0122     		mov	r2, #1	@ tmp148,
+  82 001a 1A70     		strb	r2, [r3]	@ tmp149, igrid_timer
+ 208:.\src/synchro.c **** 		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//16 o 20 es toda la senoidal 22 es un ciclo y un
+  83              		.loc 1 208 0
+  84 001c 214B     		ldr	r3, .L6+4	@ tmp150,
+  85 001e 1B88     		ldrh	r3, [r3]	@ igrid_update_samples.5, igrid_update_samples
+  86 0020 152B     		cmp	r3, #21	@ igrid_update_samples.5,
+  87 0022 27D8     		bhi	.L3	@,
+ 209:.\src/synchro.c **** 		{
+ 210:.\src/synchro.c **** 			medida = ReadADC1(ADC_Channel_8);
+  88              		.loc 1 210 0
+  89 0024 6C46     		mov	r4, sp	@ tmp151,
+  90 0026 0634     		add	r4, r4, #6	@ tmp151,
+  91 0028 8023     		mov	r3, #128	@ tmp189,
+  92 002a 5B00     		lsl	r3, r3, #1	@ tmp152, tmp189,
+  93 002c 181C     		mov	r0, r3	@, tmp152
+  94 002e FFF7FEFF 		bl	ReadADC1	@
+  95 0032 031C     		mov	r3, r0	@ tmp153,
+  96 0034 2380     		strh	r3, [r4]	@ tmp155, medida
+ 211:.\src/synchro.c **** 			//reviso si es un maximo
+ 212:.\src/synchro.c **** 			if (medida > max_igrid)
+  97              		.loc 1 212 0
+  98 0036 1C4B     		ldr	r3, .L6+8	@ tmp156,
+  99 0038 1B88     		ldrh	r3, [r3]	@ max_igrid.6, max_igrid
+ 100 003a 6A46     		mov	r2, sp	@ tmp157,
+ 101 003c 0632     		add	r2, r2, #6	@ tmp157,
+ 102 003e 1288     		ldrh	r2, [r2]	@ tmp158, medida
+ 103 0040 9A42     		cmp	r2, r3	@ tmp158, max_igrid.6
+ 104 0042 04D9     		bls	.L4	@,
+ 213:.\src/synchro.c **** 				max_igrid = medida;
+ 105              		.loc 1 213 0
+ 106 0044 184B     		ldr	r3, .L6+8	@ tmp159,
+ 107 0046 6A46     		mov	r2, sp	@ tmp160,
+ 108 0048 0632     		add	r2, r2, #6	@ tmp160,
+ 109 004a 1288     		ldrh	r2, [r2]	@ tmp161, medida
+ 110 004c 1A80     		strh	r2, [r3]	@ tmp161, max_igrid
+ 111              	.L4:
+ 214:.\src/synchro.c **** 
+ 215:.\src/synchro.c **** 			//reviso si es un minimo
+ 216:.\src/synchro.c **** 			if (medida < min_igrid)
+ 112              		.loc 1 216 0
+ 113 004e 174B     		ldr	r3, .L6+12	@ tmp162,
+ 114 0050 1B88     		ldrh	r3, [r3]	@ min_igrid.7, min_igrid
+ 115 0052 6A46     		mov	r2, sp	@ tmp163,
+ 116 0054 0632     		add	r2, r2, #6	@ tmp163,
+ 117 0056 1288     		ldrh	r2, [r2]	@ tmp164, medida
+ 118 0058 9A42     		cmp	r2, r3	@ tmp164, min_igrid.7
+ 119 005a 04D2     		bcs	.L5	@,
+ 217:.\src/synchro.c **** 				min_igrid = medida;
+ 120              		.loc 1 217 0
+ 121 005c 134B     		ldr	r3, .L6+12	@ tmp165,
+ 122 005e 6A46     		mov	r2, sp	@ tmp166,
+ 123 0060 0632     		add	r2, r2, #6	@ tmp166,
+ 124 0062 1288     		ldrh	r2, [r2]	@ tmp167, medida
+ 125 0064 1A80     		strh	r2, [r3]	@ tmp167, min_igrid
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 7
+
+
+ 126              	.L5:
+ 218:.\src/synchro.c **** 
+ 219:.\src/synchro.c **** 			igrid_update_samples++;
+ 127              		.loc 1 219 0
+ 128 0066 0F4B     		ldr	r3, .L6+4	@ tmp168,
+ 129 0068 1B88     		ldrh	r3, [r3]	@ igrid_update_samples.8, igrid_update_samples
+ 130 006a 0133     		add	r3, r3, #1	@ tmp169,
+ 131 006c 9AB2     		uxth	r2, r3	@ igrid_update_samples.9, tmp169
+ 132 006e 0D4B     		ldr	r3, .L6+4	@ tmp170,
+ 133 0070 1A80     		strh	r2, [r3]	@ tmp171, igrid_update_samples
+ 134 0072 12E0     		b	.L1	@
+ 135              	.L3:
+ 220:.\src/synchro.c **** 		}
+ 221:.\src/synchro.c **** 		else
+ 222:.\src/synchro.c **** 		{
+ 223:.\src/synchro.c **** 			//paso un ciclo y un octavo completo, seguro tengo maximo y minimos cargados
+ 224:.\src/synchro.c **** 			max_igrid_last = max_igrid;
+ 136              		.loc 1 224 0
+ 137 0074 0C4B     		ldr	r3, .L6+8	@ tmp172,
+ 138 0076 1A88     		ldrh	r2, [r3]	@ max_igrid.10, max_igrid
+ 139 0078 0D4B     		ldr	r3, .L6+16	@ tmp173,
+ 140 007a 1A80     		strh	r2, [r3]	@ tmp174, max_igrid_last
+ 225:.\src/synchro.c **** 			min_igrid_last = min_igrid;
+ 141              		.loc 1 225 0
+ 142 007c 0B4B     		ldr	r3, .L6+12	@ tmp175,
+ 143 007e 1A88     		ldrh	r2, [r3]	@ min_igrid.11, min_igrid
+ 144 0080 0C4B     		ldr	r3, .L6+20	@ tmp176,
+ 145 0082 1A80     		strh	r2, [r3]	@ tmp177, min_igrid_last
+ 226:.\src/synchro.c **** 			max_igrid = 2048;
+ 146              		.loc 1 226 0
+ 147 0084 084B     		ldr	r3, .L6+8	@ tmp178,
+ 148 0086 8022     		mov	r2, #128	@ tmp187,
+ 149 0088 1201     		lsl	r2, r2, #4	@ tmp179, tmp187,
+ 150 008a 1A80     		strh	r2, [r3]	@ tmp180, max_igrid
+ 227:.\src/synchro.c **** 			min_igrid = 2048;
+ 151              		.loc 1 227 0
+ 152 008c 074B     		ldr	r3, .L6+12	@ tmp181,
+ 153 008e 8022     		mov	r2, #128	@ tmp188,
+ 154 0090 1201     		lsl	r2, r2, #4	@ tmp182, tmp188,
+ 155 0092 1A80     		strh	r2, [r3]	@ tmp183, min_igrid
+ 228:.\src/synchro.c **** 			igrid_update_samples = 0;
+ 156              		.loc 1 228 0
+ 157 0094 034B     		ldr	r3, .L6+4	@ tmp184,
+ 158 0096 0022     		mov	r2, #0	@ tmp185,
+ 159 0098 1A80     		strh	r2, [r3]	@ tmp186, igrid_update_samples
+ 160              	.L1:
+ 229:.\src/synchro.c **** 		}
+ 230:.\src/synchro.c **** 	}
+ 231:.\src/synchro.c **** }
+ 161              		.loc 1 231 0
+ 162 009a 02B0     		add	sp, sp, #8	@,,
+ 163              		@ sp needed for prologue	@
+ 164 009c 10BD     		pop	{r4, pc}
+ 165              	.L7:
+ 166 009e C046     		.align	2
+ 167              	.L6:
+ 168 00a0 00000000 		.word	igrid_timer
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 8
+
+
+ 169 00a4 00000000 		.word	igrid_update_samples
+ 170 00a8 00000000 		.word	max_igrid
+ 171 00ac 00000000 		.word	min_igrid
+ 172 00b0 00000000 		.word	max_igrid_last
+ 173 00b4 00000000 		.word	min_igrid_last
+ 174              		.cfi_endproc
+ 175              	.LFE20:
+ 176              		.size	UpdateIGrid, .-UpdateIGrid
+ 177              		.section	.text.GetIGrid,"ax",%progbits
+ 178              		.align	2
+ 179              		.global	GetIGrid
+ 180              		.code	16
+ 181              		.thumb_func
+ 182              		.type	GetIGrid, %function
+ 183              	GetIGrid:
+ 184              	.LFB21:
+ 232:.\src/synchro.c **** 
+ 233:.\src/synchro.c **** unsigned short GetIGrid (void)
+ 234:.\src/synchro.c **** {
+ 185              		.loc 1 234 0
+ 186              		.cfi_startproc
+ 187 0000 82B0     		sub	sp, sp, #8	@,,
+ 188              	.LCFI2:
+ 189              		.cfi_def_cfa_offset 8
+ 235:.\src/synchro.c **** 	unsigned short medida;
+ 236:.\src/synchro.c **** 
+ 237:.\src/synchro.c **** 	if (max_igrid_last > min_igrid_last)
+ 190              		.loc 1 237 0
+ 191 0002 0C4B     		ldr	r3, .L12	@ tmp140,
+ 192 0004 1A88     		ldrh	r2, [r3]	@ max_igrid_last.0, max_igrid_last
+ 193 0006 0C4B     		ldr	r3, .L12+4	@ tmp141,
+ 194 0008 1B88     		ldrh	r3, [r3]	@ min_igrid_last.1, min_igrid_last
+ 195 000a 9A42     		cmp	r2, r3	@ max_igrid_last.0, min_igrid_last.1
+ 196 000c 08D9     		bls	.L9	@,
+ 238:.\src/synchro.c **** 	{
+ 239:.\src/synchro.c **** 		medida = max_igrid_last - min_igrid_last;	//valor de corriente pico a pico
+ 197              		.loc 1 239 0
+ 198 000e 094B     		ldr	r3, .L12	@ tmp142,
+ 199 0010 1988     		ldrh	r1, [r3]	@ max_igrid_last.2, max_igrid_last
+ 200 0012 094B     		ldr	r3, .L12+4	@ tmp143,
+ 201 0014 1A88     		ldrh	r2, [r3]	@ min_igrid_last.3, min_igrid_last
+ 202 0016 6B46     		mov	r3, sp	@ tmp144,
+ 203 0018 0633     		add	r3, r3, #6	@ tmp144,
+ 204 001a 8A1A     		sub	r2, r1, r2	@ tmp145, max_igrid_last.2, min_igrid_last.3
+ 205 001c 1A80     		strh	r2, [r3]	@ tmp146, medida
+ 206 001e 03E0     		b	.L10	@
+ 207              	.L9:
+ 240:.\src/synchro.c **** 	}
+ 241:.\src/synchro.c **** 	else
+ 242:.\src/synchro.c **** 		medida = 0;
+ 208              		.loc 1 242 0
+ 209 0020 6B46     		mov	r3, sp	@ tmp147,
+ 210 0022 0633     		add	r3, r3, #6	@ tmp147,
+ 211 0024 0022     		mov	r2, #0	@ tmp148,
+ 212 0026 1A80     		strh	r2, [r3]	@ tmp149, medida
+ 213              	.L10:
+ 243:.\src/synchro.c **** 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 9
+
+
+ 244:.\src/synchro.c **** 	return medida;
+ 214              		.loc 1 244 0
+ 215 0028 6B46     		mov	r3, sp	@ tmp150,
+ 216 002a 0633     		add	r3, r3, #6	@ tmp150,
+ 217 002c 1B88     		ldrh	r3, [r3]	@ D.4807, medida
+ 245:.\src/synchro.c **** }
+ 218              		.loc 1 245 0
+ 219 002e 181C     		mov	r0, r3	@, <retval>
+ 220 0030 02B0     		add	sp, sp, #8	@,,
+ 221              		@ sp needed for prologue	@
+ 222 0032 7047     		bx	lr
+ 223              	.L13:
+ 224              		.align	2
+ 225              	.L12:
+ 226 0034 00000000 		.word	max_igrid_last
+ 227 0038 00000000 		.word	min_igrid_last
+ 228              		.cfi_endproc
+ 229              	.LFE21:
+ 230              		.size	GetIGrid, .-GetIGrid
+ 231              		.text
+ 232              	.Letext0:
+ 233              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.7 2013q2\\bin\\../lib/gcc/arm-none-eab
+ 234              		.section	.debug_info,"",%progbits
+ 235              	.Ldebug_info0:
+ 236 0000 27010000 		.4byte	0x127
+ 237 0004 0200     		.2byte	0x2
+ 238 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 239 000a 04       		.byte	0x4
+ 240 000b 01       		.uleb128 0x1
+ 241 000c 16010000 		.4byte	.LASF17
+ 242 0010 01       		.byte	0x1
+ 243 0011 73000000 		.4byte	.LASF18
+ 244 0015 D0000000 		.4byte	.LASF19
+ 245 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 246 001d 00000000 		.4byte	0
+ 247 0021 00000000 		.4byte	0
+ 248 0025 00000000 		.4byte	.Ldebug_line0
+ 249 0029 02       		.uleb128 0x2
+ 250 002a 01       		.byte	0x1
+ 251 002b 06       		.byte	0x6
+ 252 002c 7E010000 		.4byte	.LASF0
+ 253 0030 02       		.uleb128 0x2
+ 254 0031 01       		.byte	0x1
+ 255 0032 08       		.byte	0x8
+ 256 0033 A6000000 		.4byte	.LASF1
+ 257 0037 02       		.uleb128 0x2
+ 258 0038 02       		.byte	0x2
+ 259 0039 05       		.byte	0x5
+ 260 003a 91010000 		.4byte	.LASF2
+ 261 003e 02       		.uleb128 0x2
+ 262 003f 02       		.byte	0x2
+ 263 0040 07       		.byte	0x7
+ 264 0041 6B010000 		.4byte	.LASF3
+ 265 0045 02       		.uleb128 0x2
+ 266 0046 04       		.byte	0x4
+ 267 0047 05       		.byte	0x5
+ 268 0048 C7000000 		.4byte	.LASF4
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 10
+
+
+ 269 004c 03       		.uleb128 0x3
+ 270 004d 25000000 		.4byte	.LASF20
+ 271 0051 02       		.byte	0x2
+ 272 0052 50       		.byte	0x50
+ 273 0053 57000000 		.4byte	0x57
+ 274 0057 02       		.uleb128 0x2
+ 275 0058 04       		.byte	0x4
+ 276 0059 07       		.byte	0x7
+ 277 005a 61000000 		.4byte	.LASF5
+ 278 005e 02       		.uleb128 0x2
+ 279 005f 08       		.byte	0x8
+ 280 0060 05       		.byte	0x5
+ 281 0061 00000000 		.4byte	.LASF6
+ 282 0065 02       		.uleb128 0x2
+ 283 0066 08       		.byte	0x8
+ 284 0067 07       		.byte	0x7
+ 285 0068 83000000 		.4byte	.LASF7
+ 286 006c 04       		.uleb128 0x4
+ 287 006d 04       		.byte	0x4
+ 288 006e 05       		.byte	0x5
+ 289 006f 696E7400 		.ascii	"int\000"
+ 290 0073 02       		.uleb128 0x2
+ 291 0074 04       		.byte	0x4
+ 292 0075 07       		.byte	0x7
+ 293 0076 0E000000 		.4byte	.LASF8
+ 294 007a 02       		.uleb128 0x2
+ 295 007b 04       		.byte	0x4
+ 296 007c 07       		.byte	0x7
+ 297 007d 9B010000 		.4byte	.LASF9
+ 298 0081 05       		.uleb128 0x5
+ 299 0082 01       		.byte	0x1
+ 300 0083 9A000000 		.4byte	.LASF21
+ 301 0087 01       		.byte	0x1
+ 302 0088 C9       		.byte	0xc9
+ 303 0089 01       		.byte	0x1
+ 304 008a 00000000 		.4byte	.LFB20
+ 305 008e B8000000 		.4byte	.LFE20
+ 306 0092 00000000 		.4byte	.LLST0
+ 307 0096 01       		.byte	0x1
+ 308 0097 AA000000 		.4byte	0xaa
+ 309 009b 06       		.uleb128 0x6
+ 310 009c 8A010000 		.4byte	.LASF10
+ 311 00a0 01       		.byte	0x1
+ 312 00a1 CB       		.byte	0xcb
+ 313 00a2 3E000000 		.4byte	0x3e
+ 314 00a6 02       		.byte	0x2
+ 315 00a7 91       		.byte	0x91
+ 316 00a8 76       		.sleb128 -10
+ 317 00a9 00       		.byte	0
+ 318 00aa 07       		.uleb128 0x7
+ 319 00ab 01       		.byte	0x1
+ 320 00ac BE000000 		.4byte	.LASF22
+ 321 00b0 01       		.byte	0x1
+ 322 00b1 E9       		.byte	0xe9
+ 323 00b2 01       		.byte	0x1
+ 324 00b3 3E000000 		.4byte	0x3e
+ 325 00b7 00000000 		.4byte	.LFB21
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 11
+
+
+ 326 00bb 3C000000 		.4byte	.LFE21
+ 327 00bf 2C000000 		.4byte	.LLST1
+ 328 00c3 01       		.byte	0x1
+ 329 00c4 D7000000 		.4byte	0xd7
+ 330 00c8 06       		.uleb128 0x6
+ 331 00c9 8A010000 		.4byte	.LASF10
+ 332 00cd 01       		.byte	0x1
+ 333 00ce EB       		.byte	0xeb
+ 334 00cf 3E000000 		.4byte	0x3e
+ 335 00d3 02       		.byte	0x2
+ 336 00d4 91       		.byte	0x91
+ 337 00d5 7E       		.sleb128 -2
+ 338 00d6 00       		.byte	0
+ 339 00d7 08       		.uleb128 0x8
+ 340 00d8 52000000 		.4byte	.LASF11
+ 341 00dc 01       		.byte	0x1
+ 342 00dd 21       		.byte	0x21
+ 343 00de 3E000000 		.4byte	0x3e
+ 344 00e2 01       		.byte	0x1
+ 345 00e3 01       		.byte	0x1
+ 346 00e4 08       		.uleb128 0x8
+ 347 00e5 1B000000 		.4byte	.LASF12
+ 348 00e9 01       		.byte	0x1
+ 349 00ea 22       		.byte	0x22
+ 350 00eb 3E000000 		.4byte	0x3e
+ 351 00ef 01       		.byte	0x1
+ 352 00f0 01       		.byte	0x1
+ 353 00f1 08       		.uleb128 0x8
+ 354 00f2 2E000000 		.4byte	.LASF13
+ 355 00f6 01       		.byte	0x1
+ 356 00f7 23       		.byte	0x23
+ 357 00f8 3E000000 		.4byte	0x3e
+ 358 00fc 01       		.byte	0x1
+ 359 00fd 01       		.byte	0x1
+ 360 00fe 08       		.uleb128 0x8
+ 361 00ff B4000000 		.4byte	.LASF14
+ 362 0103 01       		.byte	0x1
+ 363 0104 24       		.byte	0x24
+ 364 0105 3E000000 		.4byte	0x3e
+ 365 0109 01       		.byte	0x1
+ 366 010a 01       		.byte	0x1
+ 367 010b 08       		.uleb128 0x8
+ 368 010c 3D000000 		.4byte	.LASF15
+ 369 0110 01       		.byte	0x1
+ 370 0111 25       		.byte	0x25
+ 371 0112 3E000000 		.4byte	0x3e
+ 372 0116 01       		.byte	0x1
+ 373 0117 01       		.byte	0x1
+ 374 0118 08       		.uleb128 0x8
+ 375 0119 5F010000 		.4byte	.LASF16
+ 376 011d 01       		.byte	0x1
+ 377 011e 26       		.byte	0x26
+ 378 011f 25010000 		.4byte	0x125
+ 379 0123 01       		.byte	0x1
+ 380 0124 01       		.byte	0x1
+ 381 0125 09       		.uleb128 0x9
+ 382 0126 30000000 		.4byte	0x30
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 12
+
+
+ 383 012a 00       		.byte	0
+ 384              		.section	.debug_abbrev,"",%progbits
+ 385              	.Ldebug_abbrev0:
+ 386 0000 01       		.uleb128 0x1
+ 387 0001 11       		.uleb128 0x11
+ 388 0002 01       		.byte	0x1
+ 389 0003 25       		.uleb128 0x25
+ 390 0004 0E       		.uleb128 0xe
+ 391 0005 13       		.uleb128 0x13
+ 392 0006 0B       		.uleb128 0xb
+ 393 0007 03       		.uleb128 0x3
+ 394 0008 0E       		.uleb128 0xe
+ 395 0009 1B       		.uleb128 0x1b
+ 396 000a 0E       		.uleb128 0xe
+ 397 000b 55       		.uleb128 0x55
+ 398 000c 06       		.uleb128 0x6
+ 399 000d 11       		.uleb128 0x11
+ 400 000e 01       		.uleb128 0x1
+ 401 000f 52       		.uleb128 0x52
+ 402 0010 01       		.uleb128 0x1
+ 403 0011 10       		.uleb128 0x10
+ 404 0012 06       		.uleb128 0x6
+ 405 0013 00       		.byte	0
+ 406 0014 00       		.byte	0
+ 407 0015 02       		.uleb128 0x2
+ 408 0016 24       		.uleb128 0x24
+ 409 0017 00       		.byte	0
+ 410 0018 0B       		.uleb128 0xb
+ 411 0019 0B       		.uleb128 0xb
+ 412 001a 3E       		.uleb128 0x3e
+ 413 001b 0B       		.uleb128 0xb
+ 414 001c 03       		.uleb128 0x3
+ 415 001d 0E       		.uleb128 0xe
+ 416 001e 00       		.byte	0
+ 417 001f 00       		.byte	0
+ 418 0020 03       		.uleb128 0x3
+ 419 0021 16       		.uleb128 0x16
+ 420 0022 00       		.byte	0
+ 421 0023 03       		.uleb128 0x3
+ 422 0024 0E       		.uleb128 0xe
+ 423 0025 3A       		.uleb128 0x3a
+ 424 0026 0B       		.uleb128 0xb
+ 425 0027 3B       		.uleb128 0x3b
+ 426 0028 0B       		.uleb128 0xb
+ 427 0029 49       		.uleb128 0x49
+ 428 002a 13       		.uleb128 0x13
+ 429 002b 00       		.byte	0
+ 430 002c 00       		.byte	0
+ 431 002d 04       		.uleb128 0x4
+ 432 002e 24       		.uleb128 0x24
+ 433 002f 00       		.byte	0
+ 434 0030 0B       		.uleb128 0xb
+ 435 0031 0B       		.uleb128 0xb
+ 436 0032 3E       		.uleb128 0x3e
+ 437 0033 0B       		.uleb128 0xb
+ 438 0034 03       		.uleb128 0x3
+ 439 0035 08       		.uleb128 0x8
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 13
+
+
+ 440 0036 00       		.byte	0
+ 441 0037 00       		.byte	0
+ 442 0038 05       		.uleb128 0x5
+ 443 0039 2E       		.uleb128 0x2e
+ 444 003a 01       		.byte	0x1
+ 445 003b 3F       		.uleb128 0x3f
+ 446 003c 0C       		.uleb128 0xc
+ 447 003d 03       		.uleb128 0x3
+ 448 003e 0E       		.uleb128 0xe
+ 449 003f 3A       		.uleb128 0x3a
+ 450 0040 0B       		.uleb128 0xb
+ 451 0041 3B       		.uleb128 0x3b
+ 452 0042 0B       		.uleb128 0xb
+ 453 0043 27       		.uleb128 0x27
+ 454 0044 0C       		.uleb128 0xc
+ 455 0045 11       		.uleb128 0x11
+ 456 0046 01       		.uleb128 0x1
+ 457 0047 12       		.uleb128 0x12
+ 458 0048 01       		.uleb128 0x1
+ 459 0049 40       		.uleb128 0x40
+ 460 004a 06       		.uleb128 0x6
+ 461 004b 9642     		.uleb128 0x2116
+ 462 004d 0C       		.uleb128 0xc
+ 463 004e 01       		.uleb128 0x1
+ 464 004f 13       		.uleb128 0x13
+ 465 0050 00       		.byte	0
+ 466 0051 00       		.byte	0
+ 467 0052 06       		.uleb128 0x6
+ 468 0053 34       		.uleb128 0x34
+ 469 0054 00       		.byte	0
+ 470 0055 03       		.uleb128 0x3
+ 471 0056 0E       		.uleb128 0xe
+ 472 0057 3A       		.uleb128 0x3a
+ 473 0058 0B       		.uleb128 0xb
+ 474 0059 3B       		.uleb128 0x3b
+ 475 005a 0B       		.uleb128 0xb
+ 476 005b 49       		.uleb128 0x49
+ 477 005c 13       		.uleb128 0x13
+ 478 005d 02       		.uleb128 0x2
+ 479 005e 0A       		.uleb128 0xa
+ 480 005f 00       		.byte	0
+ 481 0060 00       		.byte	0
+ 482 0061 07       		.uleb128 0x7
+ 483 0062 2E       		.uleb128 0x2e
+ 484 0063 01       		.byte	0x1
+ 485 0064 3F       		.uleb128 0x3f
+ 486 0065 0C       		.uleb128 0xc
+ 487 0066 03       		.uleb128 0x3
+ 488 0067 0E       		.uleb128 0xe
+ 489 0068 3A       		.uleb128 0x3a
+ 490 0069 0B       		.uleb128 0xb
+ 491 006a 3B       		.uleb128 0x3b
+ 492 006b 0B       		.uleb128 0xb
+ 493 006c 27       		.uleb128 0x27
+ 494 006d 0C       		.uleb128 0xc
+ 495 006e 49       		.uleb128 0x49
+ 496 006f 13       		.uleb128 0x13
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 14
+
+
+ 497 0070 11       		.uleb128 0x11
+ 498 0071 01       		.uleb128 0x1
+ 499 0072 12       		.uleb128 0x12
+ 500 0073 01       		.uleb128 0x1
+ 501 0074 40       		.uleb128 0x40
+ 502 0075 06       		.uleb128 0x6
+ 503 0076 9742     		.uleb128 0x2117
+ 504 0078 0C       		.uleb128 0xc
+ 505 0079 01       		.uleb128 0x1
+ 506 007a 13       		.uleb128 0x13
+ 507 007b 00       		.byte	0
+ 508 007c 00       		.byte	0
+ 509 007d 08       		.uleb128 0x8
+ 510 007e 34       		.uleb128 0x34
+ 511 007f 00       		.byte	0
+ 512 0080 03       		.uleb128 0x3
+ 513 0081 0E       		.uleb128 0xe
+ 514 0082 3A       		.uleb128 0x3a
+ 515 0083 0B       		.uleb128 0xb
+ 516 0084 3B       		.uleb128 0x3b
+ 517 0085 0B       		.uleb128 0xb
+ 518 0086 49       		.uleb128 0x49
+ 519 0087 13       		.uleb128 0x13
+ 520 0088 3F       		.uleb128 0x3f
+ 521 0089 0C       		.uleb128 0xc
+ 522 008a 3C       		.uleb128 0x3c
+ 523 008b 0C       		.uleb128 0xc
+ 524 008c 00       		.byte	0
+ 525 008d 00       		.byte	0
+ 526 008e 09       		.uleb128 0x9
+ 527 008f 35       		.uleb128 0x35
+ 528 0090 00       		.byte	0
+ 529 0091 49       		.uleb128 0x49
+ 530 0092 13       		.uleb128 0x13
+ 531 0093 00       		.byte	0
+ 532 0094 00       		.byte	0
+ 533 0095 00       		.byte	0
+ 534              		.section	.debug_loc,"",%progbits
+ 535              	.Ldebug_loc0:
+ 536              	.LLST0:
+ 537 0000 00000000 		.4byte	.LFB20
+ 538 0004 02000000 		.4byte	.LCFI0
+ 539 0008 0200     		.2byte	0x2
+ 540 000a 7D       		.byte	0x7d
+ 541 000b 00       		.sleb128 0
+ 542 000c 02000000 		.4byte	.LCFI0
+ 543 0010 04000000 		.4byte	.LCFI1
+ 544 0014 0200     		.2byte	0x2
+ 545 0016 7D       		.byte	0x7d
+ 546 0017 08       		.sleb128 8
+ 547 0018 04000000 		.4byte	.LCFI1
+ 548 001c B8000000 		.4byte	.LFE20
+ 549 0020 0200     		.2byte	0x2
+ 550 0022 7D       		.byte	0x7d
+ 551 0023 10       		.sleb128 16
+ 552 0024 00000000 		.4byte	0
+ 553 0028 00000000 		.4byte	0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 15
+
+
+ 554              	.LLST1:
+ 555 002c 00000000 		.4byte	.LFB21
+ 556 0030 02000000 		.4byte	.LCFI2
+ 557 0034 0200     		.2byte	0x2
+ 558 0036 7D       		.byte	0x7d
+ 559 0037 00       		.sleb128 0
+ 560 0038 02000000 		.4byte	.LCFI2
+ 561 003c 3C000000 		.4byte	.LFE21
+ 562 0040 0200     		.2byte	0x2
+ 563 0042 7D       		.byte	0x7d
+ 564 0043 08       		.sleb128 8
+ 565 0044 00000000 		.4byte	0
+ 566 0048 00000000 		.4byte	0
+ 567              		.section	.debug_aranges,"",%progbits
+ 568 0000 24000000 		.4byte	0x24
+ 569 0004 0200     		.2byte	0x2
+ 570 0006 00000000 		.4byte	.Ldebug_info0
+ 571 000a 04       		.byte	0x4
+ 572 000b 00       		.byte	0
+ 573 000c 0000     		.2byte	0
+ 574 000e 0000     		.2byte	0
+ 575 0010 00000000 		.4byte	.LFB20
+ 576 0014 B8000000 		.4byte	.LFE20-.LFB20
+ 577 0018 00000000 		.4byte	.LFB21
+ 578 001c 3C000000 		.4byte	.LFE21-.LFB21
+ 579 0020 00000000 		.4byte	0
+ 580 0024 00000000 		.4byte	0
+ 581              		.section	.debug_ranges,"",%progbits
+ 582              	.Ldebug_ranges0:
+ 583 0000 00000000 		.4byte	.LFB20
+ 584 0004 B8000000 		.4byte	.LFE20
+ 585 0008 00000000 		.4byte	.LFB21
+ 586 000c 3C000000 		.4byte	.LFE21
+ 587 0010 00000000 		.4byte	0
+ 588 0014 00000000 		.4byte	0
+ 589              		.section	.debug_line,"",%progbits
+ 590              	.Ldebug_line0:
+ 591 0000 EB000000 		.section	.debug_str,"MS",%progbits,1
+ 591      0200B000 
+ 591      00000201 
+ 591      FB0E0D00 
+ 591      01010101 
+ 592              	.LASF6:
+ 593 0000 6C6F6E67 		.ascii	"long long int\000"
+ 593      206C6F6E 
+ 593      6720696E 
+ 593      7400
+ 594              	.LASF8:
+ 595 000e 756E7369 		.ascii	"unsigned int\000"
+ 595      676E6564 
+ 595      20696E74 
+ 595      00
+ 596              	.LASF12:
+ 597 001b 6D61785F 		.ascii	"max_igrid\000"
+ 597      69677269 
+ 597      6400
+ 598              	.LASF20:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 16
+
+
+ 599 0025 75696E74 		.ascii	"uint32_t\000"
+ 599      33325F74 
+ 599      00
+ 600              	.LASF13:
+ 601 002e 6D696E5F 		.ascii	"min_igrid_last\000"
+ 601      69677269 
+ 601      645F6C61 
+ 601      737400
+ 602              	.LASF15:
+ 603 003d 69677269 		.ascii	"igrid_update_samples\000"
+ 603      645F7570 
+ 603      64617465 
+ 603      5F73616D 
+ 603      706C6573 
+ 604              	.LASF11:
+ 605 0052 6D61785F 		.ascii	"max_igrid_last\000"
+ 605      69677269 
+ 605      645F6C61 
+ 605      737400
+ 606              	.LASF5:
+ 607 0061 6C6F6E67 		.ascii	"long unsigned int\000"
+ 607      20756E73 
+ 607      69676E65 
+ 607      6420696E 
+ 607      7400
+ 608              	.LASF18:
+ 609 0073 2E5C7372 		.ascii	".\\src\\synchro.c\000"
+ 609      635C7379 
+ 609      6E636872 
+ 609      6F2E6300 
+ 610              	.LASF7:
+ 611 0083 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 611      206C6F6E 
+ 611      6720756E 
+ 611      7369676E 
+ 611      65642069 
+ 612              	.LASF21:
+ 613 009a 55706461 		.ascii	"UpdateIGrid\000"
+ 613      74654947 
+ 613      72696400 
+ 614              	.LASF1:
+ 615 00a6 756E7369 		.ascii	"unsigned char\000"
+ 615      676E6564 
+ 615      20636861 
+ 615      7200
+ 616              	.LASF14:
+ 617 00b4 6D696E5F 		.ascii	"min_igrid\000"
+ 617      69677269 
+ 617      6400
+ 618              	.LASF22:
+ 619 00be 47657449 		.ascii	"GetIGrid\000"
+ 619      47726964 
+ 619      00
+ 620              	.LASF4:
+ 621 00c7 6C6F6E67 		.ascii	"long int\000"
+ 621      20696E74 
+ 621      00
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 17
+
+
+ 622              	.LASF19:
+ 623 00d0 433A5C55 		.ascii	"C:\\Users\\Mariano\\Documents\\Proyectos\\eclipse_s"
+ 623      73657273 
+ 623      5C4D6172 
+ 623      69616E6F 
+ 623      5C446F63 
+ 624 00fe 746D3332 		.ascii	"tm32\\Planolux_DMX512_P1\000"
+ 624      5C506C61 
+ 624      6E6F6C75 
+ 624      785F444D 
+ 624      58353132 
+ 625              	.LASF17:
+ 626 0116 474E5520 		.ascii	"GNU C 4.7.4 20130613 (release) [ARM/embedded-4_7-br"
+ 626      4320342E 
+ 626      372E3420 
+ 626      32303133 
+ 626      30363133 
+ 627 0149 616E6368 		.ascii	"anch revision 200083]\000"
+ 627      20726576 
+ 627      6973696F 
+ 627      6E203230 
+ 627      30303833 
+ 628              	.LASF16:
+ 629 015f 69677269 		.ascii	"igrid_timer\000"
+ 629      645F7469 
+ 629      6D657200 
+ 630              	.LASF3:
+ 631 016b 73686F72 		.ascii	"short unsigned int\000"
+ 631      7420756E 
+ 631      7369676E 
+ 631      65642069 
+ 631      6E7400
+ 632              	.LASF0:
+ 633 017e 7369676E 		.ascii	"signed char\000"
+ 633      65642063 
+ 633      68617200 
+ 634              	.LASF10:
+ 635 018a 6D656469 		.ascii	"medida\000"
+ 635      646100
+ 636              	.LASF2:
+ 637 0191 73686F72 		.ascii	"short int\000"
+ 637      7420696E 
+ 637      7400
+ 638              	.LASF9:
+ 639 019b 73697A65 		.ascii	"sizetype\000"
+ 639      74797065 
+ 639      00
+ 640              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.7.4 20130613 (release) [ARM/embedded-4_7-br
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 synchro.c
+C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s:50     .text.UpdateIGrid:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s:55     .text.UpdateIGrid:00000000 UpdateIGrid
+C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s:168    .text.UpdateIGrid:000000a0 $d
+C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s:178    .text.GetIGrid:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s:183    .text.GetIGrid:00000000 GetIGrid
+C:\Users\Mariano\AppData\Local\Temp\ccPTWkUg.s:226    .text.GetIGrid:00000034 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+ReadADC1
+igrid_timer
+igrid_update_samples
+max_igrid
+min_igrid
+max_igrid_last
+min_igrid_last

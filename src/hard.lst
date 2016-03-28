@@ -1,0 +1,1427 @@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1	@ Tag_ABI_FP_denormal
+   4              		.eabi_attribute 21, 1	@ Tag_ABI_FP_exceptions
+   5              		.eabi_attribute 23, 3	@ Tag_ABI_FP_number_model
+   6              		.eabi_attribute 24, 1	@ Tag_ABI_align8_needed
+   7              		.eabi_attribute 25, 1	@ Tag_ABI_align8_preserved
+   8              		.eabi_attribute 26, 1	@ Tag_ABI_enum_size
+   9              		.eabi_attribute 30, 6	@ Tag_ABI_optimization_goals
+  10              		.eabi_attribute 34, 0	@ Tag_CPU_unaligned_access
+  11              		.eabi_attribute 18, 4	@ Tag_ABI_PCS_wchar_t
+  12              		.file	"hard.c"
+  13              	@ GNU C (GNU Tools for ARM Embedded Processors) version 4.7.4 20130613 (release) [ARM/embedded-4_7-
+  14              	@	compiled by GNU C version 4.2.1-sjlj (mingw32-2), GMP version 4.3.2, MPFR version 2.4.2, MPC vers
+  15              	@ GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+  16              	@ options passed:  -I . -I .\src -I .\cmsis_boot -I .\cmsis_core
+  17              	@ -I ..\STM32F0xx_StdPeriph_Lib_V1.3.1\Libraries\STM32F0xx_StdPeriph_Driver\inc
+  18              	@ -I .\inc -I .\cmsis_boot -imultilib armv6-m
+  19              	@ -iprefix c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../lib/gcc/arm-none-eabi/4.
+  20              	@ -isysroot c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../arm-none-eabi
+  21              	@ -MD .\src\hard.d -MF .dep\hard.o.d -MP -MQ .\src\hard.o
+  22              	@ -D__USES_INITFINI__ -D RUN_FROM_FLASH=1 .\src\hard.c -mcpu=cortex-m0
+  23              	@ -mthumb -auxbase-strip .\src\hard.o -g -gdwarf-2 -O0 -Wall
+  24              	@ -fomit-frame-pointer -fdata-sections -ffunction-sections -fverbose-asm
+  25              	@ options enabled:  -fauto-inc-dec -fbranch-count-reg -fcommon
+  26              	@ -fdata-sections -fdebug-types-section -fdelete-null-pointer-checks
+  27              	@ -fdwarf2-cfi-asm -fearly-inlining -feliminate-unused-debug-types
+  28              	@ -ffunction-cse -ffunction-sections -fgcse-lm -fgnu-runtime -fident
+  29              	@ -finline-atomics -fira-hoist-pressure -fira-share-save-slots
+  30              	@ -fira-share-spill-slots -fivopts -fkeep-static-consts
+  31              	@ -fleading-underscore -fmath-errno -fmerge-debug-strings
+  32              	@ -fmove-loop-invariants -fomit-frame-pointer -fpeephole
+  33              	@ -fprefetch-loop-arrays -freg-struct-return
+  34              	@ -fsched-critical-path-heuristic -fsched-dep-count-heuristic
+  35              	@ -fsched-group-heuristic -fsched-interblock -fsched-last-insn-heuristic
+  36              	@ -fsched-rank-heuristic -fsched-spec -fsched-spec-insn-heuristic
+  37              	@ -fsched-stalled-insns-dep -fshow-column -fsigned-zeros
+  38              	@ -fsplit-ivs-in-unroller -fstrict-volatile-bitfields -ftrapping-math
+  39              	@ -ftree-cselim -ftree-forwprop -ftree-loop-if-convert -ftree-loop-im
+  40              	@ -ftree-loop-ivcanon -ftree-loop-optimize -ftree-parallelize-loops=
+  41              	@ -ftree-phiprop -ftree-pta -ftree-reassoc -ftree-scev-cprop
+  42              	@ -ftree-slp-vectorize -ftree-vect-loop-version -funit-at-a-time
+  43              	@ -fverbose-asm -fzero-initialized-in-bss -mlittle-endian -msched-prolog
+  44              	@ -mthumb -mvectorize-with-neon-quad
+  45              	
+  46              		.text
+  47              	.Ltext0:
+  48              		.cfi_sections	.debug_frame
+  49              		.section	.text.UpdateSwitches,"ax",%progbits
+  50              		.align	2
+  51              		.global	UpdateSwitches
+  52              		.code	16
+  53              		.thumb_func
+  54              		.type	UpdateSwitches, %function
+  55              	UpdateSwitches:
+  56              	.LFB20:
+  57              		.file 1 ".\\src\\hard.c"
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 2
+
+
+   1:.\src/hard.c  **** /*
+   2:.\src/hard.c  ****  * hard.c
+   3:.\src/hard.c  ****  *
+   4:.\src/hard.c  ****  *  Created on: 11/02/2016
+   5:.\src/hard.c  ****  *      Author: Mariano
+   6:.\src/hard.c  ****  */
+   7:.\src/hard.c  **** #include "hard.h"
+   8:.\src/hard.c  **** #include "stm32f0xx.h"
+   9:.\src/hard.c  **** 
+  10:.\src/hard.c  **** // ------- Externals de los switches -------
+  11:.\src/hard.c  **** extern unsigned short s1;
+  12:.\src/hard.c  **** extern unsigned short s2;
+  13:.\src/hard.c  **** extern unsigned short sac;
+  14:.\src/hard.c  **** extern unsigned char sac_aux;
+  15:.\src/hard.c  **** 
+  16:.\src/hard.c  **** // ------- Externals de los timers -------
+  17:.\src/hard.c  **** extern volatile unsigned char switches_timer;
+  18:.\src/hard.c  **** extern volatile unsigned char acswitch_timer;
+  19:.\src/hard.c  **** 
+  20:.\src/hard.c  **** 
+  21:.\src/hard.c  **** // ------- Funciones del Modulo -------
+  22:.\src/hard.c  **** 
+  23:.\src/hard.c  **** void UpdateSwitches (void)
+  24:.\src/hard.c  **** {
+  58              		.loc 1 24 0
+  59              		.cfi_startproc
+  25:.\src/hard.c  **** 	//revisa los switches cada 10ms
+  26:.\src/hard.c  **** 	if (!switches_timer)
+  60              		.loc 1 26 0
+  61 0000 324B     		ldr	r3, .L11	@ tmp165,
+  62 0002 1B78     		ldrb	r3, [r3]	@ tmp166, switches_timer
+  63 0004 DBB2     		uxtb	r3, r3	@ switches_timer.23, tmp166
+  64 0006 002B     		cmp	r3, #0	@ switches_timer.23,
+  65 0008 00D0     		beq	.LCB8	@
+  66 000a 5EE0     		b	.L1	@long jump	@
+  67              	.LCB8:
+  27:.\src/hard.c  **** 	{
+  28:.\src/hard.c  **** 		if (S1_PIN)
+  68              		.loc 1 28 0
+  69 000c 304B     		ldr	r3, .L11+4	@ D.4680,
+  70 000e 1B8A     		ldrh	r3, [r3, #16]	@ tmp167,
+  71 0010 9BB2     		uxth	r3, r3	@ D.4681, tmp167
+  72 0012 1A1C     		mov	r2, r3	@ D.4682, D.4681
+  73 0014 0823     		mov	r3, #8	@ tmp168,
+  74 0016 1340     		and	r3, r2	@ D.4683, D.4682
+  75 0018 06D1     		bne	.L3	@,
+  29:.\src/hard.c  **** 			s1++;
+  76              		.loc 1 29 0
+  77 001a 2E4B     		ldr	r3, .L11+8	@ tmp169,
+  78 001c 1B88     		ldrh	r3, [r3]	@ s1.24, s1
+  79 001e 0133     		add	r3, r3, #1	@ tmp170,
+  80 0020 9AB2     		uxth	r2, r3	@ s1.25, tmp170
+  81 0022 2C4B     		ldr	r3, .L11+8	@ tmp171,
+  82 0024 1A80     		strh	r2, [r3]	@ tmp172, s1
+  83 0026 1FE0     		b	.L4	@
+  84              	.L3:
+  30:.\src/hard.c  **** 		else if (s1 > 50)
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 3
+
+
+  85              		.loc 1 30 0
+  86 0028 2A4B     		ldr	r3, .L11+8	@ tmp173,
+  87 002a 1B88     		ldrh	r3, [r3]	@ s1.26, s1
+  88 002c 322B     		cmp	r3, #50	@ s1.26,
+  89 002e 06D9     		bls	.L5	@,
+  31:.\src/hard.c  **** 			s1 -= 50;
+  90              		.loc 1 31 0
+  91 0030 284B     		ldr	r3, .L11+8	@ tmp174,
+  92 0032 1B88     		ldrh	r3, [r3]	@ s1.27, s1
+  93 0034 323B     		sub	r3, r3, #50	@ tmp175,
+  94 0036 9AB2     		uxth	r2, r3	@ s1.28, tmp175
+  95 0038 264B     		ldr	r3, .L11+8	@ tmp176,
+  96 003a 1A80     		strh	r2, [r3]	@ tmp177, s1
+  97 003c 14E0     		b	.L4	@
+  98              	.L5:
+  32:.\src/hard.c  **** 		else if (s1 > 10)
+  99              		.loc 1 32 0
+ 100 003e 254B     		ldr	r3, .L11+8	@ tmp178,
+ 101 0040 1B88     		ldrh	r3, [r3]	@ s1.29, s1
+ 102 0042 0A2B     		cmp	r3, #10	@ s1.29,
+ 103 0044 06D9     		bls	.L6	@,
+  33:.\src/hard.c  **** 			s1 -= 5;
+ 104              		.loc 1 33 0
+ 105 0046 234B     		ldr	r3, .L11+8	@ tmp179,
+ 106 0048 1B88     		ldrh	r3, [r3]	@ s1.30, s1
+ 107 004a 053B     		sub	r3, r3, #5	@ tmp180,
+ 108 004c 9AB2     		uxth	r2, r3	@ s1.31, tmp180
+ 109 004e 214B     		ldr	r3, .L11+8	@ tmp181,
+ 110 0050 1A80     		strh	r2, [r3]	@ tmp182, s1
+ 111 0052 09E0     		b	.L4	@
+ 112              	.L6:
+  34:.\src/hard.c  **** 		else if (s1)
+ 113              		.loc 1 34 0
+ 114 0054 1F4B     		ldr	r3, .L11+8	@ tmp183,
+ 115 0056 1B88     		ldrh	r3, [r3]	@ s1.32, s1
+ 116 0058 002B     		cmp	r3, #0	@ s1.32,
+ 117 005a 05D0     		beq	.L4	@,
+  35:.\src/hard.c  **** 			s1--;
+ 118              		.loc 1 35 0
+ 119 005c 1D4B     		ldr	r3, .L11+8	@ tmp184,
+ 120 005e 1B88     		ldrh	r3, [r3]	@ s1.33, s1
+ 121 0060 013B     		sub	r3, r3, #1	@ tmp185,
+ 122 0062 9AB2     		uxth	r2, r3	@ s1.34, tmp185
+ 123 0064 1B4B     		ldr	r3, .L11+8	@ tmp186,
+ 124 0066 1A80     		strh	r2, [r3]	@ tmp187, s1
+ 125              	.L4:
+  36:.\src/hard.c  **** 
+  37:.\src/hard.c  **** 		if (S2_PIN)
+ 126              		.loc 1 37 0
+ 127 0068 194B     		ldr	r3, .L11+4	@ D.4706,
+ 128 006a 1B8A     		ldrh	r3, [r3, #16]	@ tmp188,
+ 129 006c 9BB2     		uxth	r3, r3	@ D.4707, tmp188
+ 130 006e 1A1C     		mov	r2, r3	@ D.4708, D.4707
+ 131 0070 0223     		mov	r3, #2	@ tmp189,
+ 132 0072 1340     		and	r3, r2	@ D.4709, D.4708
+ 133 0074 06D1     		bne	.L7	@,
+  38:.\src/hard.c  **** 			s2++;
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 4
+
+
+ 134              		.loc 1 38 0
+ 135 0076 184B     		ldr	r3, .L11+12	@ tmp190,
+ 136 0078 1B88     		ldrh	r3, [r3]	@ s2.35, s2
+ 137 007a 0133     		add	r3, r3, #1	@ tmp191,
+ 138 007c 9AB2     		uxth	r2, r3	@ s2.36, tmp191
+ 139 007e 164B     		ldr	r3, .L11+12	@ tmp192,
+ 140 0080 1A80     		strh	r2, [r3]	@ tmp193, s2
+ 141 0082 1FE0     		b	.L8	@
+ 142              	.L7:
+  39:.\src/hard.c  **** 		else if (s2 > 50)
+ 143              		.loc 1 39 0
+ 144 0084 144B     		ldr	r3, .L11+12	@ tmp194,
+ 145 0086 1B88     		ldrh	r3, [r3]	@ s2.37, s2
+ 146 0088 322B     		cmp	r3, #50	@ s2.37,
+ 147 008a 06D9     		bls	.L9	@,
+  40:.\src/hard.c  **** 			s2 -= 50;
+ 148              		.loc 1 40 0
+ 149 008c 124B     		ldr	r3, .L11+12	@ tmp195,
+ 150 008e 1B88     		ldrh	r3, [r3]	@ s2.38, s2
+ 151 0090 323B     		sub	r3, r3, #50	@ tmp196,
+ 152 0092 9AB2     		uxth	r2, r3	@ s2.39, tmp196
+ 153 0094 104B     		ldr	r3, .L11+12	@ tmp197,
+ 154 0096 1A80     		strh	r2, [r3]	@ tmp198, s2
+ 155 0098 14E0     		b	.L8	@
+ 156              	.L9:
+  41:.\src/hard.c  **** 		else if (s2 > 10)
+ 157              		.loc 1 41 0
+ 158 009a 0F4B     		ldr	r3, .L11+12	@ tmp199,
+ 159 009c 1B88     		ldrh	r3, [r3]	@ s2.40, s2
+ 160 009e 0A2B     		cmp	r3, #10	@ s2.40,
+ 161 00a0 06D9     		bls	.L10	@,
+  42:.\src/hard.c  **** 			s2 -= 5;
+ 162              		.loc 1 42 0
+ 163 00a2 0D4B     		ldr	r3, .L11+12	@ tmp200,
+ 164 00a4 1B88     		ldrh	r3, [r3]	@ s2.41, s2
+ 165 00a6 053B     		sub	r3, r3, #5	@ tmp201,
+ 166 00a8 9AB2     		uxth	r2, r3	@ s2.42, tmp201
+ 167 00aa 0B4B     		ldr	r3, .L11+12	@ tmp202,
+ 168 00ac 1A80     		strh	r2, [r3]	@ tmp203, s2
+ 169 00ae 09E0     		b	.L8	@
+ 170              	.L10:
+  43:.\src/hard.c  **** 		else if (s2)
+ 171              		.loc 1 43 0
+ 172 00b0 094B     		ldr	r3, .L11+12	@ tmp204,
+ 173 00b2 1B88     		ldrh	r3, [r3]	@ s2.43, s2
+ 174 00b4 002B     		cmp	r3, #0	@ s2.43,
+ 175 00b6 05D0     		beq	.L8	@,
+  44:.\src/hard.c  **** 			s2--;
+ 176              		.loc 1 44 0
+ 177 00b8 074B     		ldr	r3, .L11+12	@ tmp205,
+ 178 00ba 1B88     		ldrh	r3, [r3]	@ s2.44, s2
+ 179 00bc 013B     		sub	r3, r3, #1	@ tmp206,
+ 180 00be 9AB2     		uxth	r2, r3	@ s2.45, tmp206
+ 181 00c0 054B     		ldr	r3, .L11+12	@ tmp207,
+ 182 00c2 1A80     		strh	r2, [r3]	@ tmp208, s2
+ 183              	.L8:
+  45:.\src/hard.c  **** 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 5
+
+
+  46:.\src/hard.c  **** 		switches_timer = SWITCHES_TIMER_RELOAD;
+ 184              		.loc 1 46 0
+ 185 00c4 014B     		ldr	r3, .L11	@ tmp209,
+ 186 00c6 0A22     		mov	r2, #10	@ tmp210,
+ 187 00c8 1A70     		strb	r2, [r3]	@ tmp211, switches_timer
+ 188              	.L1:
+  47:.\src/hard.c  **** 	}
+  48:.\src/hard.c  **** }
+ 189              		.loc 1 48 0
+ 190              		@ sp needed for prologue	@
+ 191 00ca 7047     		bx	lr
+ 192              	.L12:
+ 193              		.align	2
+ 194              	.L11:
+ 195 00cc 00000000 		.word	switches_timer
+ 196 00d0 00040048 		.word	1207960576
+ 197 00d4 00000000 		.word	s1
+ 198 00d8 00000000 		.word	s2
+ 199              		.cfi_endproc
+ 200              	.LFE20:
+ 201              		.size	UpdateSwitches, .-UpdateSwitches
+ 202              		.section	.text.UpdateACSwitch,"ax",%progbits
+ 203              		.align	2
+ 204              		.global	UpdateACSwitch
+ 205              		.code	16
+ 206              		.thumb_func
+ 207              		.type	UpdateACSwitch, %function
+ 208              	UpdateACSwitch:
+ 209              	.LFB21:
+  49:.\src/hard.c  **** 
+  50:.\src/hard.c  **** void UpdateACSwitch (void)
+  51:.\src/hard.c  **** {
+ 210              		.loc 1 51 0
+ 211              		.cfi_startproc
+  52:.\src/hard.c  **** 	//revisa el switch ac cada 12ms
+  53:.\src/hard.c  **** 	if (!acswitch_timer)
+ 212              		.loc 1 53 0
+ 213 0000 234B     		ldr	r3, .L21	@ tmp151,
+ 214 0002 1B78     		ldrb	r3, [r3]	@ tmp152, acswitch_timer
+ 215 0004 DBB2     		uxtb	r3, r3	@ acswitch_timer.9, tmp152
+ 216 0006 002B     		cmp	r3, #0	@ acswitch_timer.9,
+ 217 0008 35D1     		bne	.L14	@,
+  54:.\src/hard.c  **** 	{
+  55:.\src/hard.c  **** 		//termino ventana de 12ms
+  56:.\src/hard.c  **** 		if (sac_aux)
+ 218              		.loc 1 56 0
+ 219 000a 224B     		ldr	r3, .L21+4	@ tmp153,
+ 220 000c 1B78     		ldrb	r3, [r3]	@ sac_aux.10, sac_aux
+ 221 000e 002B     		cmp	r3, #0	@ sac_aux.10,
+ 222 0010 0DD0     		beq	.L15	@,
+  57:.\src/hard.c  **** 		{
+  58:.\src/hard.c  **** 			if (sac < AC_SWITCH_THRESHOLD_ROOF)
+ 223              		.loc 1 58 0
+ 224 0012 214B     		ldr	r3, .L21+8	@ tmp154,
+ 225 0014 1B88     		ldrh	r3, [r3]	@ sac.11, sac
+ 226 0016 FE2B     		cmp	r3, #254	@ sac.11,
+ 227 0018 05D8     		bhi	.L16	@,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 6
+
+
+  59:.\src/hard.c  **** 				sac++;
+ 228              		.loc 1 59 0
+ 229 001a 1F4B     		ldr	r3, .L21+8	@ tmp155,
+ 230 001c 1B88     		ldrh	r3, [r3]	@ sac.12, sac
+ 231 001e 0133     		add	r3, r3, #1	@ tmp156,
+ 232 0020 9AB2     		uxth	r2, r3	@ sac.13, tmp156
+ 233 0022 1D4B     		ldr	r3, .L21+8	@ tmp157,
+ 234 0024 1A80     		strh	r2, [r3]	@ tmp158, sac
+ 235              	.L16:
+  60:.\src/hard.c  **** 			sac_aux = 0;
+ 236              		.loc 1 60 0
+ 237 0026 1B4B     		ldr	r3, .L21+4	@ tmp159,
+ 238 0028 0022     		mov	r2, #0	@ tmp160,
+ 239 002a 1A70     		strb	r2, [r3]	@ tmp161, sac_aux
+ 240 002c 1FE0     		b	.L17	@
+ 241              	.L15:
+  61:.\src/hard.c  **** 		}
+  62:.\src/hard.c  **** 		else if (sac > 50)
+ 242              		.loc 1 62 0
+ 243 002e 1A4B     		ldr	r3, .L21+8	@ tmp162,
+ 244 0030 1B88     		ldrh	r3, [r3]	@ sac.14, sac
+ 245 0032 322B     		cmp	r3, #50	@ sac.14,
+ 246 0034 06D9     		bls	.L18	@,
+  63:.\src/hard.c  **** 			sac -= 50;
+ 247              		.loc 1 63 0
+ 248 0036 184B     		ldr	r3, .L21+8	@ tmp163,
+ 249 0038 1B88     		ldrh	r3, [r3]	@ sac.15, sac
+ 250 003a 323B     		sub	r3, r3, #50	@ tmp164,
+ 251 003c 9AB2     		uxth	r2, r3	@ sac.16, tmp164
+ 252 003e 164B     		ldr	r3, .L21+8	@ tmp165,
+ 253 0040 1A80     		strh	r2, [r3]	@ tmp166, sac
+ 254 0042 14E0     		b	.L17	@
+ 255              	.L18:
+  64:.\src/hard.c  **** 		else if (sac > 10)
+ 256              		.loc 1 64 0
+ 257 0044 144B     		ldr	r3, .L21+8	@ tmp167,
+ 258 0046 1B88     		ldrh	r3, [r3]	@ sac.17, sac
+ 259 0048 0A2B     		cmp	r3, #10	@ sac.17,
+ 260 004a 06D9     		bls	.L19	@,
+  65:.\src/hard.c  **** 			sac -= 5;
+ 261              		.loc 1 65 0
+ 262 004c 124B     		ldr	r3, .L21+8	@ tmp168,
+ 263 004e 1B88     		ldrh	r3, [r3]	@ sac.18, sac
+ 264 0050 053B     		sub	r3, r3, #5	@ tmp169,
+ 265 0052 9AB2     		uxth	r2, r3	@ sac.19, tmp169
+ 266 0054 104B     		ldr	r3, .L21+8	@ tmp170,
+ 267 0056 1A80     		strh	r2, [r3]	@ tmp171, sac
+ 268 0058 09E0     		b	.L17	@
+ 269              	.L19:
+  66:.\src/hard.c  **** 		else if (sac)
+ 270              		.loc 1 66 0
+ 271 005a 0F4B     		ldr	r3, .L21+8	@ tmp172,
+ 272 005c 1B88     		ldrh	r3, [r3]	@ sac.20, sac
+ 273 005e 002B     		cmp	r3, #0	@ sac.20,
+ 274 0060 05D0     		beq	.L17	@,
+  67:.\src/hard.c  **** 			sac--;
+ 275              		.loc 1 67 0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 7
+
+
+ 276 0062 0D4B     		ldr	r3, .L21+8	@ tmp173,
+ 277 0064 1B88     		ldrh	r3, [r3]	@ sac.21, sac
+ 278 0066 013B     		sub	r3, r3, #1	@ tmp174,
+ 279 0068 9AB2     		uxth	r2, r3	@ sac.22, tmp174
+ 280 006a 0B4B     		ldr	r3, .L21+8	@ tmp175,
+ 281 006c 1A80     		strh	r2, [r3]	@ tmp176, sac
+ 282              	.L17:
+  68:.\src/hard.c  **** 
+  69:.\src/hard.c  **** 		acswitch_timer = AC_SWITCH_TIMER_RELOAD;
+ 283              		.loc 1 69 0
+ 284 006e 084B     		ldr	r3, .L21	@ tmp177,
+ 285 0070 1622     		mov	r2, #22	@ tmp178,
+ 286 0072 1A70     		strb	r2, [r3]	@ tmp179, acswitch_timer
+ 287 0074 0AE0     		b	.L13	@
+ 288              	.L14:
+  70:.\src/hard.c  **** 	}
+  71:.\src/hard.c  **** 	else
+  72:.\src/hard.c  **** 	{
+  73:.\src/hard.c  **** 		if (SW_AC)
+ 289              		.loc 1 73 0
+ 290 0076 9023     		mov	r3, #144	@ tmp185,
+ 291 0078 DB05     		lsl	r3, r3, #23	@ D.4672, tmp185,
+ 292 007a 1B8A     		ldrh	r3, [r3, #16]	@ tmp180,
+ 293 007c 9BB2     		uxth	r3, r3	@ D.4673, tmp180
+ 294 007e 9BB2     		uxth	r3, r3	@ D.4674, D.4673
+ 295 0080 1BB2     		sxth	r3, r3	@ tmp181, D.4674
+ 296 0082 002B     		cmp	r3, #0	@ tmp181,
+ 297 0084 02DB     		blt	.L13	@,
+  74:.\src/hard.c  **** 			sac_aux = 1;
+ 298              		.loc 1 74 0
+ 299 0086 034B     		ldr	r3, .L21+4	@ tmp182,
+ 300 0088 0122     		mov	r2, #1	@ tmp183,
+ 301 008a 1A70     		strb	r2, [r3]	@ tmp184, sac_aux
+ 302              	.L13:
+  75:.\src/hard.c  **** 	}
+  76:.\src/hard.c  **** }
+ 303              		.loc 1 76 0
+ 304              		@ sp needed for prologue	@
+ 305 008c 7047     		bx	lr
+ 306              	.L22:
+ 307 008e C046     		.align	2
+ 308              	.L21:
+ 309 0090 00000000 		.word	acswitch_timer
+ 310 0094 00000000 		.word	sac_aux
+ 311 0098 00000000 		.word	sac
+ 312              		.cfi_endproc
+ 313              	.LFE21:
+ 314              		.size	UpdateACSwitch, .-UpdateACSwitch
+ 315              		.section	.text.CheckACSw,"ax",%progbits
+ 316              		.align	2
+ 317              		.global	CheckACSw
+ 318              		.code	16
+ 319              		.thumb_func
+ 320              		.type	CheckACSw, %function
+ 321              	CheckACSw:
+ 322              	.LFB22:
+  77:.\src/hard.c  **** 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 8
+
+
+  78:.\src/hard.c  **** unsigned char CheckACSw (void)	//cada check tiene 12ms
+  79:.\src/hard.c  **** {
+ 323              		.loc 1 79 0
+ 324              		.cfi_startproc
+  80:.\src/hard.c  **** 	if (sac > AC_SWITCH_THRESHOLD_FULL)
+ 325              		.loc 1 80 0
+ 326 0000 0A4B     		ldr	r3, .L28	@ tmp139,
+ 327 0002 1B88     		ldrh	r3, [r3]	@ sac.6, sac
+ 328 0004 882B     		cmp	r3, #136	@ sac.6,
+ 329 0006 01D9     		bls	.L24	@,
+  81:.\src/hard.c  **** 		return S_FULL;
+ 330              		.loc 1 81 0
+ 331 0008 0A23     		mov	r3, #10	@ D.4634,
+ 332 000a 0CE0     		b	.L25	@
+ 333              	.L24:
+  82:.\src/hard.c  **** 
+  83:.\src/hard.c  **** 	if (sac > AC_SWITCH_THRESHOLD_HALF)
+ 334              		.loc 1 83 0
+ 335 000c 074B     		ldr	r3, .L28	@ tmp140,
+ 336 000e 1B88     		ldrh	r3, [r3]	@ sac.7, sac
+ 337 0010 2D2B     		cmp	r3, #45	@ sac.7,
+ 338 0012 01D9     		bls	.L26	@,
+  84:.\src/hard.c  **** 		return S_HALF;
+ 339              		.loc 1 84 0
+ 340 0014 0323     		mov	r3, #3	@ D.4634,
+ 341 0016 06E0     		b	.L25	@
+ 342              	.L26:
+  85:.\src/hard.c  **** 
+  86:.\src/hard.c  **** 	if (sac > AC_SWITCH_THRESHOLD_MIN)
+ 343              		.loc 1 86 0
+ 344 0018 044B     		ldr	r3, .L28	@ tmp141,
+ 345 001a 1B88     		ldrh	r3, [r3]	@ sac.8, sac
+ 346 001c 022B     		cmp	r3, #2	@ sac.8,
+ 347 001e 01D9     		bls	.L27	@,
+  87:.\src/hard.c  **** 		return S_MIN;
+ 348              		.loc 1 87 0
+ 349 0020 0123     		mov	r3, #1	@ D.4634,
+ 350 0022 00E0     		b	.L25	@
+ 351              	.L27:
+  88:.\src/hard.c  **** 
+  89:.\src/hard.c  **** 	return S_NO;
+ 352              		.loc 1 89 0
+ 353 0024 0023     		mov	r3, #0	@ D.4634,
+ 354              	.L25:
+  90:.\src/hard.c  **** }
+ 355              		.loc 1 90 0
+ 356 0026 181C     		mov	r0, r3	@, <retval>
+ 357              		@ sp needed for prologue	@
+ 358 0028 7047     		bx	lr
+ 359              	.L29:
+ 360 002a C046     		.align	2
+ 361              	.L28:
+ 362 002c 00000000 		.word	sac
+ 363              		.cfi_endproc
+ 364              	.LFE22:
+ 365              		.size	CheckACSw, .-CheckACSw
+ 366              		.section	.text.CheckS1,"ax",%progbits
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 9
+
+
+ 367              		.align	2
+ 368              		.global	CheckS1
+ 369              		.code	16
+ 370              		.thumb_func
+ 371              		.type	CheckS1, %function
+ 372              	CheckS1:
+ 373              	.LFB23:
+  91:.\src/hard.c  **** 
+  92:.\src/hard.c  **** unsigned char CheckS1 (void)	//cada check tiene 10ms
+  93:.\src/hard.c  **** {
+ 374              		.loc 1 93 0
+ 375              		.cfi_startproc
+  94:.\src/hard.c  **** 	if (s1 > SWITCHES_THRESHOLD_FULL)
+ 376              		.loc 1 94 0
+ 377 0000 0B4B     		ldr	r3, .L35	@ tmp139,
+ 378 0002 1A88     		ldrh	r2, [r3]	@ s1.3, s1
+ 379 0004 9623     		mov	r3, #150	@ tmp144,
+ 380 0006 5B00     		lsl	r3, r3, #1	@ tmp140, tmp144,
+ 381 0008 9A42     		cmp	r2, r3	@ s1.3, tmp140
+ 382 000a 01D9     		bls	.L31	@,
+  95:.\src/hard.c  **** 		return S_FULL;
+ 383              		.loc 1 95 0
+ 384 000c 0A23     		mov	r3, #10	@ D.4623,
+ 385 000e 0CE0     		b	.L32	@
+ 386              	.L31:
+  96:.\src/hard.c  **** 
+  97:.\src/hard.c  **** 	if (s1 > SWITCHES_THRESHOLD_HALF)
+ 387              		.loc 1 97 0
+ 388 0010 074B     		ldr	r3, .L35	@ tmp141,
+ 389 0012 1B88     		ldrh	r3, [r3]	@ s1.4, s1
+ 390 0014 642B     		cmp	r3, #100	@ s1.4,
+ 391 0016 01D9     		bls	.L33	@,
+  98:.\src/hard.c  **** 		return S_HALF;
+ 392              		.loc 1 98 0
+ 393 0018 0323     		mov	r3, #3	@ D.4623,
+ 394 001a 06E0     		b	.L32	@
+ 395              	.L33:
+  99:.\src/hard.c  **** 
+ 100:.\src/hard.c  **** 	if (s1 > SWITCHES_THRESHOLD_MIN)
+ 396              		.loc 1 100 0
+ 397 001c 044B     		ldr	r3, .L35	@ tmp142,
+ 398 001e 1B88     		ldrh	r3, [r3]	@ s1.5, s1
+ 399 0020 052B     		cmp	r3, #5	@ s1.5,
+ 400 0022 01D9     		bls	.L34	@,
+ 101:.\src/hard.c  **** 		return S_MIN;
+ 401              		.loc 1 101 0
+ 402 0024 0123     		mov	r3, #1	@ D.4623,
+ 403 0026 00E0     		b	.L32	@
+ 404              	.L34:
+ 102:.\src/hard.c  **** 
+ 103:.\src/hard.c  **** 	return S_NO;
+ 405              		.loc 1 103 0
+ 406 0028 0023     		mov	r3, #0	@ D.4623,
+ 407              	.L32:
+ 104:.\src/hard.c  **** }
+ 408              		.loc 1 104 0
+ 409 002a 181C     		mov	r0, r3	@, <retval>
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 10
+
+
+ 410              		@ sp needed for prologue	@
+ 411 002c 7047     		bx	lr
+ 412              	.L36:
+ 413 002e C046     		.align	2
+ 414              	.L35:
+ 415 0030 00000000 		.word	s1
+ 416              		.cfi_endproc
+ 417              	.LFE23:
+ 418              		.size	CheckS1, .-CheckS1
+ 419              		.section	.text.CheckS2,"ax",%progbits
+ 420              		.align	2
+ 421              		.global	CheckS2
+ 422              		.code	16
+ 423              		.thumb_func
+ 424              		.type	CheckS2, %function
+ 425              	CheckS2:
+ 426              	.LFB24:
+ 105:.\src/hard.c  **** 
+ 106:.\src/hard.c  **** unsigned char CheckS2 (void)
+ 107:.\src/hard.c  **** {
+ 427              		.loc 1 107 0
+ 428              		.cfi_startproc
+ 108:.\src/hard.c  **** 	if (s2 > SWITCHES_THRESHOLD_FULL)
+ 429              		.loc 1 108 0
+ 430 0000 0B4B     		ldr	r3, .L42	@ tmp139,
+ 431 0002 1A88     		ldrh	r2, [r3]	@ s2.0, s2
+ 432 0004 9623     		mov	r3, #150	@ tmp144,
+ 433 0006 5B00     		lsl	r3, r3, #1	@ tmp140, tmp144,
+ 434 0008 9A42     		cmp	r2, r3	@ s2.0, tmp140
+ 435 000a 01D9     		bls	.L38	@,
+ 109:.\src/hard.c  **** 		return S_FULL;
+ 436              		.loc 1 109 0
+ 437 000c 0A23     		mov	r3, #10	@ D.4612,
+ 438 000e 0CE0     		b	.L39	@
+ 439              	.L38:
+ 110:.\src/hard.c  **** 
+ 111:.\src/hard.c  **** 	if (s2 > SWITCHES_THRESHOLD_HALF)
+ 440              		.loc 1 111 0
+ 441 0010 074B     		ldr	r3, .L42	@ tmp141,
+ 442 0012 1B88     		ldrh	r3, [r3]	@ s2.1, s2
+ 443 0014 642B     		cmp	r3, #100	@ s2.1,
+ 444 0016 01D9     		bls	.L40	@,
+ 112:.\src/hard.c  **** 		return S_HALF;
+ 445              		.loc 1 112 0
+ 446 0018 0323     		mov	r3, #3	@ D.4612,
+ 447 001a 06E0     		b	.L39	@
+ 448              	.L40:
+ 113:.\src/hard.c  **** 
+ 114:.\src/hard.c  **** 	if (s2 > SWITCHES_THRESHOLD_MIN)
+ 449              		.loc 1 114 0
+ 450 001c 044B     		ldr	r3, .L42	@ tmp142,
+ 451 001e 1B88     		ldrh	r3, [r3]	@ s2.2, s2
+ 452 0020 052B     		cmp	r3, #5	@ s2.2,
+ 453 0022 01D9     		bls	.L41	@,
+ 115:.\src/hard.c  **** 		return S_MIN;
+ 454              		.loc 1 115 0
+ 455 0024 0123     		mov	r3, #1	@ D.4612,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 11
+
+
+ 456 0026 00E0     		b	.L39	@
+ 457              	.L41:
+ 116:.\src/hard.c  **** 
+ 117:.\src/hard.c  **** 	return S_NO;
+ 458              		.loc 1 117 0
+ 459 0028 0023     		mov	r3, #0	@ D.4612,
+ 460              	.L39:
+ 118:.\src/hard.c  **** }
+ 461              		.loc 1 118 0
+ 462 002a 181C     		mov	r0, r3	@, <retval>
+ 463              		@ sp needed for prologue	@
+ 464 002c 7047     		bx	lr
+ 465              	.L43:
+ 466 002e C046     		.align	2
+ 467              	.L42:
+ 468 0030 00000000 		.word	s2
+ 469              		.cfi_endproc
+ 470              	.LFE24:
+ 471              		.size	CheckS2, .-CheckS2
+ 472              		.text
+ 473              	.Letext0:
+ 474              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.7 2013q2\\bin\\../lib/gcc/arm-none-eab
+ 475              		.file 3 ".\\cmsis_boot/stm32f0xx.h"
+ 476              		.section	.debug_info,"",%progbits
+ 477              	.Ldebug_info0:
+ 478 0000 56020000 		.4byte	0x256
+ 479 0004 0200     		.2byte	0x2
+ 480 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 481 000a 04       		.byte	0x4
+ 482 000b 01       		.uleb128 0x1
+ 483 000c DA000000 		.4byte	.LASF31
+ 484 0010 01       		.byte	0x1
+ 485 0011 24000000 		.4byte	.LASF32
+ 486 0015 64010000 		.4byte	.LASF33
+ 487 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 488 001d 00000000 		.4byte	0
+ 489 0021 00000000 		.4byte	0
+ 490 0025 00000000 		.4byte	.Ldebug_line0
+ 491 0029 02       		.uleb128 0x2
+ 492 002a 01       		.byte	0x1
+ 493 002b 06       		.byte	0x6
+ 494 002c DD010000 		.4byte	.LASF0
+ 495 0030 02       		.uleb128 0x2
+ 496 0031 01       		.byte	0x1
+ 497 0032 08       		.byte	0x8
+ 498 0033 4A000000 		.4byte	.LASF1
+ 499 0037 02       		.uleb128 0x2
+ 500 0038 02       		.byte	0x2
+ 501 0039 05       		.byte	0x5
+ 502 003a B9010000 		.4byte	.LASF2
+ 503 003e 03       		.uleb128 0x3
+ 504 003f C3010000 		.4byte	.LASF5
+ 505 0043 02       		.byte	0x2
+ 506 0044 36       		.byte	0x36
+ 507 0045 49000000 		.4byte	0x49
+ 508 0049 02       		.uleb128 0x2
+ 509 004a 02       		.byte	0x2
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 12
+
+
+ 510 004b 07       		.byte	0x7
+ 511 004c 76000000 		.4byte	.LASF3
+ 512 0050 02       		.uleb128 0x2
+ 513 0051 04       		.byte	0x4
+ 514 0052 05       		.byte	0x5
+ 515 0053 CC010000 		.4byte	.LASF4
+ 516 0057 03       		.uleb128 0x3
+ 517 0058 93000000 		.4byte	.LASF6
+ 518 005c 02       		.byte	0x2
+ 519 005d 50       		.byte	0x50
+ 520 005e 62000000 		.4byte	0x62
+ 521 0062 02       		.uleb128 0x2
+ 522 0063 04       		.byte	0x4
+ 523 0064 07       		.byte	0x7
+ 524 0065 AB000000 		.4byte	.LASF7
+ 525 0069 02       		.uleb128 0x2
+ 526 006a 08       		.byte	0x8
+ 527 006b 05       		.byte	0x5
+ 528 006c 56010000 		.4byte	.LASF8
+ 529 0070 02       		.uleb128 0x2
+ 530 0071 08       		.byte	0x8
+ 531 0072 07       		.byte	0x7
+ 532 0073 30010000 		.4byte	.LASF9
+ 533 0077 04       		.uleb128 0x4
+ 534 0078 04       		.byte	0x4
+ 535 0079 05       		.byte	0x5
+ 536 007a 696E7400 		.ascii	"int\000"
+ 537 007e 02       		.uleb128 0x2
+ 538 007f 04       		.byte	0x4
+ 539 0080 07       		.byte	0x7
+ 540 0081 CD000000 		.4byte	.LASF10
+ 541 0085 02       		.uleb128 0x2
+ 542 0086 04       		.byte	0x4
+ 543 0087 07       		.byte	0x7
+ 544 0088 47010000 		.4byte	.LASF11
+ 545 008c 05       		.uleb128 0x5
+ 546 008d 57000000 		.4byte	0x57
+ 547 0091 06       		.uleb128 0x6
+ 548 0092 57000000 		.4byte	0x57
+ 549 0096 A1000000 		.4byte	0xa1
+ 550 009a 07       		.uleb128 0x7
+ 551 009b 85000000 		.4byte	0x85
+ 552 009f 01       		.byte	0x1
+ 553 00a0 00       		.byte	0
+ 554 00a1 05       		.uleb128 0x5
+ 555 00a2 3E000000 		.4byte	0x3e
+ 556 00a6 08       		.uleb128 0x8
+ 557 00a7 2C       		.byte	0x2c
+ 558 00a8 03       		.byte	0x3
+ 559 00a9 6902     		.2byte	0x269
+ 560 00ab 82010000 		.4byte	0x182
+ 561 00af 09       		.uleb128 0x9
+ 562 00b0 05000000 		.4byte	.LASF12
+ 563 00b4 03       		.byte	0x3
+ 564 00b5 6B02     		.2byte	0x26b
+ 565 00b7 8C000000 		.4byte	0x8c
+ 566 00bb 02       		.byte	0x2
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 13
+
+
+ 567 00bc 23       		.byte	0x23
+ 568 00bd 00       		.uleb128 0
+ 569 00be 09       		.uleb128 0x9
+ 570 00bf 43000000 		.4byte	.LASF13
+ 571 00c3 03       		.byte	0x3
+ 572 00c4 6C02     		.2byte	0x26c
+ 573 00c6 A1000000 		.4byte	0xa1
+ 574 00ca 02       		.byte	0x2
+ 575 00cb 23       		.byte	0x23
+ 576 00cc 04       		.uleb128 0x4
+ 577 00cd 09       		.uleb128 0x9
+ 578 00ce 10000000 		.4byte	.LASF14
+ 579 00d2 03       		.byte	0x3
+ 580 00d3 6D02     		.2byte	0x26d
+ 581 00d5 3E000000 		.4byte	0x3e
+ 582 00d9 02       		.byte	0x2
+ 583 00da 23       		.byte	0x23
+ 584 00db 06       		.uleb128 0x6
+ 585 00dc 09       		.uleb128 0x9
+ 586 00dd C5000000 		.4byte	.LASF15
+ 587 00e1 03       		.byte	0x3
+ 588 00e2 6E02     		.2byte	0x26e
+ 589 00e4 8C000000 		.4byte	0x8c
+ 590 00e8 02       		.byte	0x2
+ 591 00e9 23       		.byte	0x23
+ 592 00ea 08       		.uleb128 0x8
+ 593 00eb 09       		.uleb128 0x9
+ 594 00ec 50010000 		.4byte	.LASF16
+ 595 00f0 03       		.byte	0x3
+ 596 00f1 6F02     		.2byte	0x26f
+ 597 00f3 8C000000 		.4byte	0x8c
+ 598 00f7 02       		.byte	0x2
+ 599 00f8 23       		.byte	0x23
+ 600 00f9 0C       		.uleb128 0xc
+ 601 00fa 0A       		.uleb128 0xa
+ 602 00fb 49445200 		.ascii	"IDR\000"
+ 603 00ff 03       		.byte	0x3
+ 604 0100 7002     		.2byte	0x270
+ 605 0102 A1000000 		.4byte	0xa1
+ 606 0106 02       		.byte	0x2
+ 607 0107 23       		.byte	0x23
+ 608 0108 10       		.uleb128 0x10
+ 609 0109 09       		.uleb128 0x9
+ 610 010a 1A000000 		.4byte	.LASF17
+ 611 010e 03       		.byte	0x3
+ 612 010f 7102     		.2byte	0x271
+ 613 0111 3E000000 		.4byte	0x3e
+ 614 0115 02       		.byte	0x2
+ 615 0116 23       		.byte	0x23
+ 616 0117 12       		.uleb128 0x12
+ 617 0118 0A       		.uleb128 0xa
+ 618 0119 4F445200 		.ascii	"ODR\000"
+ 619 011d 03       		.byte	0x3
+ 620 011e 7202     		.2byte	0x272
+ 621 0120 A1000000 		.4byte	0xa1
+ 622 0124 02       		.byte	0x2
+ 623 0125 23       		.byte	0x23
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 14
+
+
+ 624 0126 14       		.uleb128 0x14
+ 625 0127 09       		.uleb128 0x9
+ 626 0128 E9010000 		.4byte	.LASF18
+ 627 012c 03       		.byte	0x3
+ 628 012d 7302     		.2byte	0x273
+ 629 012f 3E000000 		.4byte	0x3e
+ 630 0133 02       		.byte	0x2
+ 631 0134 23       		.byte	0x23
+ 632 0135 16       		.uleb128 0x16
+ 633 0136 09       		.uleb128 0x9
+ 634 0137 0B000000 		.4byte	.LASF19
+ 635 013b 03       		.byte	0x3
+ 636 013c 7402     		.2byte	0x274
+ 637 013e 8C000000 		.4byte	0x8c
+ 638 0142 02       		.byte	0x2
+ 639 0143 23       		.byte	0x23
+ 640 0144 18       		.uleb128 0x18
+ 641 0145 09       		.uleb128 0x9
+ 642 0146 00000000 		.4byte	.LASF20
+ 643 014a 03       		.byte	0x3
+ 644 014b 7502     		.2byte	0x275
+ 645 014d 8C000000 		.4byte	0x8c
+ 646 0151 02       		.byte	0x2
+ 647 0152 23       		.byte	0x23
+ 648 0153 1C       		.uleb128 0x1c
+ 649 0154 0A       		.uleb128 0xa
+ 650 0155 41465200 		.ascii	"AFR\000"
+ 651 0159 03       		.byte	0x3
+ 652 015a 7602     		.2byte	0x276
+ 653 015c 82010000 		.4byte	0x182
+ 654 0160 02       		.byte	0x2
+ 655 0161 23       		.byte	0x23
+ 656 0162 20       		.uleb128 0x20
+ 657 0163 0A       		.uleb128 0xa
+ 658 0164 42525200 		.ascii	"BRR\000"
+ 659 0168 03       		.byte	0x3
+ 660 0169 7702     		.2byte	0x277
+ 661 016b A1000000 		.4byte	0xa1
+ 662 016f 02       		.byte	0x2
+ 663 0170 23       		.byte	0x23
+ 664 0171 28       		.uleb128 0x28
+ 665 0172 09       		.uleb128 0x9
+ 666 0173 31000000 		.4byte	.LASF21
+ 667 0177 03       		.byte	0x3
+ 668 0178 7802     		.2byte	0x278
+ 669 017a 3E000000 		.4byte	0x3e
+ 670 017e 02       		.byte	0x2
+ 671 017f 23       		.byte	0x23
+ 672 0180 2A       		.uleb128 0x2a
+ 673 0181 00       		.byte	0
+ 674 0182 05       		.uleb128 0x5
+ 675 0183 91000000 		.4byte	0x91
+ 676 0187 0B       		.uleb128 0xb
+ 677 0188 23010000 		.4byte	.LASF22
+ 678 018c 03       		.byte	0x3
+ 679 018d 7902     		.2byte	0x279
+ 680 018f A6000000 		.4byte	0xa6
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 15
+
+
+ 681 0193 0C       		.uleb128 0xc
+ 682 0194 01       		.byte	0x1
+ 683 0195 67000000 		.4byte	.LASF23
+ 684 0199 01       		.byte	0x1
+ 685 019a 17       		.byte	0x17
+ 686 019b 01       		.byte	0x1
+ 687 019c 00000000 		.4byte	.LFB20
+ 688 01a0 DC000000 		.4byte	.LFE20
+ 689 01a4 02       		.byte	0x2
+ 690 01a5 7D       		.byte	0x7d
+ 691 01a6 00       		.sleb128 0
+ 692 01a7 01       		.byte	0x1
+ 693 01a8 0C       		.uleb128 0xc
+ 694 01a9 01       		.byte	0x1
+ 695 01aa 9C000000 		.4byte	.LASF24
+ 696 01ae 01       		.byte	0x1
+ 697 01af 32       		.byte	0x32
+ 698 01b0 01       		.byte	0x1
+ 699 01b1 00000000 		.4byte	.LFB21
+ 700 01b5 9C000000 		.4byte	.LFE21
+ 701 01b9 02       		.byte	0x2
+ 702 01ba 7D       		.byte	0x7d
+ 703 01bb 00       		.sleb128 0
+ 704 01bc 01       		.byte	0x1
+ 705 01bd 0D       		.uleb128 0xd
+ 706 01be 01       		.byte	0x1
+ 707 01bf 89000000 		.4byte	.LASF25
+ 708 01c3 01       		.byte	0x1
+ 709 01c4 4E       		.byte	0x4e
+ 710 01c5 01       		.byte	0x1
+ 711 01c6 30000000 		.4byte	0x30
+ 712 01ca 00000000 		.4byte	.LFB22
+ 713 01ce 30000000 		.4byte	.LFE22
+ 714 01d2 02       		.byte	0x2
+ 715 01d3 7D       		.byte	0x7d
+ 716 01d4 00       		.sleb128 0
+ 717 01d5 01       		.byte	0x1
+ 718 01d6 0D       		.uleb128 0xd
+ 719 01d7 01       		.byte	0x1
+ 720 01d8 D5010000 		.4byte	.LASF26
+ 721 01dc 01       		.byte	0x1
+ 722 01dd 5C       		.byte	0x5c
+ 723 01de 01       		.byte	0x1
+ 724 01df 30000000 		.4byte	0x30
+ 725 01e3 00000000 		.4byte	.LFB23
+ 726 01e7 34000000 		.4byte	.LFE23
+ 727 01eb 02       		.byte	0x2
+ 728 01ec 7D       		.byte	0x7d
+ 729 01ed 00       		.sleb128 0
+ 730 01ee 01       		.byte	0x1
+ 731 01ef 0D       		.uleb128 0xd
+ 732 01f0 01       		.byte	0x1
+ 733 01f1 3B000000 		.4byte	.LASF27
+ 734 01f5 01       		.byte	0x1
+ 735 01f6 6A       		.byte	0x6a
+ 736 01f7 01       		.byte	0x1
+ 737 01f8 30000000 		.4byte	0x30
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 16
+
+
+ 738 01fc 00000000 		.4byte	.LFB24
+ 739 0200 34000000 		.4byte	.LFE24
+ 740 0204 02       		.byte	0x2
+ 741 0205 7D       		.byte	0x7d
+ 742 0206 00       		.sleb128 0
+ 743 0207 01       		.byte	0x1
+ 744 0208 0E       		.uleb128 0xe
+ 745 0209 733100   		.ascii	"s1\000"
+ 746 020c 01       		.byte	0x1
+ 747 020d 0B       		.byte	0xb
+ 748 020e 49000000 		.4byte	0x49
+ 749 0212 01       		.byte	0x1
+ 750 0213 01       		.byte	0x1
+ 751 0214 0E       		.uleb128 0xe
+ 752 0215 733200   		.ascii	"s2\000"
+ 753 0218 01       		.byte	0x1
+ 754 0219 0C       		.byte	0xc
+ 755 021a 49000000 		.4byte	0x49
+ 756 021e 01       		.byte	0x1
+ 757 021f 01       		.byte	0x1
+ 758 0220 0E       		.uleb128 0xe
+ 759 0221 73616300 		.ascii	"sac\000"
+ 760 0225 01       		.byte	0x1
+ 761 0226 0D       		.byte	0xd
+ 762 0227 49000000 		.4byte	0x49
+ 763 022b 01       		.byte	0x1
+ 764 022c 01       		.byte	0x1
+ 765 022d 0F       		.uleb128 0xf
+ 766 022e BD000000 		.4byte	.LASF28
+ 767 0232 01       		.byte	0x1
+ 768 0233 0E       		.byte	0xe
+ 769 0234 30000000 		.4byte	0x30
+ 770 0238 01       		.byte	0x1
+ 771 0239 01       		.byte	0x1
+ 772 023a 0F       		.uleb128 0xf
+ 773 023b 58000000 		.4byte	.LASF29
+ 774 023f 01       		.byte	0x1
+ 775 0240 11       		.byte	0x11
+ 776 0241 47020000 		.4byte	0x247
+ 777 0245 01       		.byte	0x1
+ 778 0246 01       		.byte	0x1
+ 779 0247 05       		.uleb128 0x5
+ 780 0248 30000000 		.4byte	0x30
+ 781 024c 0F       		.uleb128 0xf
+ 782 024d AA010000 		.4byte	.LASF30
+ 783 0251 01       		.byte	0x1
+ 784 0252 12       		.byte	0x12
+ 785 0253 47020000 		.4byte	0x247
+ 786 0257 01       		.byte	0x1
+ 787 0258 01       		.byte	0x1
+ 788 0259 00       		.byte	0
+ 789              		.section	.debug_abbrev,"",%progbits
+ 790              	.Ldebug_abbrev0:
+ 791 0000 01       		.uleb128 0x1
+ 792 0001 11       		.uleb128 0x11
+ 793 0002 01       		.byte	0x1
+ 794 0003 25       		.uleb128 0x25
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 17
+
+
+ 795 0004 0E       		.uleb128 0xe
+ 796 0005 13       		.uleb128 0x13
+ 797 0006 0B       		.uleb128 0xb
+ 798 0007 03       		.uleb128 0x3
+ 799 0008 0E       		.uleb128 0xe
+ 800 0009 1B       		.uleb128 0x1b
+ 801 000a 0E       		.uleb128 0xe
+ 802 000b 55       		.uleb128 0x55
+ 803 000c 06       		.uleb128 0x6
+ 804 000d 11       		.uleb128 0x11
+ 805 000e 01       		.uleb128 0x1
+ 806 000f 52       		.uleb128 0x52
+ 807 0010 01       		.uleb128 0x1
+ 808 0011 10       		.uleb128 0x10
+ 809 0012 06       		.uleb128 0x6
+ 810 0013 00       		.byte	0
+ 811 0014 00       		.byte	0
+ 812 0015 02       		.uleb128 0x2
+ 813 0016 24       		.uleb128 0x24
+ 814 0017 00       		.byte	0
+ 815 0018 0B       		.uleb128 0xb
+ 816 0019 0B       		.uleb128 0xb
+ 817 001a 3E       		.uleb128 0x3e
+ 818 001b 0B       		.uleb128 0xb
+ 819 001c 03       		.uleb128 0x3
+ 820 001d 0E       		.uleb128 0xe
+ 821 001e 00       		.byte	0
+ 822 001f 00       		.byte	0
+ 823 0020 03       		.uleb128 0x3
+ 824 0021 16       		.uleb128 0x16
+ 825 0022 00       		.byte	0
+ 826 0023 03       		.uleb128 0x3
+ 827 0024 0E       		.uleb128 0xe
+ 828 0025 3A       		.uleb128 0x3a
+ 829 0026 0B       		.uleb128 0xb
+ 830 0027 3B       		.uleb128 0x3b
+ 831 0028 0B       		.uleb128 0xb
+ 832 0029 49       		.uleb128 0x49
+ 833 002a 13       		.uleb128 0x13
+ 834 002b 00       		.byte	0
+ 835 002c 00       		.byte	0
+ 836 002d 04       		.uleb128 0x4
+ 837 002e 24       		.uleb128 0x24
+ 838 002f 00       		.byte	0
+ 839 0030 0B       		.uleb128 0xb
+ 840 0031 0B       		.uleb128 0xb
+ 841 0032 3E       		.uleb128 0x3e
+ 842 0033 0B       		.uleb128 0xb
+ 843 0034 03       		.uleb128 0x3
+ 844 0035 08       		.uleb128 0x8
+ 845 0036 00       		.byte	0
+ 846 0037 00       		.byte	0
+ 847 0038 05       		.uleb128 0x5
+ 848 0039 35       		.uleb128 0x35
+ 849 003a 00       		.byte	0
+ 850 003b 49       		.uleb128 0x49
+ 851 003c 13       		.uleb128 0x13
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 18
+
+
+ 852 003d 00       		.byte	0
+ 853 003e 00       		.byte	0
+ 854 003f 06       		.uleb128 0x6
+ 855 0040 01       		.uleb128 0x1
+ 856 0041 01       		.byte	0x1
+ 857 0042 49       		.uleb128 0x49
+ 858 0043 13       		.uleb128 0x13
+ 859 0044 01       		.uleb128 0x1
+ 860 0045 13       		.uleb128 0x13
+ 861 0046 00       		.byte	0
+ 862 0047 00       		.byte	0
+ 863 0048 07       		.uleb128 0x7
+ 864 0049 21       		.uleb128 0x21
+ 865 004a 00       		.byte	0
+ 866 004b 49       		.uleb128 0x49
+ 867 004c 13       		.uleb128 0x13
+ 868 004d 2F       		.uleb128 0x2f
+ 869 004e 0B       		.uleb128 0xb
+ 870 004f 00       		.byte	0
+ 871 0050 00       		.byte	0
+ 872 0051 08       		.uleb128 0x8
+ 873 0052 13       		.uleb128 0x13
+ 874 0053 01       		.byte	0x1
+ 875 0054 0B       		.uleb128 0xb
+ 876 0055 0B       		.uleb128 0xb
+ 877 0056 3A       		.uleb128 0x3a
+ 878 0057 0B       		.uleb128 0xb
+ 879 0058 3B       		.uleb128 0x3b
+ 880 0059 05       		.uleb128 0x5
+ 881 005a 01       		.uleb128 0x1
+ 882 005b 13       		.uleb128 0x13
+ 883 005c 00       		.byte	0
+ 884 005d 00       		.byte	0
+ 885 005e 09       		.uleb128 0x9
+ 886 005f 0D       		.uleb128 0xd
+ 887 0060 00       		.byte	0
+ 888 0061 03       		.uleb128 0x3
+ 889 0062 0E       		.uleb128 0xe
+ 890 0063 3A       		.uleb128 0x3a
+ 891 0064 0B       		.uleb128 0xb
+ 892 0065 3B       		.uleb128 0x3b
+ 893 0066 05       		.uleb128 0x5
+ 894 0067 49       		.uleb128 0x49
+ 895 0068 13       		.uleb128 0x13
+ 896 0069 38       		.uleb128 0x38
+ 897 006a 0A       		.uleb128 0xa
+ 898 006b 00       		.byte	0
+ 899 006c 00       		.byte	0
+ 900 006d 0A       		.uleb128 0xa
+ 901 006e 0D       		.uleb128 0xd
+ 902 006f 00       		.byte	0
+ 903 0070 03       		.uleb128 0x3
+ 904 0071 08       		.uleb128 0x8
+ 905 0072 3A       		.uleb128 0x3a
+ 906 0073 0B       		.uleb128 0xb
+ 907 0074 3B       		.uleb128 0x3b
+ 908 0075 05       		.uleb128 0x5
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 19
+
+
+ 909 0076 49       		.uleb128 0x49
+ 910 0077 13       		.uleb128 0x13
+ 911 0078 38       		.uleb128 0x38
+ 912 0079 0A       		.uleb128 0xa
+ 913 007a 00       		.byte	0
+ 914 007b 00       		.byte	0
+ 915 007c 0B       		.uleb128 0xb
+ 916 007d 16       		.uleb128 0x16
+ 917 007e 00       		.byte	0
+ 918 007f 03       		.uleb128 0x3
+ 919 0080 0E       		.uleb128 0xe
+ 920 0081 3A       		.uleb128 0x3a
+ 921 0082 0B       		.uleb128 0xb
+ 922 0083 3B       		.uleb128 0x3b
+ 923 0084 05       		.uleb128 0x5
+ 924 0085 49       		.uleb128 0x49
+ 925 0086 13       		.uleb128 0x13
+ 926 0087 00       		.byte	0
+ 927 0088 00       		.byte	0
+ 928 0089 0C       		.uleb128 0xc
+ 929 008a 2E       		.uleb128 0x2e
+ 930 008b 00       		.byte	0
+ 931 008c 3F       		.uleb128 0x3f
+ 932 008d 0C       		.uleb128 0xc
+ 933 008e 03       		.uleb128 0x3
+ 934 008f 0E       		.uleb128 0xe
+ 935 0090 3A       		.uleb128 0x3a
+ 936 0091 0B       		.uleb128 0xb
+ 937 0092 3B       		.uleb128 0x3b
+ 938 0093 0B       		.uleb128 0xb
+ 939 0094 27       		.uleb128 0x27
+ 940 0095 0C       		.uleb128 0xc
+ 941 0096 11       		.uleb128 0x11
+ 942 0097 01       		.uleb128 0x1
+ 943 0098 12       		.uleb128 0x12
+ 944 0099 01       		.uleb128 0x1
+ 945 009a 40       		.uleb128 0x40
+ 946 009b 0A       		.uleb128 0xa
+ 947 009c 9742     		.uleb128 0x2117
+ 948 009e 0C       		.uleb128 0xc
+ 949 009f 00       		.byte	0
+ 950 00a0 00       		.byte	0
+ 951 00a1 0D       		.uleb128 0xd
+ 952 00a2 2E       		.uleb128 0x2e
+ 953 00a3 00       		.byte	0
+ 954 00a4 3F       		.uleb128 0x3f
+ 955 00a5 0C       		.uleb128 0xc
+ 956 00a6 03       		.uleb128 0x3
+ 957 00a7 0E       		.uleb128 0xe
+ 958 00a8 3A       		.uleb128 0x3a
+ 959 00a9 0B       		.uleb128 0xb
+ 960 00aa 3B       		.uleb128 0x3b
+ 961 00ab 0B       		.uleb128 0xb
+ 962 00ac 27       		.uleb128 0x27
+ 963 00ad 0C       		.uleb128 0xc
+ 964 00ae 49       		.uleb128 0x49
+ 965 00af 13       		.uleb128 0x13
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 20
+
+
+ 966 00b0 11       		.uleb128 0x11
+ 967 00b1 01       		.uleb128 0x1
+ 968 00b2 12       		.uleb128 0x12
+ 969 00b3 01       		.uleb128 0x1
+ 970 00b4 40       		.uleb128 0x40
+ 971 00b5 0A       		.uleb128 0xa
+ 972 00b6 9742     		.uleb128 0x2117
+ 973 00b8 0C       		.uleb128 0xc
+ 974 00b9 00       		.byte	0
+ 975 00ba 00       		.byte	0
+ 976 00bb 0E       		.uleb128 0xe
+ 977 00bc 34       		.uleb128 0x34
+ 978 00bd 00       		.byte	0
+ 979 00be 03       		.uleb128 0x3
+ 980 00bf 08       		.uleb128 0x8
+ 981 00c0 3A       		.uleb128 0x3a
+ 982 00c1 0B       		.uleb128 0xb
+ 983 00c2 3B       		.uleb128 0x3b
+ 984 00c3 0B       		.uleb128 0xb
+ 985 00c4 49       		.uleb128 0x49
+ 986 00c5 13       		.uleb128 0x13
+ 987 00c6 3F       		.uleb128 0x3f
+ 988 00c7 0C       		.uleb128 0xc
+ 989 00c8 3C       		.uleb128 0x3c
+ 990 00c9 0C       		.uleb128 0xc
+ 991 00ca 00       		.byte	0
+ 992 00cb 00       		.byte	0
+ 993 00cc 0F       		.uleb128 0xf
+ 994 00cd 34       		.uleb128 0x34
+ 995 00ce 00       		.byte	0
+ 996 00cf 03       		.uleb128 0x3
+ 997 00d0 0E       		.uleb128 0xe
+ 998 00d1 3A       		.uleb128 0x3a
+ 999 00d2 0B       		.uleb128 0xb
+ 1000 00d3 3B       		.uleb128 0x3b
+ 1001 00d4 0B       		.uleb128 0xb
+ 1002 00d5 49       		.uleb128 0x49
+ 1003 00d6 13       		.uleb128 0x13
+ 1004 00d7 3F       		.uleb128 0x3f
+ 1005 00d8 0C       		.uleb128 0xc
+ 1006 00d9 3C       		.uleb128 0x3c
+ 1007 00da 0C       		.uleb128 0xc
+ 1008 00db 00       		.byte	0
+ 1009 00dc 00       		.byte	0
+ 1010 00dd 00       		.byte	0
+ 1011              		.section	.debug_aranges,"",%progbits
+ 1012 0000 3C000000 		.4byte	0x3c
+ 1013 0004 0200     		.2byte	0x2
+ 1014 0006 00000000 		.4byte	.Ldebug_info0
+ 1015 000a 04       		.byte	0x4
+ 1016 000b 00       		.byte	0
+ 1017 000c 0000     		.2byte	0
+ 1018 000e 0000     		.2byte	0
+ 1019 0010 00000000 		.4byte	.LFB20
+ 1020 0014 DC000000 		.4byte	.LFE20-.LFB20
+ 1021 0018 00000000 		.4byte	.LFB21
+ 1022 001c 9C000000 		.4byte	.LFE21-.LFB21
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 21
+
+
+ 1023 0020 00000000 		.4byte	.LFB22
+ 1024 0024 30000000 		.4byte	.LFE22-.LFB22
+ 1025 0028 00000000 		.4byte	.LFB23
+ 1026 002c 34000000 		.4byte	.LFE23-.LFB23
+ 1027 0030 00000000 		.4byte	.LFB24
+ 1028 0034 34000000 		.4byte	.LFE24-.LFB24
+ 1029 0038 00000000 		.4byte	0
+ 1030 003c 00000000 		.4byte	0
+ 1031              		.section	.debug_ranges,"",%progbits
+ 1032              	.Ldebug_ranges0:
+ 1033 0000 00000000 		.4byte	.LFB20
+ 1034 0004 DC000000 		.4byte	.LFE20
+ 1035 0008 00000000 		.4byte	.LFB21
+ 1036 000c 9C000000 		.4byte	.LFE21
+ 1037 0010 00000000 		.4byte	.LFB22
+ 1038 0014 30000000 		.4byte	.LFE22
+ 1039 0018 00000000 		.4byte	.LFB23
+ 1040 001c 34000000 		.4byte	.LFE23
+ 1041 0020 00000000 		.4byte	.LFB24
+ 1042 0024 34000000 		.4byte	.LFE24
+ 1043 0028 00000000 		.4byte	0
+ 1044 002c 00000000 		.4byte	0
+ 1045              		.section	.debug_line,"",%progbits
+ 1046              	.Ldebug_line0:
+ 1047 0000 57010000 		.section	.debug_str,"MS",%progbits,1
+ 1047      0200C900 
+ 1047      00000201 
+ 1047      FB0E0D00 
+ 1047      01010101 
+ 1048              	.LASF20:
+ 1049 0000 4C434B52 		.ascii	"LCKR\000"
+ 1049      00
+ 1050              	.LASF12:
+ 1051 0005 4D4F4445 		.ascii	"MODER\000"
+ 1051      5200
+ 1052              	.LASF19:
+ 1053 000b 42535252 		.ascii	"BSRR\000"
+ 1053      00
+ 1054              	.LASF14:
+ 1055 0010 52455345 		.ascii	"RESERVED0\000"
+ 1055      52564544 
+ 1055      3000
+ 1056              	.LASF17:
+ 1057 001a 52455345 		.ascii	"RESERVED1\000"
+ 1057      52564544 
+ 1057      3100
+ 1058              	.LASF32:
+ 1059 0024 2E5C7372 		.ascii	".\\src\\hard.c\000"
+ 1059      635C6861 
+ 1059      72642E63 
+ 1059      00
+ 1060              	.LASF21:
+ 1061 0031 52455345 		.ascii	"RESERVED3\000"
+ 1061      52564544 
+ 1061      3300
+ 1062              	.LASF27:
+ 1063 003b 43686563 		.ascii	"CheckS2\000"
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 22
+
+
+ 1063      6B533200 
+ 1064              	.LASF13:
+ 1065 0043 4F545950 		.ascii	"OTYPER\000"
+ 1065      455200
+ 1066              	.LASF1:
+ 1067 004a 756E7369 		.ascii	"unsigned char\000"
+ 1067      676E6564 
+ 1067      20636861 
+ 1067      7200
+ 1068              	.LASF29:
+ 1069 0058 73776974 		.ascii	"switches_timer\000"
+ 1069      63686573 
+ 1069      5F74696D 
+ 1069      657200
+ 1070              	.LASF23:
+ 1071 0067 55706461 		.ascii	"UpdateSwitches\000"
+ 1071      74655377 
+ 1071      69746368 
+ 1071      657300
+ 1072              	.LASF3:
+ 1073 0076 73686F72 		.ascii	"short unsigned int\000"
+ 1073      7420756E 
+ 1073      7369676E 
+ 1073      65642069 
+ 1073      6E7400
+ 1074              	.LASF25:
+ 1075 0089 43686563 		.ascii	"CheckACSw\000"
+ 1075      6B414353 
+ 1075      7700
+ 1076              	.LASF6:
+ 1077 0093 75696E74 		.ascii	"uint32_t\000"
+ 1077      33325F74 
+ 1077      00
+ 1078              	.LASF24:
+ 1079 009c 55706461 		.ascii	"UpdateACSwitch\000"
+ 1079      74654143 
+ 1079      53776974 
+ 1079      636800
+ 1080              	.LASF7:
+ 1081 00ab 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1081      20756E73 
+ 1081      69676E65 
+ 1081      6420696E 
+ 1081      7400
+ 1082              	.LASF28:
+ 1083 00bd 7361635F 		.ascii	"sac_aux\000"
+ 1083      61757800 
+ 1084              	.LASF15:
+ 1085 00c5 4F535045 		.ascii	"OSPEEDR\000"
+ 1085      45445200 
+ 1086              	.LASF10:
+ 1087 00cd 756E7369 		.ascii	"unsigned int\000"
+ 1087      676E6564 
+ 1087      20696E74 
+ 1087      00
+ 1088              	.LASF31:
+ 1089 00da 474E5520 		.ascii	"GNU C 4.7.4 20130613 (release) [ARM/embedded-4_7-br"
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 23
+
+
+ 1089      4320342E 
+ 1089      372E3420 
+ 1089      32303133 
+ 1089      30363133 
+ 1090 010d 616E6368 		.ascii	"anch revision 200083]\000"
+ 1090      20726576 
+ 1090      6973696F 
+ 1090      6E203230 
+ 1090      30303833 
+ 1091              	.LASF22:
+ 1092 0123 4750494F 		.ascii	"GPIO_TypeDef\000"
+ 1092      5F547970 
+ 1092      65446566 
+ 1092      00
+ 1093              	.LASF9:
+ 1094 0130 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1094      206C6F6E 
+ 1094      6720756E 
+ 1094      7369676E 
+ 1094      65642069 
+ 1095              	.LASF11:
+ 1096 0147 73697A65 		.ascii	"sizetype\000"
+ 1096      74797065 
+ 1096      00
+ 1097              	.LASF16:
+ 1098 0150 50555044 		.ascii	"PUPDR\000"
+ 1098      5200
+ 1099              	.LASF8:
+ 1100 0156 6C6F6E67 		.ascii	"long long int\000"
+ 1100      206C6F6E 
+ 1100      6720696E 
+ 1100      7400
+ 1101              	.LASF33:
+ 1102 0164 433A5C55 		.ascii	"C:\\Users\\Mariano\\Documents\\Proyectos\\eclipse_s"
+ 1102      73657273 
+ 1102      5C4D6172 
+ 1102      69616E6F 
+ 1102      5C446F63 
+ 1103 0192 746D3332 		.ascii	"tm32\\Planolux_DMX512_P1\000"
+ 1103      5C506C61 
+ 1103      6E6F6C75 
+ 1103      785F444D 
+ 1103      58353132 
+ 1104              	.LASF30:
+ 1105 01aa 61637377 		.ascii	"acswitch_timer\000"
+ 1105      69746368 
+ 1105      5F74696D 
+ 1105      657200
+ 1106              	.LASF2:
+ 1107 01b9 73686F72 		.ascii	"short int\000"
+ 1107      7420696E 
+ 1107      7400
+ 1108              	.LASF5:
+ 1109 01c3 75696E74 		.ascii	"uint16_t\000"
+ 1109      31365F74 
+ 1109      00
+ 1110              	.LASF4:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 24
+
+
+ 1111 01cc 6C6F6E67 		.ascii	"long int\000"
+ 1111      20696E74 
+ 1111      00
+ 1112              	.LASF26:
+ 1113 01d5 43686563 		.ascii	"CheckS1\000"
+ 1113      6B533100 
+ 1114              	.LASF0:
+ 1115 01dd 7369676E 		.ascii	"signed char\000"
+ 1115      65642063 
+ 1115      68617200 
+ 1116              	.LASF18:
+ 1117 01e9 52455345 		.ascii	"RESERVED2\000"
+ 1117      52564544 
+ 1117      3200
+ 1118              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.7.4 20130613 (release) [ARM/embedded-4_7-br
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s 			page 25
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 hard.c
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:50     .text.UpdateSwitches:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:55     .text.UpdateSwitches:00000000 UpdateSwitches
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:195    .text.UpdateSwitches:000000cc $d
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:203    .text.UpdateACSwitch:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:208    .text.UpdateACSwitch:00000000 UpdateACSwitch
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:309    .text.UpdateACSwitch:00000090 $d
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:316    .text.CheckACSw:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:321    .text.CheckACSw:00000000 CheckACSw
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:362    .text.CheckACSw:0000002c $d
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:367    .text.CheckS1:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:372    .text.CheckS1:00000000 CheckS1
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:415    .text.CheckS1:00000030 $d
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:420    .text.CheckS2:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:425    .text.CheckS2:00000000 CheckS2
+C:\Users\Mariano\AppData\Local\Temp\ccYdFTRI.s:468    .text.CheckS2:00000030 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+switches_timer
+s1
+s2
+acswitch_timer
+sac_aux
+sac

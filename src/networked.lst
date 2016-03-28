@@ -1,0 +1,2568 @@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1	@ Tag_ABI_FP_denormal
+   4              		.eabi_attribute 21, 1	@ Tag_ABI_FP_exceptions
+   5              		.eabi_attribute 23, 3	@ Tag_ABI_FP_number_model
+   6              		.eabi_attribute 24, 1	@ Tag_ABI_align8_needed
+   7              		.eabi_attribute 25, 1	@ Tag_ABI_align8_preserved
+   8              		.eabi_attribute 26, 1	@ Tag_ABI_enum_size
+   9              		.eabi_attribute 30, 6	@ Tag_ABI_optimization_goals
+  10              		.eabi_attribute 34, 0	@ Tag_CPU_unaligned_access
+  11              		.eabi_attribute 18, 4	@ Tag_ABI_PCS_wchar_t
+  12              		.file	"networked.c"
+  13              	@ GNU C (GNU Tools for ARM Embedded Processors) version 4.7.4 20130613 (release) [ARM/embedded-4_7-
+  14              	@	compiled by GNU C version 4.2.1-sjlj (mingw32-2), GMP version 4.3.2, MPFR version 2.4.2, MPC vers
+  15              	@ GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+  16              	@ options passed:  -I . -I .\src -I .\cmsis_boot -I .\cmsis_core
+  17              	@ -I ..\STM32F0xx_StdPeriph_Lib_V1.3.1\Libraries\STM32F0xx_StdPeriph_Driver\inc
+  18              	@ -I .\inc -I .\cmsis_boot -imultilib armv6-m
+  19              	@ -iprefix c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../lib/gcc/arm-none-eabi/4.
+  20              	@ -isysroot c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../arm-none-eabi
+  21              	@ -MD .\src\networked.d -MF .dep\networked.o.d -MP -MQ .\src\networked.o
+  22              	@ -D__USES_INITFINI__ -D RUN_FROM_FLASH=1 .\src\networked.c -mcpu=cortex-m0
+  23              	@ -mthumb -auxbase-strip .\src\networked.o -g -gdwarf-2 -O0 -Wall
+  24              	@ -fomit-frame-pointer -fdata-sections -ffunction-sections -fverbose-asm
+  25              	@ options enabled:  -fauto-inc-dec -fbranch-count-reg -fcommon
+  26              	@ -fdata-sections -fdebug-types-section -fdelete-null-pointer-checks
+  27              	@ -fdwarf2-cfi-asm -fearly-inlining -feliminate-unused-debug-types
+  28              	@ -ffunction-cse -ffunction-sections -fgcse-lm -fgnu-runtime -fident
+  29              	@ -finline-atomics -fira-hoist-pressure -fira-share-save-slots
+  30              	@ -fira-share-spill-slots -fivopts -fkeep-static-consts
+  31              	@ -fleading-underscore -fmath-errno -fmerge-debug-strings
+  32              	@ -fmove-loop-invariants -fomit-frame-pointer -fpeephole
+  33              	@ -fprefetch-loop-arrays -freg-struct-return
+  34              	@ -fsched-critical-path-heuristic -fsched-dep-count-heuristic
+  35              	@ -fsched-group-heuristic -fsched-interblock -fsched-last-insn-heuristic
+  36              	@ -fsched-rank-heuristic -fsched-spec -fsched-spec-insn-heuristic
+  37              	@ -fsched-stalled-insns-dep -fshow-column -fsigned-zeros
+  38              	@ -fsplit-ivs-in-unroller -fstrict-volatile-bitfields -ftrapping-math
+  39              	@ -ftree-cselim -ftree-forwprop -ftree-loop-if-convert -ftree-loop-im
+  40              	@ -ftree-loop-ivcanon -ftree-loop-optimize -ftree-parallelize-loops=
+  41              	@ -ftree-phiprop -ftree-pta -ftree-reassoc -ftree-scev-cprop
+  42              	@ -ftree-slp-vectorize -ftree-vect-loop-version -funit-at-a-time
+  43              	@ -fverbose-asm -fzero-initialized-in-bss -mlittle-endian -msched-prolog
+  44              	@ -mthumb -mvectorize-with-neon-quad
+  45              	
+  46              		.text
+  47              	.Ltext0:
+  48              		.cfi_sections	.debug_frame
+  49              		.global	networked_state
+  50              		.section	.bss.networked_state,"aw",%nobits
+  51              		.type	networked_state, %object
+  52              		.size	networked_state, 1
+  53              	networked_state:
+  54 0000 00       		.space	1
+  55              		.global	networked_selections
+  56              		.section	.bss.networked_selections,"aw",%nobits
+  57              		.type	networked_selections, %object
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 2
+
+
+  58              		.size	networked_selections, 1
+  59              	networked_selections:
+  60 0000 00       		.space	1
+  61              		.global	networked_ii
+  62              		.section	.bss.networked_ii,"aw",%nobits
+  63              		.align	1
+  64              		.type	networked_ii, %object
+  65              		.size	networked_ii, 2
+  66              	networked_ii:
+  67 0000 0000     		.space	2
+  68              		.global	networked_menu_state
+  69              		.section	.bss.networked_menu_state,"aw",%nobits
+  70              		.type	networked_menu_state, %object
+  71              		.size	networked_menu_state, 1
+  72              	networked_menu_state:
+  73 0000 00       		.space	1
+  74              		.comm	NetworkedStruct_local,4,4
+  75              		.global	networked_dim_last
+  76              		.section	.bss.networked_dim_last,"aw",%nobits
+  77              		.type	networked_dim_last, %object
+  78              		.size	networked_dim_last, 1
+  79              	networked_dim_last:
+  80 0000 00       		.space	1
+  81              		.global	networked_dim2_last
+  82              		.section	.bss.networked_dim2_last,"aw",%nobits
+  83              		.type	networked_dim2_last, %object
+  84              		.size	networked_dim2_last, 1
+  85              	networked_dim2_last:
+  86 0000 00       		.space	1
+  87              		.section	.rodata
+  88              		.align	2
+  89              	.LC5:
+  90 0000 4E657477 		.ascii	"Networking Mode \000"
+  90      6F726B69 
+  90      6E67204D 
+  90      6F646520 
+  90      00
+  91 0011 000000   		.align	2
+  92              	.LC7:
+  93 0014 4368616E 		.ascii	"Channel: %3d\000"
+  93      6E656C3A 
+  93      20253364 
+  93      00
+  94              		.global	__aeabi_uidiv
+  95 0021 000000   		.align	2
+  96              	.LC15:
+  97 0024 25336400 		.ascii	"%3d\000"
+  98              		.align	2
+  99              	.LC17:
+ 100 0028 2500     		.ascii	"%\000"
+ 101 002a 0000     		.align	2
+ 102              	.LC20:
+ 103 002c 20202020 		.ascii	"            \000"
+ 103      20202020 
+ 103      20202020 
+ 103      00
+ 104 0039 000000   		.align	2
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 3
+
+
+ 105              	.LC22:
+ 106 003c 4E657477 		.ascii	"Network Ch: %3d \000"
+ 106      6F726B20 
+ 106      43683A20 
+ 106      25336420 
+ 106      00
+ 107 004d 000000   		.align	2
+ 108              	.LC24:
+ 109 0050 536F6D65 		.ascii	"Something Select\000"
+ 109      7468696E 
+ 109      67205365 
+ 109      6C656374 
+ 109      00
+ 110 0061 000000   		.align	2
+ 111              	.LC26:
+ 112 0064 55706461 		.ascii	"Updating Values\000"
+ 112      74696E67 
+ 112      2056616C 
+ 112      75657300 
+ 113              		.align	2
+ 114              	.LC28:
+ 115 0074 77616974 		.ascii	"wait to free    \000"
+ 115      20746F20 
+ 115      66726565 
+ 115      20202020 
+ 115      00
+ 116              		.section	.text.FuncNetworked,"ax",%progbits
+ 117              		.align	2
+ 118              		.global	FuncNetworked
+ 119              		.code	16
+ 120              		.thumb_func
+ 121              		.type	FuncNetworked, %function
+ 122              	FuncNetworked:
+ 123              	.LFB20:
+ 124              		.file 1 ".\\src\\networked.c"
+   1:.\src/networked.c **** /*
+   2:.\src/networked.c ****  * networked.c
+   3:.\src/networked.c ****  *
+   4:.\src/networked.c ****  *  Created on: 21/03/2016
+   5:.\src/networked.c ****  *      Author: Mariano
+   6:.\src/networked.c ****  */
+   7:.\src/networked.c **** 
+   8:.\src/networked.c **** #include "networked.h"
+   9:.\src/networked.c **** #include "lcd.h"
+  10:.\src/networked.c **** #include "main_menu.h"
+  11:.\src/networked.c **** #include "hard.h"
+  12:.\src/networked.c **** #include "stm32f0xx.h"
+  13:.\src/networked.c **** #include "stm32f0x_gpio.h"
+  14:.\src/networked.c **** 
+  15:.\src/networked.c **** #include <stdio.h>
+  16:.\src/networked.c **** #include <string.h>
+  17:.\src/networked.c **** 
+  18:.\src/networked.c **** 
+  19:.\src/networked.c **** /* Externals variables ---------------------------------------------------------*/
+  20:.\src/networked.c **** //extern volatile unsigned short grouped_timer;
+  21:.\src/networked.c **** //extern volatile unsigned short grouped_enable_menu_timer;
+  22:.\src/networked.c **** extern Networked_Typedef NetworkedStruct_constant;
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 4
+
+
+  23:.\src/networked.c **** 
+  24:.\src/networked.c **** extern volatile unsigned short standalone_timer;
+  25:.\src/networked.c **** extern volatile unsigned short standalone_enable_menu_timer;
+  26:.\src/networked.c **** 
+  27:.\src/networked.c **** 
+  28:.\src/networked.c **** #define networked_timer standalone_timer
+  29:.\src/networked.c **** #define networked_enable_menu_timer standalone_enable_menu_timer
+  30:.\src/networked.c **** 
+  31:.\src/networked.c **** extern const char * s_blank_line [];
+  32:.\src/networked.c **** 
+  33:.\src/networked.c **** extern volatile unsigned char Packet_Detected_Flag;
+  34:.\src/networked.c **** extern volatile unsigned short DMX_channel_selected;
+  35:.\src/networked.c **** extern volatile unsigned char DMX_channel_quantity;
+  36:.\src/networked.c **** 
+  37:.\src/networked.c **** #define SIZEOF_DATA1	512
+  38:.\src/networked.c **** extern volatile unsigned char data1[];
+  39:.\src/networked.c **** extern volatile unsigned char data[];
+  40:.\src/networked.c **** 
+  41:.\src/networked.c **** /* Global variables ------------------------------------------------------------*/
+  42:.\src/networked.c **** unsigned char networked_state = 0;			//TODO: esto puede compartir RAM con standalone
+  43:.\src/networked.c **** unsigned char networked_selections = 0;
+  44:.\src/networked.c **** unsigned short networked_ii = 0;
+  45:.\src/networked.c **** 
+  46:.\src/networked.c **** unsigned char networked_menu_state = 0;
+  47:.\src/networked.c **** 
+  48:.\src/networked.c **** 
+  49:.\src/networked.c **** 
+  50:.\src/networked.c **** 
+  51:.\src/networked.c **** 
+  52:.\src/networked.c **** Networked_Typedef NetworkedStruct_local;
+  53:.\src/networked.c **** 
+  54:.\src/networked.c **** #define grouped_dimming_top GroupedStruct_local.max_dimmer_value_dmx
+  55:.\src/networked.c **** 
+  56:.\src/networked.c **** unsigned char networked_dim_last = 0;
+  57:.\src/networked.c **** unsigned char networked_dim2_last = 0;
+  58:.\src/networked.c **** 
+  59:.\src/networked.c **** 
+  60:.\src/networked.c **** //-------- Functions -------------
+  61:.\src/networked.c **** unsigned char FuncNetworked (unsigned char jump_menu)
+  62:.\src/networked.c **** {
+ 125              		.loc 1 62 0
+ 126              		.cfi_startproc
+ 127 0000 10B5     		push	{r4, lr}	@
+ 128              	.LCFI0:
+ 129              		.cfi_def_cfa_offset 8
+ 130              		.cfi_offset 4, -8
+ 131              		.cfi_offset 14, -4
+ 132 0002 8AB0     		sub	sp, sp, #40	@,,
+ 133              	.LCFI1:
+ 134              		.cfi_def_cfa_offset 48
+ 135 0004 021C     		mov	r2, r0	@ tmp178, jump_menu
+ 136 0006 6B46     		mov	r3, sp	@ tmp179,
+ 137 0008 0733     		add	r3, r3, #7	@ tmp179,
+ 138 000a 1A70     		strb	r2, [r3]	@ tmp180, jump_menu
+  63:.\src/networked.c **** 	unsigned char resp = RESP_CONTINUE;
+ 139              		.loc 1 63 0
+ 140 000c 6B46     		mov	r3, sp	@ tmp181,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 5
+
+
+ 141 000e 2733     		add	r3, r3, #39	@ tmp181,
+ 142 0010 0022     		mov	r2, #0	@ tmp182,
+ 143 0012 1A70     		strb	r2, [r3]	@ tmp183, resp
+  64:.\src/networked.c **** 	unsigned char resp_down = RESP_CONTINUE;
+ 144              		.loc 1 64 0
+ 145 0014 6B46     		mov	r3, sp	@ tmp184,
+ 146 0016 2333     		add	r3, r3, #35	@ tmp184,
+ 147 0018 0022     		mov	r2, #0	@ tmp185,
+ 148 001a 1A70     		strb	r2, [r3]	@ tmp186, resp_down
+  65:.\src/networked.c **** 	char s_lcd [20];
+  66:.\src/networked.c **** 
+  67:.\src/networked.c **** 	if (jump_menu == RESP_YES)
+ 149              		.loc 1 67 0
+ 150 001c 6B46     		mov	r3, sp	@ tmp187,
+ 151 001e 0733     		add	r3, r3, #7	@ tmp187,
+ 152 0020 1B78     		ldrb	r3, [r3]	@ tmp188, jump_menu
+ 153 0022 0B2B     		cmp	r3, #11	@ tmp188,
+ 154 0024 03D1     		bne	.L2	@,
+  68:.\src/networked.c **** 		networked_enable_menu_timer = 0;	//no muestro el menu
+ 155              		.loc 1 68 0
+ 156 0026 CE4B     		ldr	r3, .L44	@ tmp189,
+ 157 0028 0022     		mov	r2, #0	@ tmp190,
+ 158 002a 1A80     		strh	r2, [r3]	@ tmp191, standalone_enable_menu_timer
+ 159 002c 07E0     		b	.L3	@
+ 160              	.L2:
+  69:.\src/networked.c **** 	else if (jump_menu == RESP_NO)
+ 161              		.loc 1 69 0
+ 162 002e 6B46     		mov	r3, sp	@ tmp192,
+ 163 0030 0733     		add	r3, r3, #7	@ tmp192,
+ 164 0032 1B78     		ldrb	r3, [r3]	@ tmp193, jump_menu
+ 165 0034 0C2B     		cmp	r3, #12	@ tmp193,
+ 166 0036 02D1     		bne	.L3	@,
+  70:.\src/networked.c **** 		networked_enable_menu_timer = 30000;	//muestro el menu durante 30 segs
+ 167              		.loc 1 70 0
+ 168 0038 C94B     		ldr	r3, .L44	@ tmp194,
+ 169 003a CA4A     		ldr	r2, .L44+4	@ tmp195,
+ 170 003c 1A80     		strh	r2, [r3]	@ tmp196, standalone_enable_menu_timer
+ 171              	.L3:
+  71:.\src/networked.c **** 
+  72:.\src/networked.c **** 
+  73:.\src/networked.c **** 	switch (networked_state)
+ 172              		.loc 1 73 0
+ 173 003e CA4B     		ldr	r3, .L44+8	@ tmp197,
+ 174 0040 1B78     		ldrb	r3, [r3]	@ networked_state.1, networked_state
+ 175 0042 012B     		cmp	r3, #1	@ D.5831,
+ 176 0044 57D0     		beq	.L6	@,
+ 177 0046 02DC     		bgt	.L9	@,
+ 178 0048 002B     		cmp	r3, #0	@ D.5831,
+ 179 004a 05D0     		beq	.L5	@,
+ 180 004c F0E0     		b	.L4	@
+ 181              	.L9:
+ 182 004e 022B     		cmp	r3, #2	@ D.5831,
+ 183 0050 1CD0     		beq	.L7	@,
+ 184 0052 142B     		cmp	r3, #20	@ D.5831,
+ 185 0054 37D0     		beq	.L8	@,
+ 186 0056 EBE0     		b	.L4	@
+ 187              	.L5:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 6
+
+
+  74:.\src/networked.c **** 	{
+  75:.\src/networked.c **** 		case NETWORKED_INIT:
+  76:.\src/networked.c **** 			//un segundo la pantalla principal
+  77:.\src/networked.c **** 			//networked_timer = 1000;
+  78:.\src/networked.c **** 			//TODO: leer estructura y verificar funcion cargar valore sdefualt o ultimos seleccioneados
+  79:.\src/networked.c **** 			memcpy(&NetworkedStruct_local, &NetworkedStruct_constant, sizeof(NetworkedStruct_local));
+ 188              		.loc 1 79 0
+ 189 0058 C44A     		ldr	r2, .L44+12	@ tmp198,
+ 190 005a C54B     		ldr	r3, .L44+16	@ tmp199,
+ 191 005c 111C     		mov	r1, r2	@ tmp200, tmp198
+ 192 005e 1A1C     		mov	r2, r3	@ tmp201, tmp199
+ 193 0060 0423     		mov	r3, #4	@ tmp202,
+ 194 0062 081C     		mov	r0, r1	@, tmp200
+ 195 0064 111C     		mov	r1, r2	@, tmp201
+ 196 0066 1A1C     		mov	r2, r3	@, tmp202
+ 197 0068 FFF7FEFF 		bl	memcpy	@
+  80:.\src/networked.c **** 
+  81:.\src/networked.c **** 			if (!networked_enable_menu_timer)	//muestro configuracion inicial
+ 198              		.loc 1 81 0
+ 199 006c BC4B     		ldr	r3, .L44	@ tmp205,
+ 200 006e 1B88     		ldrh	r3, [r3]	@ tmp206, standalone_enable_menu_timer
+ 201 0070 9BB2     		uxth	r3, r3	@ standalone_enable_menu_timer.2, tmp206
+ 202 0072 002B     		cmp	r3, #0	@ standalone_enable_menu_timer.2,
+ 203 0074 06D1     		bne	.L10	@,
+  82:.\src/networked.c **** 			{
+  83:.\src/networked.c **** 				networked_selections = MENU_OFF;
+ 204              		.loc 1 83 0
+ 205 0076 BF4B     		ldr	r3, .L44+20	@ tmp207,
+ 206 0078 0222     		mov	r2, #2	@ tmp208,
+ 207 007a 1A70     		strb	r2, [r3]	@ tmp209, networked_selections
+  84:.\src/networked.c **** 				networked_state = NETWORKED_SHOW_CONF;
+ 208              		.loc 1 84 0
+ 209 007c BA4B     		ldr	r3, .L44+8	@ tmp210,
+ 210 007e 0222     		mov	r2, #2	@ tmp211,
+ 211 0080 1A70     		strb	r2, [r3]	@ tmp212, networked_state
+  85:.\src/networked.c **** 			}
+  86:.\src/networked.c **** 			else
+  87:.\src/networked.c **** 				networked_state = NETWORKED_UPDATE;
+  88:.\src/networked.c **** 
+  89:.\src/networked.c **** 			break;
+ 212              		.loc 1 89 0
+ 213 0082 DCE0     		b	.L12	@
+ 214              	.L10:
+  87:.\src/networked.c **** 				networked_state = NETWORKED_UPDATE;
+ 215              		.loc 1 87 0
+ 216 0084 B84B     		ldr	r3, .L44+8	@ tmp213,
+ 217 0086 1422     		mov	r2, #20	@ tmp214,
+ 218 0088 1A70     		strb	r2, [r3]	@ tmp215, networked_state
+ 219              		.loc 1 89 0
+ 220 008a D8E0     		b	.L12	@
+ 221              	.L7:
+  90:.\src/networked.c **** 
+  91:.\src/networked.c **** 		case NETWORKED_SHOW_CONF:
+  92:.\src/networked.c **** 			if (networked_selections == MENU_OFF)
+ 222              		.loc 1 92 0
+ 223 008c B94B     		ldr	r3, .L44+20	@ tmp216,
+ 224 008e 1B78     		ldrb	r3, [r3]	@ networked_selections.3, networked_selections
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 7
+
+
+ 225 0090 022B     		cmp	r3, #2	@ networked_selections.3,
+ 226 0092 00D0     		beq	.LCB100	@
+ 227 0094 D0E0     		b	.L38	@long jump	@
+ 228              	.LCB100:
+  93:.\src/networked.c **** 			{
+  94:.\src/networked.c **** 				LCD_1ER_RENGLON;
+ 229              		.loc 1 94 0
+ 230 0096 0020     		mov	r0, #0	@,
+ 231 0098 FFF7FEFF 		bl	Lcd_SetDDRAM	@
+  95:.\src/networked.c **** 				LCDTransmitStr((const char *) "Networking Mode ");
+ 232              		.loc 1 95 0
+ 233 009c B64B     		ldr	r3, .L44+24	@ tmp217,
+ 234 009e 181C     		mov	r0, r3	@, tmp217
+ 235 00a0 FFF7FEFF 		bl	LCDTransmitStr	@
+  96:.\src/networked.c **** 				LCD_2DO_RENGLON;
+ 236              		.loc 1 96 0
+ 237 00a4 4020     		mov	r0, #64	@,
+ 238 00a6 FFF7FEFF 		bl	Lcd_SetDDRAM	@
+  97:.\src/networked.c **** 				sprintf(s_lcd, "Channel: %3d", NetworkedStruct_local.networked_dmx_channel);
+ 239              		.loc 1 97 0
+ 240 00aa B04B     		ldr	r3, .L44+12	@ tmp218,
+ 241 00ac 1B88     		ldrh	r3, [r3]	@ D.5839,
+ 242 00ae 03A9     		add	r1, sp, #12	@ tmp219,,
+ 243 00b0 B24A     		ldr	r2, .L44+28	@ tmp220,
+ 244 00b2 081C     		mov	r0, r1	@, tmp219
+ 245 00b4 111C     		mov	r1, r2	@, tmp220
+ 246 00b6 1A1C     		mov	r2, r3	@, D.5840
+ 247 00b8 FFF7FEFF 		bl	sprintf	@
+  98:.\src/networked.c **** 				LCDTransmitStr(s_lcd);
+ 248              		.loc 1 98 0
+ 249 00bc 03AB     		add	r3, sp, #12	@ tmp221,,
+ 250 00be 181C     		mov	r0, r3	@, tmp221
+ 251 00c0 FFF7FEFF 		bl	LCDTransmitStr	@
+  99:.\src/networked.c **** 			}
+ 100:.\src/networked.c **** 			break;
+ 252              		.loc 1 100 0
+ 253 00c4 B8E0     		b	.L38	@
+ 254              	.L8:
+ 101:.\src/networked.c **** 
+ 102:.\src/networked.c **** 		case NETWORKED_UPDATE:
+ 103:.\src/networked.c **** 			//reviso si es master o slave
+ 104:.\src/networked.c **** 			EXTIOn ();
+ 255              		.loc 1 104 0
+ 256 00c6 FFF7FEFF 		bl	EXTIOn	@
+ 105:.\src/networked.c **** 			DMX_channel_quantity = 1;
+ 257              		.loc 1 105 0
+ 258 00ca AD4B     		ldr	r3, .L44+32	@ tmp222,
+ 259 00cc 0122     		mov	r2, #1	@ tmp223,
+ 260 00ce 1A70     		strb	r2, [r3]	@ tmp224, DMX_channel_quantity
+ 106:.\src/networked.c **** 			DMX_channel_selected = NetworkedStruct_local.networked_dmx_channel;
+ 261              		.loc 1 106 0
+ 262 00d0 A64B     		ldr	r3, .L44+12	@ tmp225,
+ 263 00d2 1A88     		ldrh	r2, [r3]	@ DMX_channel_selected.4,
+ 264 00d4 AB4B     		ldr	r3, .L44+36	@ tmp226,
+ 265 00d6 1A80     		strh	r2, [r3]	@ tmp227, DMX_channel_selected
+ 107:.\src/networked.c **** 			if (networked_selections == MENU_OFF)
+ 266              		.loc 1 107 0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 8
+
+
+ 267 00d8 A64B     		ldr	r3, .L44+20	@ tmp228,
+ 268 00da 1B78     		ldrb	r3, [r3]	@ networked_selections.5, networked_selections
+ 269 00dc 022B     		cmp	r3, #2	@ networked_selections.5,
+ 270 00de 06D1     		bne	.L14	@,
+ 108:.\src/networked.c **** 			{
+ 109:.\src/networked.c **** 				LCD_1ER_RENGLON;
+ 271              		.loc 1 109 0
+ 272 00e0 0020     		mov	r0, #0	@,
+ 273 00e2 FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 110:.\src/networked.c **** 				LCDTransmitStr((const char *) "Networking Mode ");
+ 274              		.loc 1 110 0
+ 275 00e6 A44B     		ldr	r3, .L44+24	@ tmp229,
+ 276 00e8 181C     		mov	r0, r3	@, tmp229
+ 277 00ea FFF7FEFF 		bl	LCDTransmitStr	@
+ 278              	.L14:
+ 111:.\src/networked.c **** 			}
+ 112:.\src/networked.c **** 			networked_state = NETWORKED_WORKING;
+ 279              		.loc 1 112 0
+ 280 00ee 9E4B     		ldr	r3, .L44+8	@ tmp230,
+ 281 00f0 0122     		mov	r2, #1	@ tmp231,
+ 282 00f2 1A70     		strb	r2, [r3]	@ tmp232, networked_state
+ 113:.\src/networked.c **** 			break;
+ 283              		.loc 1 113 0
+ 284 00f4 A3E0     		b	.L12	@
+ 285              	.L6:
+ 114:.\src/networked.c **** 
+ 115:.\src/networked.c **** 		case NETWORKED_WORKING:
+ 116:.\src/networked.c **** 			//me quedo aca hasta que me saquen por menu
+ 117:.\src/networked.c **** 
+ 118:.\src/networked.c **** 			if (Packet_Detected_Flag)
+ 286              		.loc 1 118 0
+ 287 00f6 A44B     		ldr	r3, .L44+40	@ tmp233,
+ 288 00f8 1B78     		ldrb	r3, [r3]	@ tmp234, Packet_Detected_Flag
+ 289 00fa DBB2     		uxtb	r3, r3	@ Packet_Detected_Flag.6, tmp234
+ 290 00fc 002B     		cmp	r3, #0	@ Packet_Detected_Flag.6,
+ 291 00fe 0ED0     		beq	.L15	@,
+ 119:.\src/networked.c **** 			{
+ 120:.\src/networked.c **** 				//llego un paquete DMX
+ 121:.\src/networked.c **** 				Packet_Detected_Flag = 0;
+ 292              		.loc 1 121 0
+ 293 0100 A14B     		ldr	r3, .L44+40	@ tmp235,
+ 294 0102 0022     		mov	r2, #0	@ tmp236,
+ 295 0104 1A70     		strb	r2, [r3]	@ tmp237, Packet_Detected_Flag
+ 122:.\src/networked.c **** 
+ 123:.\src/networked.c **** 				//en data tengo la info
+ 124:.\src/networked.c **** 				Update_TIM3_CH1 (data[0]);
+ 296              		.loc 1 124 0
+ 297 0106 A14B     		ldr	r3, .L44+44	@ tmp238,
+ 298 0108 1B78     		ldrb	r3, [r3]	@ tmp239,
+ 299 010a DBB2     		uxtb	r3, r3	@ D.5848, tmp239
+ 300 010c 181C     		mov	r0, r3	@, D.5849
+ 301 010e FFF7FEFF 		bl	Update_TIM3_CH1	@
+ 125:.\src/networked.c **** 				networked_ii = data[0];
+ 302              		.loc 1 125 0
+ 303 0112 9E4B     		ldr	r3, .L44+44	@ tmp240,
+ 304 0114 1B78     		ldrb	r3, [r3]	@ tmp241,
+ 305 0116 DBB2     		uxtb	r3, r3	@ D.5850, tmp241
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 9
+
+
+ 306 0118 1A1C     		mov	r2, r3	@ networked_ii.7, D.5850
+ 307 011a 9D4B     		ldr	r3, .L44+48	@ tmp242,
+ 308 011c 1A80     		strh	r2, [r3]	@ tmp243, networked_ii
+ 309              	.L15:
+ 126:.\src/networked.c **** 			}
+ 127:.\src/networked.c **** 
+ 128:.\src/networked.c **** 
+ 129:.\src/networked.c **** 			if (networked_ii > 10)
+ 310              		.loc 1 129 0
+ 311 011e 9C4B     		ldr	r3, .L44+48	@ tmp244,
+ 312 0120 1B88     		ldrh	r3, [r3]	@ networked_ii.8, networked_ii
+ 313 0122 0A2B     		cmp	r3, #10	@ networked_ii.8,
+ 314 0124 05D9     		bls	.L16	@,
+ 130:.\src/networked.c **** 				RELAY_ON;
+ 315              		.loc 1 130 0
+ 316 0126 9023     		mov	r3, #144	@ tmp386,
+ 317 0128 DB05     		lsl	r3, r3, #23	@ D.5855, tmp386,
+ 318 012a 8022     		mov	r2, #128	@ tmp387,
+ 319 012c 1201     		lsl	r2, r2, #4	@ tmp245, tmp387,
+ 320 012e 9A61     		str	r2, [r3, #24]	@ tmp245, D.5855_21->BSRR
+ 321 0130 08E0     		b	.L17	@
+ 322              	.L16:
+ 131:.\src/networked.c **** 			else if (networked_ii < 5)
+ 323              		.loc 1 131 0
+ 324 0132 974B     		ldr	r3, .L44+48	@ tmp246,
+ 325 0134 1B88     		ldrh	r3, [r3]	@ networked_ii.9, networked_ii
+ 326 0136 042B     		cmp	r3, #4	@ networked_ii.9,
+ 327 0138 04D8     		bhi	.L17	@,
+ 132:.\src/networked.c **** 				RELAY_OFF;
+ 328              		.loc 1 132 0
+ 329 013a 9023     		mov	r3, #144	@ tmp384,
+ 330 013c DB05     		lsl	r3, r3, #23	@ D.5860, tmp384,
+ 331 013e 8022     		mov	r2, #128	@ tmp385,
+ 332 0140 1205     		lsl	r2, r2, #20	@ tmp247, tmp385,
+ 333 0142 9A61     		str	r2, [r3, #24]	@ tmp247, D.5860_23->BSRR
+ 334              	.L17:
+ 133:.\src/networked.c **** 
+ 134:.\src/networked.c **** 			if (networked_selections == MENU_OFF)
+ 335              		.loc 1 134 0
+ 336 0144 8B4B     		ldr	r3, .L44+20	@ tmp248,
+ 337 0146 1B78     		ldrb	r3, [r3]	@ networked_selections.10, networked_selections
+ 338 0148 022B     		cmp	r3, #2	@ networked_selections.10,
+ 339 014a 00D0     		beq	.LCB197	@
+ 340 014c 76E0     		b	.L39	@long jump	@
+ 341              	.LCB197:
+ 135:.\src/networked.c **** 			{
+ 136:.\src/networked.c **** 				if (networked_dim_last != networked_ii)
+ 342              		.loc 1 136 0
+ 343 014e 914B     		ldr	r3, .L44+52	@ tmp249,
+ 344 0150 1B78     		ldrb	r3, [r3]	@ networked_dim_last.11, networked_dim_last
+ 345 0152 1A1C     		mov	r2, r3	@ D.5865, networked_dim_last.11
+ 346 0154 8E4B     		ldr	r3, .L44+48	@ tmp250,
+ 347 0156 1B88     		ldrh	r3, [r3]	@ networked_ii.12, networked_ii
+ 348 0158 9A42     		cmp	r2, r3	@ D.5865, networked_ii.12
+ 349 015a 00D1     		bne	.LCB204	@
+ 350 015c 6EE0     		b	.L39	@long jump	@
+ 351              	.LCB204:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 10
+
+
+ 352              	.LBB2:
+ 137:.\src/networked.c **** 				{
+ 138:.\src/networked.c **** 					unsigned char i;
+ 139:.\src/networked.c **** 					unsigned short ii;
+ 140:.\src/networked.c **** 					//char s_lcd [20];
+ 141:.\src/networked.c **** 
+ 142:.\src/networked.c **** 					networked_dim_last = networked_ii;
+ 353              		.loc 1 142 0
+ 354 015e 8C4B     		ldr	r3, .L44+48	@ tmp251,
+ 355 0160 1B88     		ldrh	r3, [r3]	@ networked_ii.13, networked_ii
+ 356 0162 DAB2     		uxtb	r2, r3	@ networked_dim_last.14, networked_ii.13
+ 357 0164 8B4B     		ldr	r3, .L44+52	@ tmp252,
+ 358 0166 1A70     		strb	r2, [r3]	@ tmp253, networked_dim_last
+ 143:.\src/networked.c **** 
+ 144:.\src/networked.c **** 					ii = networked_dim_last * 100;
+ 359              		.loc 1 144 0
+ 360 0168 8A4B     		ldr	r3, .L44+52	@ tmp254,
+ 361 016a 1B78     		ldrb	r3, [r3]	@ networked_dim_last.15, networked_dim_last
+ 362 016c 1A1C     		mov	r2, r3	@ D.5872, networked_dim_last.15
+ 363 016e 09AB     		add	r3, sp, #36	@ tmp255,,
+ 364 0170 6421     		mov	r1, #100	@ tmp257,
+ 365 0172 4A43     		mul	r2, r1	@ tmp256, tmp257
+ 366 0174 1A80     		strh	r2, [r3]	@ tmp258, ii
+ 145:.\src/networked.c **** 					ii = ii / 255;
+ 367              		.loc 1 145 0
+ 368 0176 09AC     		add	r4, sp, #36	@ tmp259,,
+ 369 0178 09AB     		add	r3, sp, #36	@ tmp260,,
+ 370 017a 1B88     		ldrh	r3, [r3]	@ tmp262, ii
+ 371 017c 181C     		mov	r0, r3	@, tmp262
+ 372 017e FF21     		mov	r1, #255	@,
+ 373 0180 FFF7FEFF 		bl	__aeabi_uidiv	@
+ 374 0184 031C     		mov	r3, r0	@ tmp265,
+ 375 0186 2380     		strh	r3, [r4]	@ tmp266, ii
+ 146:.\src/networked.c **** 					if (ii > 100)
+ 376              		.loc 1 146 0
+ 377 0188 09AB     		add	r3, sp, #36	@ tmp267,,
+ 378 018a 1B88     		ldrh	r3, [r3]	@ tmp268, ii
+ 379 018c 642B     		cmp	r3, #100	@ tmp268,
+ 380 018e 02D9     		bls	.L19	@,
+ 147:.\src/networked.c **** 						ii = 100;
+ 381              		.loc 1 147 0
+ 382 0190 09AB     		add	r3, sp, #36	@ tmp269,,
+ 383 0192 6422     		mov	r2, #100	@ tmp270,
+ 384 0194 1A80     		strh	r2, [r3]	@ tmp271, ii
+ 385              	.L19:
+ 148:.\src/networked.c **** 
+ 149:.\src/networked.c **** 					LCD_2DO_RENGLON;
+ 386              		.loc 1 149 0
+ 387 0196 4020     		mov	r0, #64	@,
+ 388 0198 FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 150:.\src/networked.c **** 					Lcd_SetDDRAM(0x40 + 12);
+ 389              		.loc 1 150 0
+ 390 019c 4C20     		mov	r0, #76	@,
+ 391 019e FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 151:.\src/networked.c **** 					sprintf(s_lcd, "%3d", ii);
+ 392              		.loc 1 151 0
+ 393 01a2 09AB     		add	r3, sp, #36	@ tmp272,,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 11
+
+
+ 394 01a4 1B88     		ldrh	r3, [r3]	@ D.5875, ii
+ 395 01a6 03A9     		add	r1, sp, #12	@ tmp273,,
+ 396 01a8 7B4A     		ldr	r2, .L44+56	@ tmp274,
+ 397 01aa 081C     		mov	r0, r1	@, tmp273
+ 398 01ac 111C     		mov	r1, r2	@, tmp274
+ 399 01ae 1A1C     		mov	r2, r3	@, D.5875
+ 400 01b0 FFF7FEFF 		bl	sprintf	@
+ 152:.\src/networked.c **** 					LCDTransmitStr(s_lcd);
+ 401              		.loc 1 152 0
+ 402 01b4 03AB     		add	r3, sp, #12	@ tmp275,,
+ 403 01b6 181C     		mov	r0, r3	@, tmp275
+ 404 01b8 FFF7FEFF 		bl	LCDTransmitStr	@
+ 153:.\src/networked.c **** 					LCDTransmitStr("%");
+ 405              		.loc 1 153 0
+ 406 01bc 774B     		ldr	r3, .L44+60	@ tmp276,
+ 407 01be 181C     		mov	r0, r3	@, tmp276
+ 408 01c0 FFF7FEFF 		bl	LCDTransmitStr	@
+ 154:.\src/networked.c **** 
+ 155:.\src/networked.c **** 					ii = ii / 10;
+ 409              		.loc 1 155 0
+ 410 01c4 09AC     		add	r4, sp, #36	@ tmp277,,
+ 411 01c6 09AB     		add	r3, sp, #36	@ tmp278,,
+ 412 01c8 1B88     		ldrh	r3, [r3]	@ tmp280, ii
+ 413 01ca 181C     		mov	r0, r3	@, tmp280
+ 414 01cc 0A21     		mov	r1, #10	@,
+ 415 01ce FFF7FEFF 		bl	__aeabi_uidiv	@
+ 416 01d2 031C     		mov	r3, r0	@ tmp283,
+ 417 01d4 2380     		strh	r3, [r4]	@ tmp284, ii
+ 156:.\src/networked.c **** 					if (networked_dim2_last != ii)
+ 418              		.loc 1 156 0
+ 419 01d6 724B     		ldr	r3, .L44+64	@ tmp285,
+ 420 01d8 1B78     		ldrb	r3, [r3]	@ networked_dim2_last.16, networked_dim2_last
+ 421 01da 09AA     		add	r2, sp, #36	@ tmp286,,
+ 422 01dc 1288     		ldrh	r2, [r2]	@ tmp287, ii
+ 423 01de 9A42     		cmp	r2, r3	@ tmp287, D.5877
+ 424 01e0 2CD0     		beq	.L39	@,
+ 157:.\src/networked.c **** 					{
+ 158:.\src/networked.c **** 						networked_dim2_last = ii;
+ 425              		.loc 1 158 0
+ 426 01e2 09AB     		add	r3, sp, #36	@ tmp288,,
+ 427 01e4 1B88     		ldrh	r3, [r3]	@ tmp290, ii
+ 428 01e6 DAB2     		uxtb	r2, r3	@ networked_dim2_last.17, tmp289
+ 429 01e8 6D4B     		ldr	r3, .L44+64	@ tmp291,
+ 430 01ea 1A70     		strb	r2, [r3]	@ tmp292, networked_dim2_last
+ 159:.\src/networked.c **** 						LCD_2DO_RENGLON;
+ 431              		.loc 1 159 0
+ 432 01ec 4020     		mov	r0, #64	@,
+ 433 01ee FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 160:.\src/networked.c **** 						LCDTransmitStr((const char *) "            ");
+ 434              		.loc 1 160 0
+ 435 01f2 6C4B     		ldr	r3, .L44+68	@ tmp293,
+ 436 01f4 181C     		mov	r0, r3	@, tmp293
+ 437 01f6 FFF7FEFF 		bl	LCDTransmitStr	@
+ 161:.\src/networked.c **** 						LCD_2DO_RENGLON;
+ 438              		.loc 1 161 0
+ 439 01fa 4020     		mov	r0, #64	@,
+ 440 01fc FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 12
+
+
+ 162:.\src/networked.c **** 						for (i = 0; i < ii; i++)
+ 441              		.loc 1 162 0
+ 442 0200 6B46     		mov	r3, sp	@ tmp294,
+ 443 0202 2633     		add	r3, r3, #38	@ tmp294,
+ 444 0204 0022     		mov	r2, #0	@ tmp295,
+ 445 0206 1A70     		strb	r2, [r3]	@ tmp296, i
+ 446 0208 09E0     		b	.L20	@
+ 447              	.L21:
+ 163:.\src/networked.c **** 						{
+ 164:.\src/networked.c **** 							LCDStartTransmit(0xff);
+ 448              		.loc 1 164 0 discriminator 2
+ 449 020a FF20     		mov	r0, #255	@,
+ 450 020c FFF7FEFF 		bl	LCDStartTransmit	@
+ 162:.\src/networked.c **** 						for (i = 0; i < ii; i++)
+ 451              		.loc 1 162 0 discriminator 2
+ 452 0210 6B46     		mov	r3, sp	@ tmp297,
+ 453 0212 2633     		add	r3, r3, #38	@ tmp297,
+ 454 0214 6A46     		mov	r2, sp	@ tmp298,
+ 455 0216 2632     		add	r2, r2, #38	@ tmp298,
+ 456 0218 1278     		ldrb	r2, [r2]	@ tmp299, i
+ 457 021a 0132     		add	r2, r2, #1	@ tmp300,
+ 458 021c 1A70     		strb	r2, [r3]	@ tmp301, i
+ 459              	.L20:
+ 162:.\src/networked.c **** 						for (i = 0; i < ii; i++)
+ 460              		.loc 1 162 0 is_stmt 0 discriminator 1
+ 461 021e 6B46     		mov	r3, sp	@ tmp302,
+ 462 0220 2633     		add	r3, r3, #38	@ tmp302,
+ 463 0222 1B78     		ldrb	r3, [r3]	@ tmp304, i
+ 464 0224 9BB2     		uxth	r3, r3	@ D.5881, tmp303
+ 465 0226 09AA     		add	r2, sp, #36	@ tmp305,,
+ 466 0228 1288     		ldrh	r2, [r2]	@ tmp306, ii
+ 467 022a 9A42     		cmp	r2, r3	@ tmp306, D.5881
+ 468 022c EDD8     		bhi	.L21	@,
+ 469              	.LBE2:
+ 165:.\src/networked.c **** 						}
+ 166:.\src/networked.c **** 					}
+ 167:.\src/networked.c **** 				}
+ 168:.\src/networked.c **** 			}
+ 169:.\src/networked.c **** 			break;
+ 470              		.loc 1 169 0 is_stmt 1
+ 471 022e 05E0     		b	.L39	@
+ 472              	.L4:
+ 170:.\src/networked.c **** 
+ 171:.\src/networked.c **** 		default:
+ 172:.\src/networked.c **** 			networked_state = NETWORKED_INIT;
+ 473              		.loc 1 172 0
+ 474 0230 4D4B     		ldr	r3, .L44+8	@ tmp307,
+ 475 0232 0022     		mov	r2, #0	@ tmp308,
+ 476 0234 1A70     		strb	r2, [r3]	@ tmp309, networked_state
+ 173:.\src/networked.c **** 			break;
+ 477              		.loc 1 173 0
+ 478 0236 02E0     		b	.L12	@
+ 479              	.L38:
+ 100:.\src/networked.c **** 			break;
+ 480              		.loc 1 100 0
+ 481 0238 C046     		mov	r8, r8
+ 482 023a 00E0     		b	.L12	@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 13
+
+
+ 483              	.L39:
+ 169:.\src/networked.c **** 			break;
+ 484              		.loc 1 169 0
+ 485 023c C046     		mov	r8, r8
+ 486              	.L12:
+ 174:.\src/networked.c **** 	}
+ 175:.\src/networked.c **** 
+ 176:.\src/networked.c **** 	//veo el menu solo si alguien toca los botones o timeout
+ 177:.\src/networked.c **** 	switch (networked_selections)
+ 487              		.loc 1 177 0
+ 488 023e 4D4B     		ldr	r3, .L44+20	@ tmp310,
+ 489 0240 1B78     		ldrb	r3, [r3]	@ networked_selections.18, networked_selections
+ 490 0242 012B     		cmp	r3, #1	@ D.5883,
+ 491 0244 3AD0     		beq	.L24	@,
+ 492 0246 02DC     		bgt	.L27	@,
+ 493 0248 002B     		cmp	r3, #0	@ D.5883,
+ 494 024a 05D0     		beq	.L23	@,
+ 495 024c 82E0     		b	.L22	@
+ 496              	.L27:
+ 497 024e 022B     		cmp	r3, #2	@ D.5883,
+ 498 0250 4DD0     		beq	.L25	@,
+ 499 0252 032B     		cmp	r3, #3	@ D.5883,
+ 500 0254 6DD0     		beq	.L26	@,
+ 501 0256 7DE0     		b	.L22	@
+ 502              	.L23:
+ 178:.\src/networked.c **** 	{
+ 179:.\src/networked.c **** 		case MENU_ON:
+ 180:.\src/networked.c **** 			//estado normal
+ 181:.\src/networked.c **** 			resp_down = MenuNetworked();
+ 503              		.loc 1 181 0
+ 504 0258 6C46     		mov	r4, sp	@ tmp311,
+ 505 025a 2334     		add	r4, r4, #35	@ tmp311,
+ 506 025c FFF7FEFF 		bl	MenuNetworked	@
+ 507 0260 031C     		mov	r3, r0	@ tmp312,
+ 508 0262 2370     		strb	r3, [r4]	@ tmp314, resp_down
+ 182:.\src/networked.c **** 
+ 183:.\src/networked.c **** 			if (resp_down == RESP_WORKING)	//alguien esta tratando de seleccionar algo, le doy tiempo
+ 509              		.loc 1 183 0
+ 510 0264 6B46     		mov	r3, sp	@ tmp315,
+ 511 0266 2333     		add	r3, r3, #35	@ tmp315,
+ 512 0268 1B78     		ldrb	r3, [r3]	@ tmp316, resp_down
+ 513 026a 042B     		cmp	r3, #4	@ tmp316,
+ 514 026c 02D1     		bne	.L28	@,
+ 184:.\src/networked.c **** 				networked_enable_menu_timer = 30000;
+ 515              		.loc 1 184 0
+ 516 026e 3C4B     		ldr	r3, .L44	@ tmp317,
+ 517 0270 3C4A     		ldr	r2, .L44+4	@ tmp318,
+ 518 0272 1A80     		strh	r2, [r3]	@ tmp319, standalone_enable_menu_timer
+ 519              	.L28:
+ 185:.\src/networked.c **** 
+ 186:.\src/networked.c **** 			if (resp_down == RESP_SELECTED)	//se selecciono algo
+ 520              		.loc 1 186 0
+ 521 0274 6B46     		mov	r3, sp	@ tmp320,
+ 522 0276 2333     		add	r3, r3, #35	@ tmp320,
+ 523 0278 1B78     		ldrb	r3, [r3]	@ tmp321, resp_down
+ 524 027a 012B     		cmp	r3, #1	@ tmp321,
+ 525 027c 05D1     		bne	.L29	@,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 14
+
+
+ 187:.\src/networked.c **** 			{
+ 188:.\src/networked.c **** 				networked_enable_menu_timer = 30000;
+ 526              		.loc 1 188 0
+ 527 027e 384B     		ldr	r3, .L44	@ tmp322,
+ 528 0280 384A     		ldr	r2, .L44+4	@ tmp323,
+ 529 0282 1A80     		strh	r2, [r3]	@ tmp324, standalone_enable_menu_timer
+ 189:.\src/networked.c **** 				networked_selections = MENU_SELECTED;
+ 530              		.loc 1 189 0
+ 531 0284 3B4B     		ldr	r3, .L44+20	@ tmp325,
+ 532 0286 0122     		mov	r2, #1	@ tmp326,
+ 533 0288 1A70     		strb	r2, [r3]	@ tmp327, networked_selections
+ 534              	.L29:
+ 190:.\src/networked.c **** 			}
+ 191:.\src/networked.c **** 
+ 192:.\src/networked.c **** 			if (!networked_enable_menu_timer)	//agoto el timer
+ 535              		.loc 1 192 0
+ 536 028a 354B     		ldr	r3, .L44	@ tmp328,
+ 537 028c 1B88     		ldrh	r3, [r3]	@ tmp329, standalone_enable_menu_timer
+ 538 028e 9BB2     		uxth	r3, r3	@ standalone_enable_menu_timer.19, tmp329
+ 539 0290 002B     		cmp	r3, #0	@ standalone_enable_menu_timer.19,
+ 540 0292 63D1     		bne	.L40	@,
+ 193:.\src/networked.c **** 			{
+ 194:.\src/networked.c **** 				LCD_1ER_RENGLON;
+ 541              		.loc 1 194 0
+ 542 0294 0020     		mov	r0, #0	@,
+ 543 0296 FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 195:.\src/networked.c **** 				sprintf(s_lcd, "Network Ch: %3d ", NetworkedStruct_local.networked_dmx_channel);
+ 544              		.loc 1 195 0
+ 545 029a 344B     		ldr	r3, .L44+12	@ tmp330,
+ 546 029c 1B88     		ldrh	r3, [r3]	@ D.5891,
+ 547 029e 03A9     		add	r1, sp, #12	@ tmp331,,
+ 548 02a0 414A     		ldr	r2, .L44+72	@ tmp332,
+ 549 02a2 081C     		mov	r0, r1	@, tmp331
+ 550 02a4 111C     		mov	r1, r2	@, tmp332
+ 551 02a6 1A1C     		mov	r2, r3	@, D.5892
+ 552 02a8 FFF7FEFF 		bl	sprintf	@
+ 196:.\src/networked.c **** 				LCDTransmitStr(s_lcd);
+ 553              		.loc 1 196 0
+ 554 02ac 03AB     		add	r3, sp, #12	@ tmp333,,
+ 555 02ae 181C     		mov	r0, r3	@, tmp333
+ 556 02b0 FFF7FEFF 		bl	LCDTransmitStr	@
+ 197:.\src/networked.c **** 
+ 198:.\src/networked.c **** 
+ 199:.\src/networked.c **** 				networked_selections = MENU_OFF;
+ 557              		.loc 1 199 0
+ 558 02b4 2F4B     		ldr	r3, .L44+20	@ tmp334,
+ 559 02b6 0222     		mov	r2, #2	@ tmp335,
+ 560 02b8 1A70     		strb	r2, [r3]	@ tmp336, networked_selections
+ 200:.\src/networked.c **** 			}
+ 201:.\src/networked.c **** 			break;
+ 561              		.loc 1 201 0
+ 562 02ba 4FE0     		b	.L40	@
+ 563              	.L24:
+ 202:.\src/networked.c **** 
+ 203:.\src/networked.c **** 		case MENU_SELECTED:
+ 204:.\src/networked.c **** 			//estado algo seleccionado espero update
+ 205:.\src/networked.c **** 			resp_down = FuncShowBlink ((const char *) "Something Select", (const char *) "Updating Values", 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 15
+
+
+ 564              		.loc 1 205 0
+ 565 02bc 6C46     		mov	r4, sp	@ tmp337,
+ 566 02be 2334     		add	r4, r4, #35	@ tmp337,
+ 567 02c0 3A4A     		ldr	r2, .L44+76	@ tmp338,
+ 568 02c2 3B4B     		ldr	r3, .L44+80	@ tmp339,
+ 569 02c4 101C     		mov	r0, r2	@, tmp338
+ 570 02c6 191C     		mov	r1, r3	@, tmp339
+ 571 02c8 0122     		mov	r2, #1	@,
+ 572 02ca 0223     		mov	r3, #2	@,
+ 573 02cc FFF7FEFF 		bl	FuncShowBlink	@
+ 574 02d0 031C     		mov	r3, r0	@ tmp340,
+ 575 02d2 2370     		strb	r3, [r4]	@ tmp342, resp_down
+ 206:.\src/networked.c **** 
+ 207:.\src/networked.c **** 			if (resp_down == RESP_FINISH)
+ 576              		.loc 1 207 0
+ 577 02d4 6B46     		mov	r3, sp	@ tmp343,
+ 578 02d6 2333     		add	r3, r3, #35	@ tmp343,
+ 579 02d8 1B78     		ldrb	r3, [r3]	@ tmp344, resp_down
+ 580 02da 0A2B     		cmp	r3, #10	@ tmp344,
+ 581 02dc 00D0     		beq	.LCB414	@
+ 582 02de 6FE0     		b	.L41	@long jump	@
+ 583              	.LCB414:
+ 208:.\src/networked.c **** 			{
+ 209:.\src/networked.c **** 				networked_state = NETWORKED_UPDATE;
+ 584              		.loc 1 209 0
+ 585 02e0 214B     		ldr	r3, .L44+8	@ tmp345,
+ 586 02e2 1422     		mov	r2, #20	@ tmp346,
+ 587 02e4 1A70     		strb	r2, [r3]	@ tmp347, networked_state
+ 210:.\src/networked.c **** 				networked_selections = 0;
+ 588              		.loc 1 210 0
+ 589 02e6 234B     		ldr	r3, .L44+20	@ tmp348,
+ 590 02e8 0022     		mov	r2, #0	@ tmp349,
+ 591 02ea 1A70     		strb	r2, [r3]	@ tmp350, networked_selections
+ 211:.\src/networked.c **** 			}
+ 212:.\src/networked.c **** 			break;
+ 592              		.loc 1 212 0
+ 593 02ec 68E0     		b	.L41	@
+ 594              	.L25:
+ 213:.\src/networked.c **** 
+ 214:.\src/networked.c **** 		case MENU_OFF:
+ 215:.\src/networked.c **** 			//estado menu apagado
+ 216:.\src/networked.c **** 			if ((CheckS1() > S_NO) || (CheckS2() > S_NO))
+ 595              		.loc 1 216 0
+ 596 02ee FFF7FEFF 		bl	CheckS1	@
+ 597 02f2 031C     		mov	r3, r0	@ tmp351,
+ 598 02f4 002B     		cmp	r3, #0	@ D.5897,
+ 599 02f6 04D1     		bne	.L33	@,
+ 600              		.loc 1 216 0 is_stmt 0 discriminator 1
+ 601 02f8 FFF7FEFF 		bl	CheckS2	@
+ 602 02fc 031C     		mov	r3, r0	@ tmp353,
+ 603 02fe 002B     		cmp	r3, #0	@ D.5899,
+ 604 0300 60D0     		beq	.L42	@,
+ 605              	.L33:
+ 217:.\src/networked.c **** 			{
+ 218:.\src/networked.c **** 				networked_enable_menu_timer = 30000;			//vuelvo a mostrar
+ 606              		.loc 1 218 0 is_stmt 1
+ 607 0302 174B     		ldr	r3, .L44	@ tmp355,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 16
+
+
+ 608 0304 174A     		ldr	r2, .L44+4	@ tmp356,
+ 609 0306 1A80     		strh	r2, [r3]	@ tmp357, standalone_enable_menu_timer
+ 219:.\src/networked.c **** 				LCD_1ER_RENGLON;
+ 610              		.loc 1 219 0
+ 611 0308 0020     		mov	r0, #0	@,
+ 612 030a FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 220:.\src/networked.c **** 				LCDTransmitStr((const char *) "wait to free    ");
+ 613              		.loc 1 220 0
+ 614 030e 294B     		ldr	r3, .L44+84	@ tmp358,
+ 615 0310 181C     		mov	r0, r3	@, tmp358
+ 616 0312 FFF7FEFF 		bl	LCDTransmitStr	@
+ 221:.\src/networked.c **** 				LCD_2DO_RENGLON;
+ 617              		.loc 1 221 0
+ 618 0316 4020     		mov	r0, #64	@,
+ 619 0318 FFF7FEFF 		bl	Lcd_SetDDRAM	@
+ 222:.\src/networked.c **** 				LCDTransmitStr((const char *) s_blank_line);
+ 620              		.loc 1 222 0
+ 621 031c 264B     		ldr	r3, .L44+88	@ tmp359,
+ 622 031e 181C     		mov	r0, r3	@, tmp359
+ 623 0320 FFF7FEFF 		bl	LCDTransmitStr	@
+ 223:.\src/networked.c **** 				networked_selections++;
+ 624              		.loc 1 223 0
+ 625 0324 134B     		ldr	r3, .L44+20	@ tmp360,
+ 626 0326 1B78     		ldrb	r3, [r3]	@ networked_selections.20, networked_selections
+ 627 0328 0133     		add	r3, r3, #1	@ tmp361,
+ 628 032a DAB2     		uxtb	r2, r3	@ networked_selections.21, tmp361
+ 629 032c 114B     		ldr	r3, .L44+20	@ tmp362,
+ 630 032e 1A70     		strb	r2, [r3]	@ tmp363, networked_selections
+ 224:.\src/networked.c **** 			}
+ 225:.\src/networked.c **** 			break;
+ 631              		.loc 1 225 0
+ 632 0330 48E0     		b	.L42	@
+ 633              	.L26:
+ 226:.\src/networked.c **** 
+ 227:.\src/networked.c **** 		case MENU_WAIT_FREE:
+ 228:.\src/networked.c **** 			if ((CheckS1() == S_NO) && (CheckS2() == S_NO))
+ 634              		.loc 1 228 0
+ 635 0332 FFF7FEFF 		bl	CheckS1	@
+ 636 0336 031C     		mov	r3, r0	@ tmp364,
+ 637 0338 002B     		cmp	r3, #0	@ D.5902,
+ 638 033a 45D1     		bne	.L43	@,
+ 639              		.loc 1 228 0 is_stmt 0 discriminator 1
+ 640 033c FFF7FEFF 		bl	CheckS2	@
+ 641 0340 031C     		mov	r3, r0	@ tmp366,
+ 642 0342 002B     		cmp	r3, #0	@ D.5905,
+ 643 0344 40D1     		bne	.L43	@,
+ 229:.\src/networked.c **** 			{
+ 230:.\src/networked.c **** 				networked_selections = MENU_ON;
+ 644              		.loc 1 230 0 is_stmt 1
+ 645 0346 0B4B     		ldr	r3, .L44+20	@ tmp368,
+ 646 0348 0022     		mov	r2, #0	@ tmp369,
+ 647 034a 1A70     		strb	r2, [r3]	@ tmp370, networked_selections
+ 231:.\src/networked.c **** 				//limpio Menu
+ 232:.\src/networked.c **** 				networked_menu_state = NETWORKED_MENU_INIT;
+ 648              		.loc 1 232 0
+ 649 034c 1B4B     		ldr	r3, .L44+92	@ tmp371,
+ 650 034e 0022     		mov	r2, #0	@ tmp372,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 17
+
+
+ 651 0350 1A70     		strb	r2, [r3]	@ tmp373, networked_menu_state
+ 233:.\src/networked.c **** 			}
+ 234:.\src/networked.c **** 			break;
+ 652              		.loc 1 234 0
+ 653 0352 39E0     		b	.L43	@
+ 654              	.L22:
+ 235:.\src/networked.c **** 
+ 236:.\src/networked.c **** 		default:
+ 237:.\src/networked.c **** 			networked_selections = MENU_ON;
+ 655              		.loc 1 237 0
+ 656 0354 074B     		ldr	r3, .L44+20	@ tmp374,
+ 657 0356 0022     		mov	r2, #0	@ tmp375,
+ 658 0358 1A70     		strb	r2, [r3]	@ tmp376, networked_selections
+ 238:.\src/networked.c **** 			break;
+ 659              		.loc 1 238 0
+ 660 035a 36E0     		b	.L31	@
+ 661              	.L40:
+ 201:.\src/networked.c **** 			break;
+ 662              		.loc 1 201 0
+ 663 035c C046     		mov	r8, r8
+ 664 035e 34E0     		b	.L31	@
+ 665              	.L45:
+ 666              		.align	2
+ 667              	.L44:
+ 668 0360 00000000 		.word	standalone_enable_menu_timer
+ 669 0364 30750000 		.word	30000
+ 670 0368 00000000 		.word	networked_state
+ 671 036c 00000000 		.word	NetworkedStruct_local
+ 672 0370 00000000 		.word	NetworkedStruct_constant
+ 673 0374 00000000 		.word	networked_selections
+ 674 0378 00000000 		.word	.LC5
+ 675 037c 14000000 		.word	.LC7
+ 676 0380 00000000 		.word	DMX_channel_quantity
+ 677 0384 00000000 		.word	DMX_channel_selected
+ 678 0388 00000000 		.word	Packet_Detected_Flag
+ 679 038c 00000000 		.word	data
+ 680 0390 00000000 		.word	networked_ii
+ 681 0394 00000000 		.word	networked_dim_last
+ 682 0398 24000000 		.word	.LC15
+ 683 039c 28000000 		.word	.LC17
+ 684 03a0 00000000 		.word	networked_dim2_last
+ 685 03a4 2C000000 		.word	.LC20
+ 686 03a8 3C000000 		.word	.LC22
+ 687 03ac 50000000 		.word	.LC24
+ 688 03b0 64000000 		.word	.LC26
+ 689 03b4 74000000 		.word	.LC28
+ 690 03b8 00000000 		.word	s_blank_line
+ 691 03bc 00000000 		.word	networked_menu_state
+ 692              	.L41:
+ 212:.\src/networked.c **** 			break;
+ 693              		.loc 1 212 0
+ 694 03c0 C046     		mov	r8, r8
+ 695 03c2 02E0     		b	.L31	@
+ 696              	.L42:
+ 225:.\src/networked.c **** 			break;
+ 697              		.loc 1 225 0
+ 698 03c4 C046     		mov	r8, r8
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 18
+
+
+ 699 03c6 00E0     		b	.L31	@
+ 700              	.L43:
+ 234:.\src/networked.c **** 			break;
+ 701              		.loc 1 234 0
+ 702 03c8 C046     		mov	r8, r8
+ 703              	.L31:
+ 239:.\src/networked.c **** 	}
+ 240:.\src/networked.c **** 
+ 241:.\src/networked.c **** 	if (CheckS1() > S_HALF)
+ 704              		.loc 1 241 0
+ 705 03ca FFF7FEFF 		bl	CheckS1	@
+ 706 03ce 031C     		mov	r3, r0	@ tmp377,
+ 707 03d0 032B     		cmp	r3, #3	@ D.5908,
+ 708 03d2 03D9     		bls	.L36	@,
+ 242:.\src/networked.c **** 		resp = RESP_CHANGE_ALL_UP;
+ 709              		.loc 1 242 0
+ 710 03d4 6B46     		mov	r3, sp	@ tmp379,
+ 711 03d6 2733     		add	r3, r3, #39	@ tmp379,
+ 712 03d8 0322     		mov	r2, #3	@ tmp380,
+ 713 03da 1A70     		strb	r2, [r3]	@ tmp381, resp
+ 714              	.L36:
+ 243:.\src/networked.c **** 
+ 244:.\src/networked.c **** 	return resp;
+ 715              		.loc 1 244 0
+ 716 03dc 6B46     		mov	r3, sp	@ tmp382,
+ 717 03de 2733     		add	r3, r3, #39	@ tmp382,
+ 718 03e0 1B78     		ldrb	r3, [r3]	@ D.5911, resp
+ 245:.\src/networked.c **** }
+ 719              		.loc 1 245 0
+ 720 03e2 181C     		mov	r0, r3	@, <retval>
+ 721 03e4 0AB0     		add	sp, sp, #40	@,,
+ 722              		@ sp needed for prologue	@
+ 723 03e6 10BD     		pop	{r4, pc}
+ 724              		.cfi_endproc
+ 725              	.LFE20:
+ 726              		.size	FuncNetworked, .-FuncNetworked
+ 727              		.section	.rodata
+ 728 0085 000000   		.align	2
+ 729              	.LC33:
+ 730 0088 53746172 		.ascii	"Starting Network\000"
+ 730      74696E67 
+ 730      204E6574 
+ 730      776F726B 
+ 730      00
+ 731 0099 000000   		.align	2
+ 732              	.LC35:
+ 733 009c 53656C65 		.ascii	"Selections     \000"
+ 733      6374696F 
+ 733      6E732020 
+ 733      20202000 
+ 734              		.align	2
+ 735              	.LC37:
+ 736 00ac 20204E65 		.ascii	"  Network Mode  \000"
+ 736      74776F72 
+ 736      6B204D6F 
+ 736      64652020 
+ 736      00
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 19
+
+
+ 737 00bd 000000   		.section	.text.MenuNetworked,"ax",%progbits
+ 738              		.align	2
+ 739              		.global	MenuNetworked
+ 740              		.code	16
+ 741              		.thumb_func
+ 742              		.type	MenuNetworked, %function
+ 743              	MenuNetworked:
+ 744              	.LFB21:
+ 246:.\src/networked.c **** 
+ 247:.\src/networked.c **** 
+ 248:.\src/networked.c **** unsigned char MenuNetworked(void)
+ 249:.\src/networked.c **** {
+ 745              		.loc 1 249 0
+ 746              		.cfi_startproc
+ 747 0000 10B5     		push	{r4, lr}	@
+ 748              	.LCFI2:
+ 749              		.cfi_def_cfa_offset 8
+ 750              		.cfi_offset 4, -8
+ 751              		.cfi_offset 14, -4
+ 752 0002 82B0     		sub	sp, sp, #8	@,,
+ 753              	.LCFI3:
+ 754              		.cfi_def_cfa_offset 16
+ 250:.\src/networked.c **** 	unsigned char resp = RESP_CONTINUE;
+ 755              		.loc 1 250 0
+ 756 0004 6B46     		mov	r3, sp	@ tmp138,
+ 757 0006 0733     		add	r3, r3, #7	@ tmp138,
+ 758 0008 0022     		mov	r2, #0	@ tmp139,
+ 759 000a 1A70     		strb	r2, [r3]	@ tmp140, resp
+ 251:.\src/networked.c **** 	unsigned char resp_down = RESP_CONTINUE;
+ 760              		.loc 1 251 0
+ 761 000c 6B46     		mov	r3, sp	@ tmp141,
+ 762 000e 0633     		add	r3, r3, #6	@ tmp141,
+ 763 0010 0022     		mov	r2, #0	@ tmp142,
+ 764 0012 1A70     		strb	r2, [r3]	@ tmp143, resp_down
+ 252:.\src/networked.c **** 	unsigned char dummy = 0;
+ 765              		.loc 1 252 0
+ 766 0014 6B46     		mov	r3, sp	@ tmp144,
+ 767 0016 0533     		add	r3, r3, #5	@ tmp144,
+ 768 0018 0022     		mov	r2, #0	@ tmp145,
+ 769 001a 1A70     		strb	r2, [r3]	@ tmp146, dummy
+ 253:.\src/networked.c **** 
+ 254:.\src/networked.c **** 	switch (networked_menu_state)
+ 770              		.loc 1 254 0
+ 771 001c 364B     		ldr	r3, .L62	@ tmp147,
+ 772 001e 1B78     		ldrb	r3, [r3]	@ networked_menu_state.0, networked_menu_state
+ 773 0020 012B     		cmp	r3, #1	@ D.5813,
+ 774 0022 1DD0     		beq	.L49	@,
+ 775 0024 02DC     		bgt	.L52	@,
+ 776 0026 002B     		cmp	r3, #0	@ D.5813,
+ 777 0028 05D0     		beq	.L48	@,
+ 778 002a 56E0     		b	.L47	@
+ 779              	.L52:
+ 780 002c 022B     		cmp	r3, #2	@ D.5813,
+ 781 002e 2CD0     		beq	.L50	@,
+ 782 0030 032B     		cmp	r3, #3	@ D.5813,
+ 783 0032 30D0     		beq	.L51	@,
+ 784 0034 51E0     		b	.L47	@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 20
+
+
+ 785              	.L48:
+ 255:.\src/networked.c **** 	{
+ 256:.\src/networked.c **** 		case NETWORKED_MENU_INIT:
+ 257:.\src/networked.c **** 			//empiezo con las selecciones
+ 258:.\src/networked.c **** 			resp_down = FuncShowBlink ((const char *) "Starting Network", (const char *) "Selections     ", 
+ 786              		.loc 1 258 0
+ 787 0036 6C46     		mov	r4, sp	@ tmp148,
+ 788 0038 0634     		add	r4, r4, #6	@ tmp148,
+ 789 003a 304A     		ldr	r2, .L62+4	@ tmp149,
+ 790 003c 304B     		ldr	r3, .L62+8	@ tmp150,
+ 791 003e 101C     		mov	r0, r2	@, tmp149
+ 792 0040 191C     		mov	r1, r3	@, tmp150
+ 793 0042 0122     		mov	r2, #1	@,
+ 794 0044 0223     		mov	r3, #2	@,
+ 795 0046 FFF7FEFF 		bl	FuncShowBlink	@
+ 796 004a 031C     		mov	r3, r0	@ tmp151,
+ 797 004c 2370     		strb	r3, [r4]	@ tmp153, resp_down
+ 259:.\src/networked.c **** 
+ 260:.\src/networked.c **** 			if (resp_down == RESP_FINISH)
+ 798              		.loc 1 260 0
+ 799 004e 6B46     		mov	r3, sp	@ tmp154,
+ 800 0050 0633     		add	r3, r3, #6	@ tmp154,
+ 801 0052 1B78     		ldrb	r3, [r3]	@ tmp155, resp_down
+ 802 0054 0A2B     		cmp	r3, #10	@ tmp155,
+ 803 0056 44D1     		bne	.L59	@,
+ 261:.\src/networked.c **** 				networked_menu_state = NETWORKED_MENU_INIT_1;
+ 804              		.loc 1 261 0
+ 805 0058 274B     		ldr	r3, .L62	@ tmp156,
+ 806 005a 0122     		mov	r2, #1	@ tmp157,
+ 807 005c 1A70     		strb	r2, [r3]	@ tmp158, networked_menu_state
+ 262:.\src/networked.c **** 			break;
+ 808              		.loc 1 262 0
+ 809 005e 40E0     		b	.L59	@
+ 810              	.L49:
+ 263:.\src/networked.c **** 
+ 264:.\src/networked.c **** 		case NETWORKED_MENU_INIT_1:
+ 265:.\src/networked.c **** 			resp_down = FuncShowBlink ((const char *) "  Network Mode  ",(const char *) s_blank_line, 1, BLI
+ 811              		.loc 1 265 0
+ 812 0060 6C46     		mov	r4, sp	@ tmp159,
+ 813 0062 0634     		add	r4, r4, #6	@ tmp159,
+ 814 0064 274A     		ldr	r2, .L62+12	@ tmp160,
+ 815 0066 284B     		ldr	r3, .L62+16	@ tmp161,
+ 816 0068 101C     		mov	r0, r2	@, tmp160
+ 817 006a 191C     		mov	r1, r3	@, tmp161
+ 818 006c 0122     		mov	r2, #1	@,
+ 819 006e 0223     		mov	r3, #2	@,
+ 820 0070 FFF7FEFF 		bl	FuncShowBlink	@
+ 821 0074 031C     		mov	r3, r0	@ tmp162,
+ 822 0076 2370     		strb	r3, [r4]	@ tmp164, resp_down
+ 266:.\src/networked.c **** 
+ 267:.\src/networked.c **** 			if (resp_down == RESP_FINISH)
+ 823              		.loc 1 267 0
+ 824 0078 6B46     		mov	r3, sp	@ tmp165,
+ 825 007a 0633     		add	r3, r3, #6	@ tmp165,
+ 826 007c 1B78     		ldrb	r3, [r3]	@ tmp166, resp_down
+ 827 007e 0A2B     		cmp	r3, #10	@ tmp166,
+ 828 0080 31D1     		bne	.L60	@,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 21
+
+
+ 268:.\src/networked.c **** 				networked_menu_state = NETWORKED_MENU_SELECT_CHANNEL;
+ 829              		.loc 1 268 0
+ 830 0082 1D4B     		ldr	r3, .L62	@ tmp167,
+ 831 0084 0222     		mov	r2, #2	@ tmp168,
+ 832 0086 1A70     		strb	r2, [r3]	@ tmp169, networked_menu_state
+ 269:.\src/networked.c **** 
+ 270:.\src/networked.c **** 			break;
+ 833              		.loc 1 270 0
+ 834 0088 2DE0     		b	.L60	@
+ 835              	.L50:
+ 271:.\src/networked.c **** 
+ 272:.\src/networked.c **** 		case NETWORKED_MENU_SELECT_CHANNEL:
+ 273:.\src/networked.c **** 			FuncChangeChannelsReset ();
+ 836              		.loc 1 273 0
+ 837 008a FFF7FEFF 		bl	FuncChangeReset	@
+ 274:.\src/networked.c **** 			networked_menu_state = NETWORKED_MENU_SELECT_CHANNEL_1;
+ 838              		.loc 1 274 0
+ 839 008e 1A4B     		ldr	r3, .L62	@ tmp170,
+ 840 0090 0322     		mov	r2, #3	@ tmp171,
+ 841 0092 1A70     		strb	r2, [r3]	@ tmp172, networked_menu_state
+ 275:.\src/networked.c **** 			break;
+ 842              		.loc 1 275 0
+ 843 0094 2AE0     		b	.L54	@
+ 844              	.L51:
+ 276:.\src/networked.c **** 
+ 277:.\src/networked.c **** 		case NETWORKED_MENU_SELECT_CHANNEL_1:
+ 278:.\src/networked.c **** 			resp_down = FuncChangeChannels ((unsigned char *) &NetworkedStruct_local.networked_dmx_channel);
+ 845              		.loc 1 278 0
+ 846 0096 6C46     		mov	r4, sp	@ tmp173,
+ 847 0098 0634     		add	r4, r4, #6	@ tmp173,
+ 848 009a 1C4B     		ldr	r3, .L62+20	@ tmp174,
+ 849 009c 181C     		mov	r0, r3	@, tmp174
+ 850 009e 0221     		mov	r1, #2	@,
+ 851 00a0 0122     		mov	r2, #1	@,
+ 852 00a2 FF23     		mov	r3, #255	@,
+ 853 00a4 FFF7FEFF 		bl	FuncChange	@
+ 854 00a8 031C     		mov	r3, r0	@ tmp175,
+ 855 00aa 2370     		strb	r3, [r4]	@ tmp177, resp_down
+ 279:.\src/networked.c **** 
+ 280:.\src/networked.c **** 			if (resp_down == RESP_FINISH)
+ 856              		.loc 1 280 0
+ 857 00ac 6B46     		mov	r3, sp	@ tmp178,
+ 858 00ae 0633     		add	r3, r3, #6	@ tmp178,
+ 859 00b0 1B78     		ldrb	r3, [r3]	@ tmp179, resp_down
+ 860 00b2 0A2B     		cmp	r3, #10	@ tmp179,
+ 861 00b4 07D1     		bne	.L56	@,
+ 281:.\src/networked.c **** 			{
+ 282:.\src/networked.c **** 				resp = RESP_SELECTED;
+ 862              		.loc 1 282 0
+ 863 00b6 6B46     		mov	r3, sp	@ tmp180,
+ 864 00b8 0733     		add	r3, r3, #7	@ tmp180,
+ 865 00ba 0122     		mov	r2, #1	@ tmp181,
+ 866 00bc 1A70     		strb	r2, [r3]	@ tmp182, resp
+ 283:.\src/networked.c **** 				networked_menu_state = NETWORKED_MENU_INIT;
+ 867              		.loc 1 283 0
+ 868 00be 0E4B     		ldr	r3, .L62	@ tmp183,
+ 869 00c0 0022     		mov	r2, #0	@ tmp184,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 22
+
+
+ 870 00c2 1A70     		strb	r2, [r3]	@ tmp185, networked_menu_state
+ 284:.\src/networked.c **** 			}
+ 285:.\src/networked.c **** 			else if (resp_down == RESP_WORKING)
+ 286:.\src/networked.c **** 				resp = RESP_WORKING;
+ 287:.\src/networked.c **** 
+ 288:.\src/networked.c **** 			break;
+ 871              		.loc 1 288 0
+ 872 00c4 11E0     		b	.L61	@
+ 873              	.L56:
+ 285:.\src/networked.c **** 			else if (resp_down == RESP_WORKING)
+ 874              		.loc 1 285 0
+ 875 00c6 6B46     		mov	r3, sp	@ tmp186,
+ 876 00c8 0633     		add	r3, r3, #6	@ tmp186,
+ 877 00ca 1B78     		ldrb	r3, [r3]	@ tmp187, resp_down
+ 878 00cc 042B     		cmp	r3, #4	@ tmp187,
+ 879 00ce 0CD1     		bne	.L61	@,
+ 286:.\src/networked.c **** 				resp = RESP_WORKING;
+ 880              		.loc 1 286 0
+ 881 00d0 6B46     		mov	r3, sp	@ tmp188,
+ 882 00d2 0733     		add	r3, r3, #7	@ tmp188,
+ 883 00d4 0422     		mov	r2, #4	@ tmp189,
+ 884 00d6 1A70     		strb	r2, [r3]	@ tmp190, resp
+ 885              		.loc 1 288 0
+ 886 00d8 07E0     		b	.L61	@
+ 887              	.L47:
+ 289:.\src/networked.c **** 
+ 290:.\src/networked.c **** 
+ 291:.\src/networked.c **** 		default:
+ 292:.\src/networked.c **** 			networked_menu_state = NETWORKED_MENU_INIT;
+ 888              		.loc 1 292 0
+ 889 00da 074B     		ldr	r3, .L62	@ tmp191,
+ 890 00dc 0022     		mov	r2, #0	@ tmp192,
+ 891 00de 1A70     		strb	r2, [r3]	@ tmp193, networked_menu_state
+ 293:.\src/networked.c **** 			break;
+ 892              		.loc 1 293 0
+ 893 00e0 04E0     		b	.L54	@
+ 894              	.L59:
+ 262:.\src/networked.c **** 			break;
+ 895              		.loc 1 262 0
+ 896 00e2 C046     		mov	r8, r8
+ 897 00e4 02E0     		b	.L54	@
+ 898              	.L60:
+ 270:.\src/networked.c **** 			break;
+ 899              		.loc 1 270 0
+ 900 00e6 C046     		mov	r8, r8
+ 901 00e8 00E0     		b	.L54	@
+ 902              	.L61:
+ 288:.\src/networked.c **** 			break;
+ 903              		.loc 1 288 0
+ 904 00ea C046     		mov	r8, r8
+ 905              	.L54:
+ 294:.\src/networked.c **** 	}
+ 295:.\src/networked.c **** 	return resp;
+ 906              		.loc 1 295 0
+ 907 00ec 6B46     		mov	r3, sp	@ tmp194,
+ 908 00ee 0733     		add	r3, r3, #7	@ tmp194,
+ 909 00f0 1B78     		ldrb	r3, [r3]	@ D.5823, resp
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 23
+
+
+ 296:.\src/networked.c **** }
+ 910              		.loc 1 296 0
+ 911 00f2 181C     		mov	r0, r3	@, <retval>
+ 912 00f4 02B0     		add	sp, sp, #8	@,,
+ 913              		@ sp needed for prologue	@
+ 914 00f6 10BD     		pop	{r4, pc}
+ 915              	.L63:
+ 916              		.align	2
+ 917              	.L62:
+ 918 00f8 00000000 		.word	networked_menu_state
+ 919 00fc 88000000 		.word	.LC33
+ 920 0100 9C000000 		.word	.LC35
+ 921 0104 AC000000 		.word	.LC37
+ 922 0108 00000000 		.word	s_blank_line
+ 923 010c 00000000 		.word	NetworkedStruct_local
+ 924              		.cfi_endproc
+ 925              	.LFE21:
+ 926              		.size	MenuNetworked, .-MenuNetworked
+ 927              		.text
+ 928              	.Letext0:
+ 929              		.file 2 ".\\src\\networked.h"
+ 930              		.file 3 "c:\\program files (x86)\\gnu tools arm embedded\\4.7 2013q2\\bin\\../lib/gcc/arm-none-eab
+ 931              		.file 4 ".\\cmsis_boot/stm32f0xx.h"
+ 932              		.section	.debug_info,"",%progbits
+ 933              	.Ldebug_info0:
+ 934 0000 B5030000 		.4byte	0x3b5
+ 935 0004 0200     		.2byte	0x2
+ 936 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 937 000a 04       		.byte	0x4
+ 938 000b 01       		.uleb128 0x1
+ 939 000c 6C010000 		.4byte	.LASF48
+ 940 0010 01       		.byte	0x1
+ 941 0011 B8000000 		.4byte	.LASF49
+ 942 0015 60020000 		.4byte	.LASF50
+ 943 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 944 001d 00000000 		.4byte	0
+ 945 0021 00000000 		.4byte	0
+ 946 0025 00000000 		.4byte	.Ldebug_line0
+ 947 0029 02       		.uleb128 0x2
+ 948 002a 67000000 		.4byte	.LASF51
+ 949 002e 04       		.byte	0x4
+ 950 002f 02       		.byte	0x2
+ 951 0030 0C       		.byte	0xc
+ 952 0031 60000000 		.4byte	0x60
+ 953 0035 03       		.uleb128 0x3
+ 954 0036 00000000 		.4byte	.LASF0
+ 955 003a 02       		.byte	0x2
+ 956 003b 0F       		.byte	0xf
+ 957 003c 60000000 		.4byte	0x60
+ 958 0040 02       		.byte	0x2
+ 959 0041 23       		.byte	0x23
+ 960 0042 00       		.uleb128 0
+ 961 0043 03       		.uleb128 0x3
+ 962 0044 27010000 		.4byte	.LASF1
+ 963 0048 02       		.byte	0x2
+ 964 0049 10       		.byte	0x10
+ 965 004a 67000000 		.4byte	0x67
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 24
+
+
+ 966 004e 02       		.byte	0x2
+ 967 004f 23       		.byte	0x23
+ 968 0050 02       		.uleb128 0x2
+ 969 0051 03       		.uleb128 0x3
+ 970 0052 2E010000 		.4byte	.LASF2
+ 971 0056 02       		.byte	0x2
+ 972 0057 11       		.byte	0x11
+ 973 0058 67000000 		.4byte	0x67
+ 974 005c 02       		.byte	0x2
+ 975 005d 23       		.byte	0x23
+ 976 005e 03       		.uleb128 0x3
+ 977 005f 00       		.byte	0
+ 978 0060 04       		.uleb128 0x4
+ 979 0061 02       		.byte	0x2
+ 980 0062 07       		.byte	0x7
+ 981 0063 4E000000 		.4byte	.LASF3
+ 982 0067 04       		.uleb128 0x4
+ 983 0068 01       		.byte	0x1
+ 984 0069 08       		.byte	0x8
+ 985 006a A5000000 		.4byte	.LASF4
+ 986 006e 05       		.uleb128 0x5
+ 987 006f C2010000 		.4byte	.LASF7
+ 988 0073 02       		.byte	0x2
+ 989 0074 13       		.byte	0x13
+ 990 0075 29000000 		.4byte	0x29
+ 991 0079 04       		.uleb128 0x4
+ 992 007a 01       		.byte	0x1
+ 993 007b 06       		.byte	0x6
+ 994 007c DB020000 		.4byte	.LASF5
+ 995 0080 04       		.uleb128 0x4
+ 996 0081 02       		.byte	0x2
+ 997 0082 05       		.byte	0x5
+ 998 0083 AB020000 		.4byte	.LASF6
+ 999 0087 05       		.uleb128 0x5
+ 1000 0088 B5020000 		.4byte	.LASF8
+ 1001 008c 03       		.byte	0x3
+ 1002 008d 36       		.byte	0x36
+ 1003 008e 60000000 		.4byte	0x60
+ 1004 0092 04       		.uleb128 0x4
+ 1005 0093 04       		.byte	0x4
+ 1006 0094 05       		.byte	0x5
+ 1007 0095 40000000 		.4byte	.LASF9
+ 1008 0099 05       		.uleb128 0x5
+ 1009 009a BE020000 		.4byte	.LASF10
+ 1010 009e 03       		.byte	0x3
+ 1011 009f 50       		.byte	0x50
+ 1012 00a0 A4000000 		.4byte	0xa4
+ 1013 00a4 04       		.uleb128 0x4
+ 1014 00a5 04       		.byte	0x4
+ 1015 00a6 07       		.byte	0x7
+ 1016 00a7 CA000000 		.4byte	.LASF11
+ 1017 00ab 04       		.uleb128 0x4
+ 1018 00ac 08       		.byte	0x8
+ 1019 00ad 05       		.byte	0x5
+ 1020 00ae 52020000 		.4byte	.LASF12
+ 1021 00b2 04       		.uleb128 0x4
+ 1022 00b3 08       		.byte	0x8
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 25
+
+
+ 1023 00b4 07       		.byte	0x7
+ 1024 00b5 D4010000 		.4byte	.LASF13
+ 1025 00b9 06       		.uleb128 0x6
+ 1026 00ba 04       		.byte	0x4
+ 1027 00bb 05       		.byte	0x5
+ 1028 00bc 696E7400 		.ascii	"int\000"
+ 1029 00c0 04       		.uleb128 0x4
+ 1030 00c1 04       		.byte	0x4
+ 1031 00c2 07       		.byte	0x7
+ 1032 00c3 5F010000 		.4byte	.LASF14
+ 1033 00c7 04       		.uleb128 0x4
+ 1034 00c8 04       		.byte	0x4
+ 1035 00c9 07       		.byte	0x7
+ 1036 00ca 49020000 		.4byte	.LASF15
+ 1037 00ce 07       		.uleb128 0x7
+ 1038 00cf 99000000 		.4byte	0x99
+ 1039 00d3 08       		.uleb128 0x8
+ 1040 00d4 99000000 		.4byte	0x99
+ 1041 00d8 E3000000 		.4byte	0xe3
+ 1042 00dc 09       		.uleb128 0x9
+ 1043 00dd C7000000 		.4byte	0xc7
+ 1044 00e1 01       		.byte	0x1
+ 1045 00e2 00       		.byte	0
+ 1046 00e3 07       		.uleb128 0x7
+ 1047 00e4 87000000 		.4byte	0x87
+ 1048 00e8 0A       		.uleb128 0xa
+ 1049 00e9 2C       		.byte	0x2c
+ 1050 00ea 04       		.byte	0x4
+ 1051 00eb 6902     		.2byte	0x269
+ 1052 00ed C4010000 		.4byte	0x1c4
+ 1053 00f1 0B       		.uleb128 0xb
+ 1054 00f2 61000000 		.4byte	.LASF16
+ 1055 00f6 04       		.byte	0x4
+ 1056 00f7 6B02     		.2byte	0x26b
+ 1057 00f9 CE000000 		.4byte	0xce
+ 1058 00fd 02       		.byte	0x2
+ 1059 00fe 23       		.byte	0x23
+ 1060 00ff 00       		.uleb128 0
+ 1061 0100 0B       		.uleb128 0xb
+ 1062 0101 99000000 		.4byte	.LASF17
+ 1063 0105 04       		.byte	0x4
+ 1064 0106 6C02     		.2byte	0x26c
+ 1065 0108 E3000000 		.4byte	0xe3
+ 1066 010c 02       		.byte	0x2
+ 1067 010d 23       		.byte	0x23
+ 1068 010e 04       		.uleb128 0x4
+ 1069 010f 0B       		.uleb128 0xb
+ 1070 0110 71000000 		.4byte	.LASF18
+ 1071 0114 04       		.byte	0x4
+ 1072 0115 6D02     		.2byte	0x26d
+ 1073 0117 87000000 		.4byte	0x87
+ 1074 011b 02       		.byte	0x2
+ 1075 011c 23       		.byte	0x23
+ 1076 011d 06       		.uleb128 0x6
+ 1077 011e 0B       		.uleb128 0xb
+ 1078 011f 16000000 		.4byte	.LASF19
+ 1079 0123 04       		.byte	0x4
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 26
+
+
+ 1080 0124 6E02     		.2byte	0x26e
+ 1081 0126 CE000000 		.4byte	0xce
+ 1082 012a 02       		.byte	0x2
+ 1083 012b 23       		.byte	0x23
+ 1084 012c 08       		.uleb128 0x8
+ 1085 012d 0B       		.uleb128 0xb
+ 1086 012e 43020000 		.4byte	.LASF20
+ 1087 0132 04       		.byte	0x4
+ 1088 0133 6F02     		.2byte	0x26f
+ 1089 0135 CE000000 		.4byte	0xce
+ 1090 0139 02       		.byte	0x2
+ 1091 013a 23       		.byte	0x23
+ 1092 013b 0C       		.uleb128 0xc
+ 1093 013c 0C       		.uleb128 0xc
+ 1094 013d 49445200 		.ascii	"IDR\000"
+ 1095 0141 04       		.byte	0x4
+ 1096 0142 7002     		.2byte	0x270
+ 1097 0144 E3000000 		.4byte	0xe3
+ 1098 0148 02       		.byte	0x2
+ 1099 0149 23       		.byte	0x23
+ 1100 014a 10       		.uleb128 0x10
+ 1101 014b 0B       		.uleb128 0xb
+ 1102 014c 7B000000 		.4byte	.LASF21
+ 1103 0150 04       		.byte	0x4
+ 1104 0151 7102     		.2byte	0x271
+ 1105 0153 87000000 		.4byte	0x87
+ 1106 0157 02       		.byte	0x2
+ 1107 0158 23       		.byte	0x23
+ 1108 0159 12       		.uleb128 0x12
+ 1109 015a 0C       		.uleb128 0xc
+ 1110 015b 4F445200 		.ascii	"ODR\000"
+ 1111 015f 04       		.byte	0x4
+ 1112 0160 7202     		.2byte	0x272
+ 1113 0162 E3000000 		.4byte	0xe3
+ 1114 0166 02       		.byte	0x2
+ 1115 0167 23       		.byte	0x23
+ 1116 0168 14       		.uleb128 0x14
+ 1117 0169 0B       		.uleb128 0xb
+ 1118 016a 85000000 		.4byte	.LASF22
+ 1119 016e 04       		.byte	0x4
+ 1120 016f 7302     		.2byte	0x273
+ 1121 0171 87000000 		.4byte	0x87
+ 1122 0175 02       		.byte	0x2
+ 1123 0176 23       		.byte	0x23
+ 1124 0177 16       		.uleb128 0x16
+ 1125 0178 0B       		.uleb128 0xb
+ 1126 0179 49000000 		.4byte	.LASF23
+ 1127 017d 04       		.byte	0x4
+ 1128 017e 7402     		.2byte	0x274
+ 1129 0180 CE000000 		.4byte	0xce
+ 1130 0184 02       		.byte	0x2
+ 1131 0185 23       		.byte	0x23
+ 1132 0186 18       		.uleb128 0x18
+ 1133 0187 0B       		.uleb128 0xb
+ 1134 0188 16030000 		.4byte	.LASF24
+ 1135 018c 04       		.byte	0x4
+ 1136 018d 7502     		.2byte	0x275
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 27
+
+
+ 1137 018f CE000000 		.4byte	0xce
+ 1138 0193 02       		.byte	0x2
+ 1139 0194 23       		.byte	0x23
+ 1140 0195 1C       		.uleb128 0x1c
+ 1141 0196 0C       		.uleb128 0xc
+ 1142 0197 41465200 		.ascii	"AFR\000"
+ 1143 019b 04       		.byte	0x4
+ 1144 019c 7602     		.2byte	0x276
+ 1145 019e C4010000 		.4byte	0x1c4
+ 1146 01a2 02       		.byte	0x2
+ 1147 01a3 23       		.byte	0x23
+ 1148 01a4 20       		.uleb128 0x20
+ 1149 01a5 0C       		.uleb128 0xc
+ 1150 01a6 42525200 		.ascii	"BRR\000"
+ 1151 01aa 04       		.byte	0x4
+ 1152 01ab 7702     		.2byte	0x277
+ 1153 01ad E3000000 		.4byte	0xe3
+ 1154 01b1 02       		.byte	0x2
+ 1155 01b2 23       		.byte	0x23
+ 1156 01b3 28       		.uleb128 0x28
+ 1157 01b4 0B       		.uleb128 0xb
+ 1158 01b5 8F000000 		.4byte	.LASF25
+ 1159 01b9 04       		.byte	0x4
+ 1160 01ba 7802     		.2byte	0x278
+ 1161 01bc 87000000 		.4byte	0x87
+ 1162 01c0 02       		.byte	0x2
+ 1163 01c1 23       		.byte	0x23
+ 1164 01c2 2A       		.uleb128 0x2a
+ 1165 01c3 00       		.byte	0
+ 1166 01c4 07       		.uleb128 0x7
+ 1167 01c5 D3000000 		.4byte	0xd3
+ 1168 01c9 0D       		.uleb128 0xd
+ 1169 01ca B5010000 		.4byte	.LASF26
+ 1170 01ce 04       		.byte	0x4
+ 1171 01cf 7902     		.2byte	0x279
+ 1172 01d1 E8000000 		.4byte	0xe8
+ 1173 01d5 04       		.uleb128 0x4
+ 1174 01d6 01       		.byte	0x1
+ 1175 01d7 08       		.byte	0x8
+ 1176 01d8 A6020000 		.4byte	.LASF27
+ 1177 01dc 0E       		.uleb128 0xe
+ 1178 01dd 04       		.byte	0x4
+ 1179 01de E2010000 		.4byte	0x1e2
+ 1180 01e2 0F       		.uleb128 0xf
+ 1181 01e3 D5010000 		.4byte	0x1d5
+ 1182 01e7 10       		.uleb128 0x10
+ 1183 01e8 01       		.byte	0x1
+ 1184 01e9 EB010000 		.4byte	.LASF31
+ 1185 01ed 01       		.byte	0x1
+ 1186 01ee 3D       		.byte	0x3d
+ 1187 01ef 01       		.byte	0x1
+ 1188 01f0 67000000 		.4byte	0x67
+ 1189 01f4 00000000 		.4byte	.LFB20
+ 1190 01f8 E8030000 		.4byte	.LFE20
+ 1191 01fc 00000000 		.4byte	.LLST0
+ 1192 0200 01       		.byte	0x1
+ 1193 0201 61020000 		.4byte	0x261
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 28
+
+
+ 1194 0205 11       		.uleb128 0x11
+ 1195 0206 2C000000 		.4byte	.LASF52
+ 1196 020a 01       		.byte	0x1
+ 1197 020b 3D       		.byte	0x3d
+ 1198 020c 67000000 		.4byte	0x67
+ 1199 0210 02       		.byte	0x2
+ 1200 0211 91       		.byte	0x91
+ 1201 0212 57       		.sleb128 -41
+ 1202 0213 12       		.uleb128 0x12
+ 1203 0214 B3000000 		.4byte	.LASF28
+ 1204 0218 01       		.byte	0x1
+ 1205 0219 3F       		.byte	0x3f
+ 1206 021a 67000000 		.4byte	0x67
+ 1207 021e 02       		.byte	0x2
+ 1208 021f 91       		.byte	0x91
+ 1209 0220 77       		.sleb128 -9
+ 1210 0221 12       		.uleb128 0x12
+ 1211 0222 36000000 		.4byte	.LASF29
+ 1212 0226 01       		.byte	0x1
+ 1213 0227 40       		.byte	0x40
+ 1214 0228 67000000 		.4byte	0x67
+ 1215 022c 02       		.byte	0x2
+ 1216 022d 91       		.byte	0x91
+ 1217 022e 73       		.sleb128 -13
+ 1218 022f 12       		.uleb128 0x12
+ 1219 0230 0C010000 		.4byte	.LASF30
+ 1220 0234 01       		.byte	0x1
+ 1221 0235 41       		.byte	0x41
+ 1222 0236 61020000 		.4byte	0x261
+ 1223 023a 02       		.byte	0x2
+ 1224 023b 91       		.byte	0x91
+ 1225 023c 5C       		.sleb128 -36
+ 1226 023d 13       		.uleb128 0x13
+ 1227 023e 5E010000 		.4byte	.LBB2
+ 1228 0242 2E020000 		.4byte	.LBE2
+ 1229 0246 14       		.uleb128 0x14
+ 1230 0247 6900     		.ascii	"i\000"
+ 1231 0249 01       		.byte	0x1
+ 1232 024a 8A       		.byte	0x8a
+ 1233 024b 67000000 		.4byte	0x67
+ 1234 024f 02       		.byte	0x2
+ 1235 0250 91       		.byte	0x91
+ 1236 0251 76       		.sleb128 -10
+ 1237 0252 14       		.uleb128 0x14
+ 1238 0253 696900   		.ascii	"ii\000"
+ 1239 0256 01       		.byte	0x1
+ 1240 0257 8B       		.byte	0x8b
+ 1241 0258 60000000 		.4byte	0x60
+ 1242 025c 02       		.byte	0x2
+ 1243 025d 91       		.byte	0x91
+ 1244 025e 74       		.sleb128 -12
+ 1245 025f 00       		.byte	0
+ 1246 0260 00       		.byte	0
+ 1247 0261 08       		.uleb128 0x8
+ 1248 0262 D5010000 		.4byte	0x1d5
+ 1249 0266 71020000 		.4byte	0x271
+ 1250 026a 09       		.uleb128 0x9
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 29
+
+
+ 1251 026b C7000000 		.4byte	0xc7
+ 1252 026f 13       		.byte	0x13
+ 1253 0270 00       		.byte	0
+ 1254 0271 10       		.uleb128 0x10
+ 1255 0272 01       		.byte	0x1
+ 1256 0273 1E000000 		.4byte	.LASF32
+ 1257 0277 01       		.byte	0x1
+ 1258 0278 F8       		.byte	0xf8
+ 1259 0279 01       		.byte	0x1
+ 1260 027a 67000000 		.4byte	0x67
+ 1261 027e 00000000 		.4byte	.LFB21
+ 1262 0282 10010000 		.4byte	.LFE21
+ 1263 0286 2C000000 		.4byte	.LLST1
+ 1264 028a 01       		.byte	0x1
+ 1265 028b BA020000 		.4byte	0x2ba
+ 1266 028f 12       		.uleb128 0x12
+ 1267 0290 B3000000 		.4byte	.LASF28
+ 1268 0294 01       		.byte	0x1
+ 1269 0295 FA       		.byte	0xfa
+ 1270 0296 67000000 		.4byte	0x67
+ 1271 029a 02       		.byte	0x2
+ 1272 029b 91       		.byte	0x91
+ 1273 029c 77       		.sleb128 -9
+ 1274 029d 12       		.uleb128 0x12
+ 1275 029e 36000000 		.4byte	.LASF29
+ 1276 02a2 01       		.byte	0x1
+ 1277 02a3 FB       		.byte	0xfb
+ 1278 02a4 67000000 		.4byte	0x67
+ 1279 02a8 02       		.byte	0x2
+ 1280 02a9 91       		.byte	0x91
+ 1281 02aa 76       		.sleb128 -10
+ 1282 02ab 12       		.uleb128 0x12
+ 1283 02ac DC000000 		.4byte	.LASF33
+ 1284 02b0 01       		.byte	0x1
+ 1285 02b1 FC       		.byte	0xfc
+ 1286 02b2 67000000 		.4byte	0x67
+ 1287 02b6 02       		.byte	0x2
+ 1288 02b7 91       		.byte	0x91
+ 1289 02b8 75       		.sleb128 -11
+ 1290 02b9 00       		.byte	0
+ 1291 02ba 15       		.uleb128 0x15
+ 1292 02bb FD020000 		.4byte	.LASF34
+ 1293 02bf 01       		.byte	0x1
+ 1294 02c0 16       		.byte	0x16
+ 1295 02c1 6E000000 		.4byte	0x6e
+ 1296 02c5 01       		.byte	0x1
+ 1297 02c6 01       		.byte	0x1
+ 1298 02c7 15       		.uleb128 0x15
+ 1299 02c8 35010000 		.4byte	.LASF35
+ 1300 02cc 01       		.byte	0x1
+ 1301 02cd 19       		.byte	0x19
+ 1302 02ce D4020000 		.4byte	0x2d4
+ 1303 02d2 01       		.byte	0x1
+ 1304 02d3 01       		.byte	0x1
+ 1305 02d4 07       		.uleb128 0x7
+ 1306 02d5 60000000 		.4byte	0x60
+ 1307 02d9 08       		.uleb128 0x8
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 30
+
+
+ 1308 02da DC010000 		.4byte	0x1dc
+ 1309 02de E4020000 		.4byte	0x2e4
+ 1310 02e2 16       		.uleb128 0x16
+ 1311 02e3 00       		.byte	0
+ 1312 02e4 15       		.uleb128 0x15
+ 1313 02e5 52010000 		.4byte	.LASF36
+ 1314 02e9 01       		.byte	0x1
+ 1315 02ea 1F       		.byte	0x1f
+ 1316 02eb D9020000 		.4byte	0x2d9
+ 1317 02ef 01       		.byte	0x1
+ 1318 02f0 01       		.byte	0x1
+ 1319 02f1 15       		.uleb128 0x15
+ 1320 02f2 E2000000 		.4byte	.LASF37
+ 1321 02f6 01       		.byte	0x1
+ 1322 02f7 21       		.byte	0x21
+ 1323 02f8 FE020000 		.4byte	0x2fe
+ 1324 02fc 01       		.byte	0x1
+ 1325 02fd 01       		.byte	0x1
+ 1326 02fe 07       		.uleb128 0x7
+ 1327 02ff 67000000 		.4byte	0x67
+ 1328 0303 15       		.uleb128 0x15
+ 1329 0304 F7000000 		.4byte	.LASF38
+ 1330 0308 01       		.byte	0x1
+ 1331 0309 22       		.byte	0x22
+ 1332 030a D4020000 		.4byte	0x2d4
+ 1333 030e 01       		.byte	0x1
+ 1334 030f 01       		.byte	0x1
+ 1335 0310 15       		.uleb128 0x15
+ 1336 0311 2E020000 		.4byte	.LASF39
+ 1337 0315 01       		.byte	0x1
+ 1338 0316 23       		.byte	0x23
+ 1339 0317 FE020000 		.4byte	0x2fe
+ 1340 031b 01       		.byte	0x1
+ 1341 031c 01       		.byte	0x1
+ 1342 031d 08       		.uleb128 0x8
+ 1343 031e 67000000 		.4byte	0x67
+ 1344 0322 28030000 		.4byte	0x328
+ 1345 0326 16       		.uleb128 0x16
+ 1346 0327 00       		.byte	0
+ 1347 0328 15       		.uleb128 0x15
+ 1348 0329 A0000000 		.4byte	.LASF40
+ 1349 032d 01       		.byte	0x1
+ 1350 032e 27       		.byte	0x27
+ 1351 032f 35030000 		.4byte	0x335
+ 1352 0333 01       		.byte	0x1
+ 1353 0334 01       		.byte	0x1
+ 1354 0335 07       		.uleb128 0x7
+ 1355 0336 1D030000 		.4byte	0x31d
+ 1356 033a 17       		.uleb128 0x17
+ 1357 033b 1B030000 		.4byte	.LASF41
+ 1358 033f 01       		.byte	0x1
+ 1359 0340 2A       		.byte	0x2a
+ 1360 0341 67000000 		.4byte	0x67
+ 1361 0345 01       		.byte	0x1
+ 1362 0346 05       		.byte	0x5
+ 1363 0347 03       		.byte	0x3
+ 1364 0348 00000000 		.4byte	networked_state
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 31
+
+
+ 1365 034c 17       		.uleb128 0x17
+ 1366 034d F9010000 		.4byte	.LASF42
+ 1367 0351 01       		.byte	0x1
+ 1368 0352 2B       		.byte	0x2b
+ 1369 0353 67000000 		.4byte	0x67
+ 1370 0357 01       		.byte	0x1
+ 1371 0358 05       		.byte	0x5
+ 1372 0359 03       		.byte	0x3
+ 1373 035a 00000000 		.4byte	networked_selections
+ 1374 035e 17       		.uleb128 0x17
+ 1375 035f 21020000 		.4byte	.LASF43
+ 1376 0363 01       		.byte	0x1
+ 1377 0364 2C       		.byte	0x2c
+ 1378 0365 60000000 		.4byte	0x60
+ 1379 0369 01       		.byte	0x1
+ 1380 036a 05       		.byte	0x5
+ 1381 036b 03       		.byte	0x3
+ 1382 036c 00000000 		.4byte	networked_ii
+ 1383 0370 17       		.uleb128 0x17
+ 1384 0371 12010000 		.4byte	.LASF44
+ 1385 0375 01       		.byte	0x1
+ 1386 0376 2E       		.byte	0x2e
+ 1387 0377 67000000 		.4byte	0x67
+ 1388 037b 01       		.byte	0x1
+ 1389 037c 05       		.byte	0x5
+ 1390 037d 03       		.byte	0x3
+ 1391 037e 00000000 		.4byte	networked_menu_state
+ 1392 0382 17       		.uleb128 0x17
+ 1393 0383 E7020000 		.4byte	.LASF45
+ 1394 0387 01       		.byte	0x1
+ 1395 0388 34       		.byte	0x34
+ 1396 0389 6E000000 		.4byte	0x6e
+ 1397 038d 01       		.byte	0x1
+ 1398 038e 05       		.byte	0x5
+ 1399 038f 03       		.byte	0x3
+ 1400 0390 00000000 		.4byte	NetworkedStruct_local
+ 1401 0394 17       		.uleb128 0x17
+ 1402 0395 0E020000 		.4byte	.LASF46
+ 1403 0399 01       		.byte	0x1
+ 1404 039a 38       		.byte	0x38
+ 1405 039b 67000000 		.4byte	0x67
+ 1406 039f 01       		.byte	0x1
+ 1407 03a0 05       		.byte	0x5
+ 1408 03a1 03       		.byte	0x3
+ 1409 03a2 00000000 		.4byte	networked_dim_last
+ 1410 03a6 17       		.uleb128 0x17
+ 1411 03a7 C7020000 		.4byte	.LASF47
+ 1412 03ab 01       		.byte	0x1
+ 1413 03ac 39       		.byte	0x39
+ 1414 03ad 67000000 		.4byte	0x67
+ 1415 03b1 01       		.byte	0x1
+ 1416 03b2 05       		.byte	0x5
+ 1417 03b3 03       		.byte	0x3
+ 1418 03b4 00000000 		.4byte	networked_dim2_last
+ 1419 03b8 00       		.byte	0
+ 1420              		.section	.debug_abbrev,"",%progbits
+ 1421              	.Ldebug_abbrev0:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 32
+
+
+ 1422 0000 01       		.uleb128 0x1
+ 1423 0001 11       		.uleb128 0x11
+ 1424 0002 01       		.byte	0x1
+ 1425 0003 25       		.uleb128 0x25
+ 1426 0004 0E       		.uleb128 0xe
+ 1427 0005 13       		.uleb128 0x13
+ 1428 0006 0B       		.uleb128 0xb
+ 1429 0007 03       		.uleb128 0x3
+ 1430 0008 0E       		.uleb128 0xe
+ 1431 0009 1B       		.uleb128 0x1b
+ 1432 000a 0E       		.uleb128 0xe
+ 1433 000b 55       		.uleb128 0x55
+ 1434 000c 06       		.uleb128 0x6
+ 1435 000d 11       		.uleb128 0x11
+ 1436 000e 01       		.uleb128 0x1
+ 1437 000f 52       		.uleb128 0x52
+ 1438 0010 01       		.uleb128 0x1
+ 1439 0011 10       		.uleb128 0x10
+ 1440 0012 06       		.uleb128 0x6
+ 1441 0013 00       		.byte	0
+ 1442 0014 00       		.byte	0
+ 1443 0015 02       		.uleb128 0x2
+ 1444 0016 13       		.uleb128 0x13
+ 1445 0017 01       		.byte	0x1
+ 1446 0018 03       		.uleb128 0x3
+ 1447 0019 0E       		.uleb128 0xe
+ 1448 001a 0B       		.uleb128 0xb
+ 1449 001b 0B       		.uleb128 0xb
+ 1450 001c 3A       		.uleb128 0x3a
+ 1451 001d 0B       		.uleb128 0xb
+ 1452 001e 3B       		.uleb128 0x3b
+ 1453 001f 0B       		.uleb128 0xb
+ 1454 0020 01       		.uleb128 0x1
+ 1455 0021 13       		.uleb128 0x13
+ 1456 0022 00       		.byte	0
+ 1457 0023 00       		.byte	0
+ 1458 0024 03       		.uleb128 0x3
+ 1459 0025 0D       		.uleb128 0xd
+ 1460 0026 00       		.byte	0
+ 1461 0027 03       		.uleb128 0x3
+ 1462 0028 0E       		.uleb128 0xe
+ 1463 0029 3A       		.uleb128 0x3a
+ 1464 002a 0B       		.uleb128 0xb
+ 1465 002b 3B       		.uleb128 0x3b
+ 1466 002c 0B       		.uleb128 0xb
+ 1467 002d 49       		.uleb128 0x49
+ 1468 002e 13       		.uleb128 0x13
+ 1469 002f 38       		.uleb128 0x38
+ 1470 0030 0A       		.uleb128 0xa
+ 1471 0031 00       		.byte	0
+ 1472 0032 00       		.byte	0
+ 1473 0033 04       		.uleb128 0x4
+ 1474 0034 24       		.uleb128 0x24
+ 1475 0035 00       		.byte	0
+ 1476 0036 0B       		.uleb128 0xb
+ 1477 0037 0B       		.uleb128 0xb
+ 1478 0038 3E       		.uleb128 0x3e
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 33
+
+
+ 1479 0039 0B       		.uleb128 0xb
+ 1480 003a 03       		.uleb128 0x3
+ 1481 003b 0E       		.uleb128 0xe
+ 1482 003c 00       		.byte	0
+ 1483 003d 00       		.byte	0
+ 1484 003e 05       		.uleb128 0x5
+ 1485 003f 16       		.uleb128 0x16
+ 1486 0040 00       		.byte	0
+ 1487 0041 03       		.uleb128 0x3
+ 1488 0042 0E       		.uleb128 0xe
+ 1489 0043 3A       		.uleb128 0x3a
+ 1490 0044 0B       		.uleb128 0xb
+ 1491 0045 3B       		.uleb128 0x3b
+ 1492 0046 0B       		.uleb128 0xb
+ 1493 0047 49       		.uleb128 0x49
+ 1494 0048 13       		.uleb128 0x13
+ 1495 0049 00       		.byte	0
+ 1496 004a 00       		.byte	0
+ 1497 004b 06       		.uleb128 0x6
+ 1498 004c 24       		.uleb128 0x24
+ 1499 004d 00       		.byte	0
+ 1500 004e 0B       		.uleb128 0xb
+ 1501 004f 0B       		.uleb128 0xb
+ 1502 0050 3E       		.uleb128 0x3e
+ 1503 0051 0B       		.uleb128 0xb
+ 1504 0052 03       		.uleb128 0x3
+ 1505 0053 08       		.uleb128 0x8
+ 1506 0054 00       		.byte	0
+ 1507 0055 00       		.byte	0
+ 1508 0056 07       		.uleb128 0x7
+ 1509 0057 35       		.uleb128 0x35
+ 1510 0058 00       		.byte	0
+ 1511 0059 49       		.uleb128 0x49
+ 1512 005a 13       		.uleb128 0x13
+ 1513 005b 00       		.byte	0
+ 1514 005c 00       		.byte	0
+ 1515 005d 08       		.uleb128 0x8
+ 1516 005e 01       		.uleb128 0x1
+ 1517 005f 01       		.byte	0x1
+ 1518 0060 49       		.uleb128 0x49
+ 1519 0061 13       		.uleb128 0x13
+ 1520 0062 01       		.uleb128 0x1
+ 1521 0063 13       		.uleb128 0x13
+ 1522 0064 00       		.byte	0
+ 1523 0065 00       		.byte	0
+ 1524 0066 09       		.uleb128 0x9
+ 1525 0067 21       		.uleb128 0x21
+ 1526 0068 00       		.byte	0
+ 1527 0069 49       		.uleb128 0x49
+ 1528 006a 13       		.uleb128 0x13
+ 1529 006b 2F       		.uleb128 0x2f
+ 1530 006c 0B       		.uleb128 0xb
+ 1531 006d 00       		.byte	0
+ 1532 006e 00       		.byte	0
+ 1533 006f 0A       		.uleb128 0xa
+ 1534 0070 13       		.uleb128 0x13
+ 1535 0071 01       		.byte	0x1
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 34
+
+
+ 1536 0072 0B       		.uleb128 0xb
+ 1537 0073 0B       		.uleb128 0xb
+ 1538 0074 3A       		.uleb128 0x3a
+ 1539 0075 0B       		.uleb128 0xb
+ 1540 0076 3B       		.uleb128 0x3b
+ 1541 0077 05       		.uleb128 0x5
+ 1542 0078 01       		.uleb128 0x1
+ 1543 0079 13       		.uleb128 0x13
+ 1544 007a 00       		.byte	0
+ 1545 007b 00       		.byte	0
+ 1546 007c 0B       		.uleb128 0xb
+ 1547 007d 0D       		.uleb128 0xd
+ 1548 007e 00       		.byte	0
+ 1549 007f 03       		.uleb128 0x3
+ 1550 0080 0E       		.uleb128 0xe
+ 1551 0081 3A       		.uleb128 0x3a
+ 1552 0082 0B       		.uleb128 0xb
+ 1553 0083 3B       		.uleb128 0x3b
+ 1554 0084 05       		.uleb128 0x5
+ 1555 0085 49       		.uleb128 0x49
+ 1556 0086 13       		.uleb128 0x13
+ 1557 0087 38       		.uleb128 0x38
+ 1558 0088 0A       		.uleb128 0xa
+ 1559 0089 00       		.byte	0
+ 1560 008a 00       		.byte	0
+ 1561 008b 0C       		.uleb128 0xc
+ 1562 008c 0D       		.uleb128 0xd
+ 1563 008d 00       		.byte	0
+ 1564 008e 03       		.uleb128 0x3
+ 1565 008f 08       		.uleb128 0x8
+ 1566 0090 3A       		.uleb128 0x3a
+ 1567 0091 0B       		.uleb128 0xb
+ 1568 0092 3B       		.uleb128 0x3b
+ 1569 0093 05       		.uleb128 0x5
+ 1570 0094 49       		.uleb128 0x49
+ 1571 0095 13       		.uleb128 0x13
+ 1572 0096 38       		.uleb128 0x38
+ 1573 0097 0A       		.uleb128 0xa
+ 1574 0098 00       		.byte	0
+ 1575 0099 00       		.byte	0
+ 1576 009a 0D       		.uleb128 0xd
+ 1577 009b 16       		.uleb128 0x16
+ 1578 009c 00       		.byte	0
+ 1579 009d 03       		.uleb128 0x3
+ 1580 009e 0E       		.uleb128 0xe
+ 1581 009f 3A       		.uleb128 0x3a
+ 1582 00a0 0B       		.uleb128 0xb
+ 1583 00a1 3B       		.uleb128 0x3b
+ 1584 00a2 05       		.uleb128 0x5
+ 1585 00a3 49       		.uleb128 0x49
+ 1586 00a4 13       		.uleb128 0x13
+ 1587 00a5 00       		.byte	0
+ 1588 00a6 00       		.byte	0
+ 1589 00a7 0E       		.uleb128 0xe
+ 1590 00a8 0F       		.uleb128 0xf
+ 1591 00a9 00       		.byte	0
+ 1592 00aa 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 35
+
+
+ 1593 00ab 0B       		.uleb128 0xb
+ 1594 00ac 49       		.uleb128 0x49
+ 1595 00ad 13       		.uleb128 0x13
+ 1596 00ae 00       		.byte	0
+ 1597 00af 00       		.byte	0
+ 1598 00b0 0F       		.uleb128 0xf
+ 1599 00b1 26       		.uleb128 0x26
+ 1600 00b2 00       		.byte	0
+ 1601 00b3 49       		.uleb128 0x49
+ 1602 00b4 13       		.uleb128 0x13
+ 1603 00b5 00       		.byte	0
+ 1604 00b6 00       		.byte	0
+ 1605 00b7 10       		.uleb128 0x10
+ 1606 00b8 2E       		.uleb128 0x2e
+ 1607 00b9 01       		.byte	0x1
+ 1608 00ba 3F       		.uleb128 0x3f
+ 1609 00bb 0C       		.uleb128 0xc
+ 1610 00bc 03       		.uleb128 0x3
+ 1611 00bd 0E       		.uleb128 0xe
+ 1612 00be 3A       		.uleb128 0x3a
+ 1613 00bf 0B       		.uleb128 0xb
+ 1614 00c0 3B       		.uleb128 0x3b
+ 1615 00c1 0B       		.uleb128 0xb
+ 1616 00c2 27       		.uleb128 0x27
+ 1617 00c3 0C       		.uleb128 0xc
+ 1618 00c4 49       		.uleb128 0x49
+ 1619 00c5 13       		.uleb128 0x13
+ 1620 00c6 11       		.uleb128 0x11
+ 1621 00c7 01       		.uleb128 0x1
+ 1622 00c8 12       		.uleb128 0x12
+ 1623 00c9 01       		.uleb128 0x1
+ 1624 00ca 40       		.uleb128 0x40
+ 1625 00cb 06       		.uleb128 0x6
+ 1626 00cc 9642     		.uleb128 0x2116
+ 1627 00ce 0C       		.uleb128 0xc
+ 1628 00cf 01       		.uleb128 0x1
+ 1629 00d0 13       		.uleb128 0x13
+ 1630 00d1 00       		.byte	0
+ 1631 00d2 00       		.byte	0
+ 1632 00d3 11       		.uleb128 0x11
+ 1633 00d4 05       		.uleb128 0x5
+ 1634 00d5 00       		.byte	0
+ 1635 00d6 03       		.uleb128 0x3
+ 1636 00d7 0E       		.uleb128 0xe
+ 1637 00d8 3A       		.uleb128 0x3a
+ 1638 00d9 0B       		.uleb128 0xb
+ 1639 00da 3B       		.uleb128 0x3b
+ 1640 00db 0B       		.uleb128 0xb
+ 1641 00dc 49       		.uleb128 0x49
+ 1642 00dd 13       		.uleb128 0x13
+ 1643 00de 02       		.uleb128 0x2
+ 1644 00df 0A       		.uleb128 0xa
+ 1645 00e0 00       		.byte	0
+ 1646 00e1 00       		.byte	0
+ 1647 00e2 12       		.uleb128 0x12
+ 1648 00e3 34       		.uleb128 0x34
+ 1649 00e4 00       		.byte	0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 36
+
+
+ 1650 00e5 03       		.uleb128 0x3
+ 1651 00e6 0E       		.uleb128 0xe
+ 1652 00e7 3A       		.uleb128 0x3a
+ 1653 00e8 0B       		.uleb128 0xb
+ 1654 00e9 3B       		.uleb128 0x3b
+ 1655 00ea 0B       		.uleb128 0xb
+ 1656 00eb 49       		.uleb128 0x49
+ 1657 00ec 13       		.uleb128 0x13
+ 1658 00ed 02       		.uleb128 0x2
+ 1659 00ee 0A       		.uleb128 0xa
+ 1660 00ef 00       		.byte	0
+ 1661 00f0 00       		.byte	0
+ 1662 00f1 13       		.uleb128 0x13
+ 1663 00f2 0B       		.uleb128 0xb
+ 1664 00f3 01       		.byte	0x1
+ 1665 00f4 11       		.uleb128 0x11
+ 1666 00f5 01       		.uleb128 0x1
+ 1667 00f6 12       		.uleb128 0x12
+ 1668 00f7 01       		.uleb128 0x1
+ 1669 00f8 00       		.byte	0
+ 1670 00f9 00       		.byte	0
+ 1671 00fa 14       		.uleb128 0x14
+ 1672 00fb 34       		.uleb128 0x34
+ 1673 00fc 00       		.byte	0
+ 1674 00fd 03       		.uleb128 0x3
+ 1675 00fe 08       		.uleb128 0x8
+ 1676 00ff 3A       		.uleb128 0x3a
+ 1677 0100 0B       		.uleb128 0xb
+ 1678 0101 3B       		.uleb128 0x3b
+ 1679 0102 0B       		.uleb128 0xb
+ 1680 0103 49       		.uleb128 0x49
+ 1681 0104 13       		.uleb128 0x13
+ 1682 0105 02       		.uleb128 0x2
+ 1683 0106 0A       		.uleb128 0xa
+ 1684 0107 00       		.byte	0
+ 1685 0108 00       		.byte	0
+ 1686 0109 15       		.uleb128 0x15
+ 1687 010a 34       		.uleb128 0x34
+ 1688 010b 00       		.byte	0
+ 1689 010c 03       		.uleb128 0x3
+ 1690 010d 0E       		.uleb128 0xe
+ 1691 010e 3A       		.uleb128 0x3a
+ 1692 010f 0B       		.uleb128 0xb
+ 1693 0110 3B       		.uleb128 0x3b
+ 1694 0111 0B       		.uleb128 0xb
+ 1695 0112 49       		.uleb128 0x49
+ 1696 0113 13       		.uleb128 0x13
+ 1697 0114 3F       		.uleb128 0x3f
+ 1698 0115 0C       		.uleb128 0xc
+ 1699 0116 3C       		.uleb128 0x3c
+ 1700 0117 0C       		.uleb128 0xc
+ 1701 0118 00       		.byte	0
+ 1702 0119 00       		.byte	0
+ 1703 011a 16       		.uleb128 0x16
+ 1704 011b 21       		.uleb128 0x21
+ 1705 011c 00       		.byte	0
+ 1706 011d 00       		.byte	0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 37
+
+
+ 1707 011e 00       		.byte	0
+ 1708 011f 17       		.uleb128 0x17
+ 1709 0120 34       		.uleb128 0x34
+ 1710 0121 00       		.byte	0
+ 1711 0122 03       		.uleb128 0x3
+ 1712 0123 0E       		.uleb128 0xe
+ 1713 0124 3A       		.uleb128 0x3a
+ 1714 0125 0B       		.uleb128 0xb
+ 1715 0126 3B       		.uleb128 0x3b
+ 1716 0127 0B       		.uleb128 0xb
+ 1717 0128 49       		.uleb128 0x49
+ 1718 0129 13       		.uleb128 0x13
+ 1719 012a 3F       		.uleb128 0x3f
+ 1720 012b 0C       		.uleb128 0xc
+ 1721 012c 02       		.uleb128 0x2
+ 1722 012d 0A       		.uleb128 0xa
+ 1723 012e 00       		.byte	0
+ 1724 012f 00       		.byte	0
+ 1725 0130 00       		.byte	0
+ 1726              		.section	.debug_loc,"",%progbits
+ 1727              	.Ldebug_loc0:
+ 1728              	.LLST0:
+ 1729 0000 00000000 		.4byte	.LFB20
+ 1730 0004 02000000 		.4byte	.LCFI0
+ 1731 0008 0200     		.2byte	0x2
+ 1732 000a 7D       		.byte	0x7d
+ 1733 000b 00       		.sleb128 0
+ 1734 000c 02000000 		.4byte	.LCFI0
+ 1735 0010 04000000 		.4byte	.LCFI1
+ 1736 0014 0200     		.2byte	0x2
+ 1737 0016 7D       		.byte	0x7d
+ 1738 0017 08       		.sleb128 8
+ 1739 0018 04000000 		.4byte	.LCFI1
+ 1740 001c E8030000 		.4byte	.LFE20
+ 1741 0020 0200     		.2byte	0x2
+ 1742 0022 7D       		.byte	0x7d
+ 1743 0023 30       		.sleb128 48
+ 1744 0024 00000000 		.4byte	0
+ 1745 0028 00000000 		.4byte	0
+ 1746              	.LLST1:
+ 1747 002c 00000000 		.4byte	.LFB21
+ 1748 0030 02000000 		.4byte	.LCFI2
+ 1749 0034 0200     		.2byte	0x2
+ 1750 0036 7D       		.byte	0x7d
+ 1751 0037 00       		.sleb128 0
+ 1752 0038 02000000 		.4byte	.LCFI2
+ 1753 003c 04000000 		.4byte	.LCFI3
+ 1754 0040 0200     		.2byte	0x2
+ 1755 0042 7D       		.byte	0x7d
+ 1756 0043 08       		.sleb128 8
+ 1757 0044 04000000 		.4byte	.LCFI3
+ 1758 0048 10010000 		.4byte	.LFE21
+ 1759 004c 0200     		.2byte	0x2
+ 1760 004e 7D       		.byte	0x7d
+ 1761 004f 10       		.sleb128 16
+ 1762 0050 00000000 		.4byte	0
+ 1763 0054 00000000 		.4byte	0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 38
+
+
+ 1764              		.section	.debug_aranges,"",%progbits
+ 1765 0000 24000000 		.4byte	0x24
+ 1766 0004 0200     		.2byte	0x2
+ 1767 0006 00000000 		.4byte	.Ldebug_info0
+ 1768 000a 04       		.byte	0x4
+ 1769 000b 00       		.byte	0
+ 1770 000c 0000     		.2byte	0
+ 1771 000e 0000     		.2byte	0
+ 1772 0010 00000000 		.4byte	.LFB20
+ 1773 0014 E8030000 		.4byte	.LFE20-.LFB20
+ 1774 0018 00000000 		.4byte	.LFB21
+ 1775 001c 10010000 		.4byte	.LFE21-.LFB21
+ 1776 0020 00000000 		.4byte	0
+ 1777 0024 00000000 		.4byte	0
+ 1778              		.section	.debug_ranges,"",%progbits
+ 1779              	.Ldebug_ranges0:
+ 1780 0000 00000000 		.4byte	.LFB20
+ 1781 0004 E8030000 		.4byte	.LFE20
+ 1782 0008 00000000 		.4byte	.LFB21
+ 1783 000c 10010000 		.4byte	.LFE21
+ 1784 0010 00000000 		.4byte	0
+ 1785 0014 00000000 		.4byte	0
+ 1786              		.section	.debug_line,"",%progbits
+ 1787              	.Ldebug_line0:
+ 1788 0000 B8010000 		.section	.debug_str,"MS",%progbits,1
+ 1788      0200DD00 
+ 1788      00000201 
+ 1788      FB0E0D00 
+ 1788      01010101 
+ 1789              	.LASF0:
+ 1790 0000 6E657477 		.ascii	"networked_dmx_channel\000"
+ 1790      6F726B65 
+ 1790      645F646D 
+ 1790      785F6368 
+ 1790      616E6E65 
+ 1791              	.LASF19:
+ 1792 0016 4F535045 		.ascii	"OSPEEDR\000"
+ 1792      45445200 
+ 1793              	.LASF32:
+ 1794 001e 4D656E75 		.ascii	"MenuNetworked\000"
+ 1794      4E657477 
+ 1794      6F726B65 
+ 1794      6400
+ 1795              	.LASF52:
+ 1796 002c 6A756D70 		.ascii	"jump_menu\000"
+ 1796      5F6D656E 
+ 1796      7500
+ 1797              	.LASF29:
+ 1798 0036 72657370 		.ascii	"resp_down\000"
+ 1798      5F646F77 
+ 1798      6E00
+ 1799              	.LASF9:
+ 1800 0040 6C6F6E67 		.ascii	"long int\000"
+ 1800      20696E74 
+ 1800      00
+ 1801              	.LASF23:
+ 1802 0049 42535252 		.ascii	"BSRR\000"
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 39
+
+
+ 1802      00
+ 1803              	.LASF3:
+ 1804 004e 73686F72 		.ascii	"short unsigned int\000"
+ 1804      7420756E 
+ 1804      7369676E 
+ 1804      65642069 
+ 1804      6E7400
+ 1805              	.LASF16:
+ 1806 0061 4D4F4445 		.ascii	"MODER\000"
+ 1806      5200
+ 1807              	.LASF51:
+ 1808 0067 4E657477 		.ascii	"Networked\000"
+ 1808      6F726B65 
+ 1808      6400
+ 1809              	.LASF18:
+ 1810 0071 52455345 		.ascii	"RESERVED0\000"
+ 1810      52564544 
+ 1810      3000
+ 1811              	.LASF21:
+ 1812 007b 52455345 		.ascii	"RESERVED1\000"
+ 1812      52564544 
+ 1812      3100
+ 1813              	.LASF22:
+ 1814 0085 52455345 		.ascii	"RESERVED2\000"
+ 1814      52564544 
+ 1814      3200
+ 1815              	.LASF25:
+ 1816 008f 52455345 		.ascii	"RESERVED3\000"
+ 1816      52564544 
+ 1816      3300
+ 1817              	.LASF17:
+ 1818 0099 4F545950 		.ascii	"OTYPER\000"
+ 1818      455200
+ 1819              	.LASF40:
+ 1820 00a0 64617461 		.ascii	"data\000"
+ 1820      00
+ 1821              	.LASF4:
+ 1822 00a5 756E7369 		.ascii	"unsigned char\000"
+ 1822      676E6564 
+ 1822      20636861 
+ 1822      7200
+ 1823              	.LASF28:
+ 1824 00b3 72657370 		.ascii	"resp\000"
+ 1824      00
+ 1825              	.LASF49:
+ 1826 00b8 2E5C7372 		.ascii	".\\src\\networked.c\000"
+ 1826      635C6E65 
+ 1826      74776F72 
+ 1826      6B65642E 
+ 1826      6300
+ 1827              	.LASF11:
+ 1828 00ca 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1828      20756E73 
+ 1828      69676E65 
+ 1828      6420696E 
+ 1828      7400
+ 1829              	.LASF33:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 40
+
+
+ 1830 00dc 64756D6D 		.ascii	"dummy\000"
+ 1830      7900
+ 1831              	.LASF37:
+ 1832 00e2 5061636B 		.ascii	"Packet_Detected_Flag\000"
+ 1832      65745F44 
+ 1832      65746563 
+ 1832      7465645F 
+ 1832      466C6167 
+ 1833              	.LASF38:
+ 1834 00f7 444D585F 		.ascii	"DMX_channel_selected\000"
+ 1834      6368616E 
+ 1834      6E656C5F 
+ 1834      73656C65 
+ 1834      63746564 
+ 1835              	.LASF30:
+ 1836 010c 735F6C63 		.ascii	"s_lcd\000"
+ 1836      6400
+ 1837              	.LASF44:
+ 1838 0112 6E657477 		.ascii	"networked_menu_state\000"
+ 1838      6F726B65 
+ 1838      645F6D65 
+ 1838      6E755F73 
+ 1838      74617465 
+ 1839              	.LASF1:
+ 1840 0127 64756D6D 		.ascii	"dummy1\000"
+ 1840      793100
+ 1841              	.LASF2:
+ 1842 012e 64756D6D 		.ascii	"dummy2\000"
+ 1842      793200
+ 1843              	.LASF35:
+ 1844 0135 7374616E 		.ascii	"standalone_enable_menu_timer\000"
+ 1844      64616C6F 
+ 1844      6E655F65 
+ 1844      6E61626C 
+ 1844      655F6D65 
+ 1845              	.LASF36:
+ 1846 0152 735F626C 		.ascii	"s_blank_line\000"
+ 1846      616E6B5F 
+ 1846      6C696E65 
+ 1846      00
+ 1847              	.LASF14:
+ 1848 015f 756E7369 		.ascii	"unsigned int\000"
+ 1848      676E6564 
+ 1848      20696E74 
+ 1848      00
+ 1849              	.LASF48:
+ 1850 016c 474E5520 		.ascii	"GNU C 4.7.4 20130613 (release) [ARM/embedded-4_7-br"
+ 1850      4320342E 
+ 1850      372E3420 
+ 1850      32303133 
+ 1850      30363133 
+ 1851 019f 616E6368 		.ascii	"anch revision 200083]\000"
+ 1851      20726576 
+ 1851      6973696F 
+ 1851      6E203230 
+ 1851      30303833 
+ 1852              	.LASF26:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 41
+
+
+ 1853 01b5 4750494F 		.ascii	"GPIO_TypeDef\000"
+ 1853      5F547970 
+ 1853      65446566 
+ 1853      00
+ 1854              	.LASF7:
+ 1855 01c2 4E657477 		.ascii	"Networked_Typedef\000"
+ 1855      6F726B65 
+ 1855      645F5479 
+ 1855      70656465 
+ 1855      6600
+ 1856              	.LASF13:
+ 1857 01d4 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1857      206C6F6E 
+ 1857      6720756E 
+ 1857      7369676E 
+ 1857      65642069 
+ 1858              	.LASF31:
+ 1859 01eb 46756E63 		.ascii	"FuncNetworked\000"
+ 1859      4E657477 
+ 1859      6F726B65 
+ 1859      6400
+ 1860              	.LASF42:
+ 1861 01f9 6E657477 		.ascii	"networked_selections\000"
+ 1861      6F726B65 
+ 1861      645F7365 
+ 1861      6C656374 
+ 1861      696F6E73 
+ 1862              	.LASF46:
+ 1863 020e 6E657477 		.ascii	"networked_dim_last\000"
+ 1863      6F726B65 
+ 1863      645F6469 
+ 1863      6D5F6C61 
+ 1863      737400
+ 1864              	.LASF43:
+ 1865 0221 6E657477 		.ascii	"networked_ii\000"
+ 1865      6F726B65 
+ 1865      645F6969 
+ 1865      00
+ 1866              	.LASF39:
+ 1867 022e 444D585F 		.ascii	"DMX_channel_quantity\000"
+ 1867      6368616E 
+ 1867      6E656C5F 
+ 1867      7175616E 
+ 1867      74697479 
+ 1868              	.LASF20:
+ 1869 0243 50555044 		.ascii	"PUPDR\000"
+ 1869      5200
+ 1870              	.LASF15:
+ 1871 0249 73697A65 		.ascii	"sizetype\000"
+ 1871      74797065 
+ 1871      00
+ 1872              	.LASF12:
+ 1873 0252 6C6F6E67 		.ascii	"long long int\000"
+ 1873      206C6F6E 
+ 1873      6720696E 
+ 1873      7400
+ 1874              	.LASF50:
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 42
+
+
+ 1875 0260 433A5C55 		.ascii	"C:\\Users\\Mariano\\Documents\\Proyectos\\eclipse_s"
+ 1875      73657273 
+ 1875      5C4D6172 
+ 1875      69616E6F 
+ 1875      5C446F63 
+ 1876 028e 746D3332 		.ascii	"tm32\\Planolux_DMX512_P1\000"
+ 1876      5C506C61 
+ 1876      6E6F6C75 
+ 1876      785F444D 
+ 1876      58353132 
+ 1877              	.LASF27:
+ 1878 02a6 63686172 		.ascii	"char\000"
+ 1878      00
+ 1879              	.LASF6:
+ 1880 02ab 73686F72 		.ascii	"short int\000"
+ 1880      7420696E 
+ 1880      7400
+ 1881              	.LASF8:
+ 1882 02b5 75696E74 		.ascii	"uint16_t\000"
+ 1882      31365F74 
+ 1882      00
+ 1883              	.LASF10:
+ 1884 02be 75696E74 		.ascii	"uint32_t\000"
+ 1884      33325F74 
+ 1884      00
+ 1885              	.LASF47:
+ 1886 02c7 6E657477 		.ascii	"networked_dim2_last\000"
+ 1886      6F726B65 
+ 1886      645F6469 
+ 1886      6D325F6C 
+ 1886      61737400 
+ 1887              	.LASF5:
+ 1888 02db 7369676E 		.ascii	"signed char\000"
+ 1888      65642063 
+ 1888      68617200 
+ 1889              	.LASF45:
+ 1890 02e7 4E657477 		.ascii	"NetworkedStruct_local\000"
+ 1890      6F726B65 
+ 1890      64537472 
+ 1890      7563745F 
+ 1890      6C6F6361 
+ 1891              	.LASF34:
+ 1892 02fd 4E657477 		.ascii	"NetworkedStruct_constant\000"
+ 1892      6F726B65 
+ 1892      64537472 
+ 1892      7563745F 
+ 1892      636F6E73 
+ 1893              	.LASF24:
+ 1894 0316 4C434B52 		.ascii	"LCKR\000"
+ 1894      00
+ 1895              	.LASF41:
+ 1896 031b 6E657477 		.ascii	"networked_state\000"
+ 1896      6F726B65 
+ 1896      645F7374 
+ 1896      61746500 
+ 1897              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.7.4 20130613 (release) [ARM/embedded-4_7-br
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s 			page 43
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 networked.c
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:53     .bss.networked_state:00000000 networked_state
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:54     .bss.networked_state:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:59     .bss.networked_selections:00000000 networked_selections
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:60     .bss.networked_selections:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:66     .bss.networked_ii:00000000 networked_ii
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:63     .bss.networked_ii:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:72     .bss.networked_menu_state:00000000 networked_menu_state
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:73     .bss.networked_menu_state:00000000 $d
+                            *COM*:00000004 NetworkedStruct_local
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:79     .bss.networked_dim_last:00000000 networked_dim_last
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:80     .bss.networked_dim_last:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:85     .bss.networked_dim2_last:00000000 networked_dim2_last
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:86     .bss.networked_dim2_last:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:88     .rodata:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:117    .text.FuncNetworked:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:122    .text.FuncNetworked:00000000 FuncNetworked
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:743    .text.MenuNetworked:00000000 MenuNetworked
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:668    .text.FuncNetworked:00000360 $d
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:694    .text.FuncNetworked:000003c0 $t
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:738    .text.MenuNetworked:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccKoDrvY.s:918    .text.MenuNetworked:000000f8 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uidiv
+memcpy
+Lcd_SetDDRAM
+LCDTransmitStr
+sprintf
+EXTIOn
+Update_TIM3_CH1
+LCDStartTransmit
+FuncShowBlink
+CheckS1
+CheckS2
+standalone_enable_menu_timer
+NetworkedStruct_constant
+DMX_channel_quantity
+DMX_channel_selected
+Packet_Detected_Flag
+data
+s_blank_line
+FuncChangeReset
+FuncChange

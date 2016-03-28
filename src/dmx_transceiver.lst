@@ -1,0 +1,1348 @@
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1	@ Tag_ABI_FP_denormal
+   4              		.eabi_attribute 21, 1	@ Tag_ABI_FP_exceptions
+   5              		.eabi_attribute 23, 3	@ Tag_ABI_FP_number_model
+   6              		.eabi_attribute 24, 1	@ Tag_ABI_align8_needed
+   7              		.eabi_attribute 25, 1	@ Tag_ABI_align8_preserved
+   8              		.eabi_attribute 26, 1	@ Tag_ABI_enum_size
+   9              		.eabi_attribute 30, 6	@ Tag_ABI_optimization_goals
+  10              		.eabi_attribute 34, 0	@ Tag_CPU_unaligned_access
+  11              		.eabi_attribute 18, 4	@ Tag_ABI_PCS_wchar_t
+  12              		.file	"dmx_transceiver.c"
+  13              	@ GNU C (GNU Tools for ARM Embedded Processors) version 4.7.4 20130613 (release) [ARM/embedded-4_7-
+  14              	@	compiled by GNU C version 4.2.1-sjlj (mingw32-2), GMP version 4.3.2, MPFR version 2.4.2, MPC vers
+  15              	@ GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+  16              	@ options passed:  -I . -I .\src -I .\cmsis_boot -I .\cmsis_core
+  17              	@ -I ..\STM32F0xx_StdPeriph_Lib_V1.3.1\Libraries\STM32F0xx_StdPeriph_Driver\inc
+  18              	@ -I .\inc -I .\cmsis_boot -imultilib armv6-m
+  19              	@ -iprefix c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../lib/gcc/arm-none-eabi/4.
+  20              	@ -isysroot c:\program files (x86)\gnu tools arm embedded\4.7 2013q2\bin\../arm-none-eabi
+  21              	@ -MD .\src\dmx_transceiver.d -MF .dep\dmx_transceiver.o.d -MP
+  22              	@ -MQ .\src\dmx_transceiver.o -D__USES_INITFINI__ -D RUN_FROM_FLASH=1
+  23              	@ .\src\dmx_transceiver.c -mcpu=cortex-m0 -mthumb
+  24              	@ -auxbase-strip .\src\dmx_transceiver.o -g -gdwarf-2 -O0 -Wall
+  25              	@ -fomit-frame-pointer -fdata-sections -ffunction-sections -fverbose-asm
+  26              	@ options enabled:  -fauto-inc-dec -fbranch-count-reg -fcommon
+  27              	@ -fdata-sections -fdebug-types-section -fdelete-null-pointer-checks
+  28              	@ -fdwarf2-cfi-asm -fearly-inlining -feliminate-unused-debug-types
+  29              	@ -ffunction-cse -ffunction-sections -fgcse-lm -fgnu-runtime -fident
+  30              	@ -finline-atomics -fira-hoist-pressure -fira-share-save-slots
+  31              	@ -fira-share-spill-slots -fivopts -fkeep-static-consts
+  32              	@ -fleading-underscore -fmath-errno -fmerge-debug-strings
+  33              	@ -fmove-loop-invariants -fomit-frame-pointer -fpeephole
+  34              	@ -fprefetch-loop-arrays -freg-struct-return
+  35              	@ -fsched-critical-path-heuristic -fsched-dep-count-heuristic
+  36              	@ -fsched-group-heuristic -fsched-interblock -fsched-last-insn-heuristic
+  37              	@ -fsched-rank-heuristic -fsched-spec -fsched-spec-insn-heuristic
+  38              	@ -fsched-stalled-insns-dep -fshow-column -fsigned-zeros
+  39              	@ -fsplit-ivs-in-unroller -fstrict-volatile-bitfields -ftrapping-math
+  40              	@ -ftree-cselim -ftree-forwprop -ftree-loop-if-convert -ftree-loop-im
+  41              	@ -ftree-loop-ivcanon -ftree-loop-optimize -ftree-parallelize-loops=
+  42              	@ -ftree-phiprop -ftree-pta -ftree-reassoc -ftree-scev-cprop
+  43              	@ -ftree-slp-vectorize -ftree-vect-loop-version -funit-at-a-time
+  44              	@ -fverbose-asm -fzero-initialized-in-bss -mlittle-endian -msched-prolog
+  45              	@ -mthumb -mvectorize-with-neon-quad
+  46              	
+  47              		.text
+  48              	.Ltext0:
+  49              		.cfi_sections	.debug_frame
+  50              		.global	dmx_state
+  51              		.section	.bss.dmx_state,"aw",%nobits
+  52              		.type	dmx_state, %object
+  53              		.size	dmx_state, 1
+  54              	dmx_state:
+  55 0000 00       		.space	1
+  56              		.section	.text.DMX_Ena,"ax",%progbits
+  57              		.align	2
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 2
+
+
+  58              		.global	DMX_Ena
+  59              		.code	16
+  60              		.thumb_func
+  61              		.type	DMX_Ena, %function
+  62              	DMX_Ena:
+  63              	.LFB20:
+  64              		.file 1 ".\\src\\dmx_transceiver.c"
+   1:.\src/dmx_transceiver.c **** /*
+   2:.\src/dmx_transceiver.c ****  * dmx_transceiver.c
+   3:.\src/dmx_transceiver.c ****  *
+   4:.\src/dmx_transceiver.c ****  *  Created on: 09/02/2016
+   5:.\src/dmx_transceiver.c ****  *      Author: Mariano
+   6:.\src/dmx_transceiver.c ****  */
+   7:.\src/dmx_transceiver.c **** #include "dmx_transceiver.h"
+   8:.\src/dmx_transceiver.c **** #include "hard.h"
+   9:.\src/dmx_transceiver.c **** #include "stm32f0xx.h"
+  10:.\src/dmx_transceiver.c **** #include "stm32f0x_tim.h"
+  11:.\src/dmx_transceiver.c **** #include "stm32f0x_uart.h"
+  12:.\src/dmx_transceiver.c **** #include "stm32f0x_gpio.h"
+  13:.\src/dmx_transceiver.c **** 
+  14:.\src/dmx_transceiver.c **** 
+  15:.\src/dmx_transceiver.c **** 
+  16:.\src/dmx_transceiver.c **** //--- VARIABLES GLOBALES ---//
+  17:.\src/dmx_transceiver.c **** volatile unsigned char dmx_state = 0;
+  18:.\src/dmx_transceiver.c **** 
+  19:.\src/dmx_transceiver.c **** 
+  20:.\src/dmx_transceiver.c **** //--- FUNCIONES DEL MODULO ---//
+  21:.\src/dmx_transceiver.c **** void DMX_Ena(void)
+  22:.\src/dmx_transceiver.c **** {
+  65              		.loc 1 22 0
+  66              		.cfi_startproc
+  67 0000 08B5     		push	{r3, lr}	@
+  68              	.LCFI0:
+  69              		.cfi_def_cfa_offset 8
+  70              		.cfi_offset 3, -8
+  71              		.cfi_offset 14, -4
+  23:.\src/dmx_transceiver.c **** 	//habilito la interrupción
+  24:.\src/dmx_transceiver.c **** 	EXTIOn ();
+  72              		.loc 1 24 0
+  73 0002 FFF7FEFF 		bl	EXTIOn	@
+  25:.\src/dmx_transceiver.c **** 	USART1->CR1 |= USART_CR1_UE;
+  74              		.loc 1 25 0
+  75 0006 034B     		ldr	r3, .L2	@ D.4684,
+  76 0008 024A     		ldr	r2, .L2	@ D.4685,
+  77 000a 1268     		ldr	r2, [r2]	@ D.4686, D.4685_2->CR1
+  78 000c 0121     		mov	r1, #1	@ tmp138,
+  79 000e 0A43     		orr	r2, r1	@ D.4687, tmp138
+  80 0010 1A60     		str	r2, [r3]	@ D.4687, D.4684_1->CR1
+  26:.\src/dmx_transceiver.c **** }
+  81              		.loc 1 26 0
+  82              		@ sp needed for prologue	@
+  83 0012 08BD     		pop	{r3, pc}
+  84              	.L3:
+  85              		.align	2
+  86              	.L2:
+  87 0014 00380140 		.word	1073821696
+  88              		.cfi_endproc
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 3
+
+
+  89              	.LFE20:
+  90              		.size	DMX_Ena, .-DMX_Ena
+  91              		.section	.text.DMX_Disa,"ax",%progbits
+  92              		.align	2
+  93              		.global	DMX_Disa
+  94              		.code	16
+  95              		.thumb_func
+  96              		.type	DMX_Disa, %function
+  97              	DMX_Disa:
+  98              	.LFB21:
+  27:.\src/dmx_transceiver.c **** 
+  28:.\src/dmx_transceiver.c **** void DMX_Disa(void)
+  29:.\src/dmx_transceiver.c **** {
+  99              		.loc 1 29 0
+ 100              		.cfi_startproc
+ 101 0000 08B5     		push	{r3, lr}	@
+ 102              	.LCFI1:
+ 103              		.cfi_def_cfa_offset 8
+ 104              		.cfi_offset 3, -8
+ 105              		.cfi_offset 14, -4
+  30:.\src/dmx_transceiver.c **** 	//deshabilito la interrupción
+  31:.\src/dmx_transceiver.c **** 	EXTIOff ();
+ 106              		.loc 1 31 0
+ 107 0002 FFF7FEFF 		bl	EXTIOff	@
+  32:.\src/dmx_transceiver.c **** 	USART1->CR1 &= ~USART_CR1_UE;
+ 108              		.loc 1 32 0
+ 109 0006 034B     		ldr	r3, .L5	@ D.4680,
+ 110 0008 024A     		ldr	r2, .L5	@ D.4681,
+ 111 000a 1268     		ldr	r2, [r2]	@ D.4682, D.4681_2->CR1
+ 112 000c 0121     		mov	r1, #1	@ tmp138,
+ 113 000e 8A43     		bic	r2, r1	@ D.4683, tmp138
+ 114 0010 1A60     		str	r2, [r3]	@ D.4683, D.4680_1->CR1
+  33:.\src/dmx_transceiver.c **** }
+ 115              		.loc 1 33 0
+ 116              		@ sp needed for prologue	@
+ 117 0012 08BD     		pop	{r3, pc}
+ 118              	.L6:
+ 119              		.align	2
+ 120              	.L5:
+ 121 0014 00380140 		.word	1073821696
+ 122              		.cfi_endproc
+ 123              	.LFE21:
+ 124              		.size	DMX_Disa, .-DMX_Disa
+ 125              		.section	.text.SendDMXPacket,"ax",%progbits
+ 126              		.align	2
+ 127              		.global	SendDMXPacket
+ 128              		.code	16
+ 129              		.thumb_func
+ 130              		.type	SendDMXPacket, %function
+ 131              	SendDMXPacket:
+ 132              	.LFB22:
+  34:.\src/dmx_transceiver.c **** 
+  35:.\src/dmx_transceiver.c **** 
+  36:.\src/dmx_transceiver.c **** void SendDMXPacket (unsigned char new_func)
+  37:.\src/dmx_transceiver.c **** {
+ 133              		.loc 1 37 0
+ 134              		.cfi_startproc
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 4
+
+
+ 135 0000 00B5     		push	{lr}	@
+ 136              	.LCFI2:
+ 137              		.cfi_def_cfa_offset 4
+ 138              		.cfi_offset 14, -4
+ 139 0002 83B0     		sub	sp, sp, #12	@,,
+ 140              	.LCFI3:
+ 141              		.cfi_def_cfa_offset 16
+ 142 0004 021C     		mov	r2, r0	@ tmp151, new_func
+ 143 0006 6B46     		mov	r3, sp	@ tmp152,
+ 144 0008 0733     		add	r3, r3, #7	@ tmp152,
+ 145 000a 1A70     		strb	r2, [r3]	@ tmp153, new_func
+  38:.\src/dmx_transceiver.c **** 	if ((new_func == PCKT_INIT) &&
+ 146              		.loc 1 38 0
+ 147 000c 6B46     		mov	r3, sp	@ tmp154,
+ 148 000e 0733     		add	r3, r3, #7	@ tmp154,
+ 149 0010 1B78     		ldrb	r3, [r3]	@ tmp155, new_func
+ 150 0012 002B     		cmp	r3, #0	@ tmp155,
+ 151 0014 0DD1     		bne	.L8	@,
+  39:.\src/dmx_transceiver.c **** 			((dmx_state == PCKT_INIT) || (dmx_state == PCKT_END_TX)))
+ 152              		.loc 1 39 0 discriminator 1
+ 153 0016 324B     		ldr	r3, .L21	@ tmp156,
+ 154 0018 1B78     		ldrb	r3, [r3]	@ tmp157, dmx_state
+ 155 001a DBB2     		uxtb	r3, r3	@ dmx_state.0, tmp157
+  38:.\src/dmx_transceiver.c **** 	if ((new_func == PCKT_INIT) &&
+ 156              		.loc 1 38 0 discriminator 1
+ 157 001c 002B     		cmp	r3, #0	@ dmx_state.0,
+ 158 001e 04D0     		beq	.L9	@,
+ 159              		.loc 1 39 0
+ 160 0020 2F4B     		ldr	r3, .L21	@ tmp158,
+ 161 0022 1B78     		ldrb	r3, [r3]	@ tmp159, dmx_state
+ 162 0024 DBB2     		uxtb	r3, r3	@ dmx_state.1, tmp159
+ 163 0026 042B     		cmp	r3, #4	@ dmx_state.1,
+ 164 0028 03D1     		bne	.L8	@,
+ 165              	.L9:
+  40:.\src/dmx_transceiver.c **** 	{
+  41:.\src/dmx_transceiver.c **** 		//empiezo la maquina de estados
+  42:.\src/dmx_transceiver.c **** 		dmx_state = PCKT_INIT;
+ 166              		.loc 1 42 0
+ 167 002a 2D4B     		ldr	r3, .L21	@ tmp160,
+ 168 002c 0022     		mov	r2, #0	@ tmp161,
+ 169 002e 1A70     		strb	r2, [r3]	@ tmp162, dmx_state
+ 170 0030 04E0     		b	.L10	@
+ 171              	.L8:
+  43:.\src/dmx_transceiver.c **** 	}
+  44:.\src/dmx_transceiver.c **** 	else if (new_func != PCKT_UPDATE)	//update de la maquina de estados
+ 172              		.loc 1 44 0
+ 173 0032 6B46     		mov	r3, sp	@ tmp163,
+ 174 0034 0733     		add	r3, r3, #7	@ tmp163,
+ 175 0036 1B78     		ldrb	r3, [r3]	@ tmp164, new_func
+ 176 0038 0A2B     		cmp	r3, #10	@ tmp164,
+ 177 003a 4BD1     		bne	.L19	@,
+ 178              	.L10:
+  45:.\src/dmx_transceiver.c **** 		return;
+  46:.\src/dmx_transceiver.c **** 
+  47:.\src/dmx_transceiver.c **** 	switch (dmx_state)
+ 179              		.loc 1 47 0
+ 180 003c 284B     		ldr	r3, .L21	@ tmp165,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 5
+
+
+ 181 003e 1B78     		ldrb	r3, [r3]	@ tmp166, dmx_state
+ 182 0040 DBB2     		uxtb	r3, r3	@ dmx_state.2, tmp166
+ 183 0042 042B     		cmp	r3, #4	@ D.4665,
+ 184 0044 3ED8     		bhi	.L12	@,
+ 185 0046 9A00     		lsl	r2, r3, #2	@ tmp167, D.4665,
+ 186 0048 264B     		ldr	r3, .L21+4	@ tmp169,
+ 187 004a D318     		add	r3, r2, r3	@ tmp168, tmp167, tmp169
+ 188 004c 1B68     		ldr	r3, [r3]	@ tmp170,
+ 189 004e 9F46     		mov	pc, r3	@ tmp170
+ 190              		.section	.rodata.SendDMXPacket,"a",%progbits
+ 191              		.align	2
+ 192              	.L18:
+ 193 0000 50000000 		.word	.L13
+ 194 0004 7E000000 		.word	.L14
+ 195 0008 9A000000 		.word	.L15
+ 196 000c AE000000 		.word	.L16
+ 197 0010 D8000000 		.word	.L20
+ 198              		.section	.text.SendDMXPacket
+ 199              	.L13:
+  48:.\src/dmx_transceiver.c **** 	{
+  49:.\src/dmx_transceiver.c **** 		case PCKT_INIT:
+  50:.\src/dmx_transceiver.c **** 			SW_TX;
+ 200              		.loc 1 50 0
+ 201 0050 9023     		mov	r3, #144	@ tmp200,
+ 202 0052 DB05     		lsl	r3, r3, #23	@ D.4666, tmp200,
+ 203 0054 8022     		mov	r2, #128	@ tmp201,
+ 204 0056 5201     		lsl	r2, r2, #5	@ tmp171, tmp201,
+ 205 0058 9A61     		str	r2, [r3, #24]	@ tmp171, D.4666_6->BSRR
+  51:.\src/dmx_transceiver.c **** 			LED_ON;
+ 206              		.loc 1 51 0
+ 207 005a 234B     		ldr	r3, .L21+8	@ D.4667,
+ 208 005c 8022     		mov	r2, #128	@ tmp172,
+ 209 005e 9A61     		str	r2, [r3, #24]	@ tmp172, D.4667_7->BSRR
+  52:.\src/dmx_transceiver.c **** 			dmx_state++;
+ 210              		.loc 1 52 0
+ 211 0060 1F4B     		ldr	r3, .L21	@ tmp173,
+ 212 0062 1B78     		ldrb	r3, [r3]	@ tmp174, dmx_state
+ 213 0064 DBB2     		uxtb	r3, r3	@ dmx_state.3, tmp174
+ 214 0066 0133     		add	r3, r3, #1	@ tmp175,
+ 215 0068 DAB2     		uxtb	r2, r3	@ dmx_state.4, tmp175
+ 216 006a 1D4B     		ldr	r3, .L21	@ tmp176,
+ 217 006c 1A70     		strb	r2, [r3]	@ tmp177, dmx_state
+  53:.\src/dmx_transceiver.c **** 			DMX_TX_PIN_ON;	//mando break
+ 218              		.loc 1 53 0
+ 219 006e 1E4B     		ldr	r3, .L21+8	@ D.4670,
+ 220 0070 8022     		mov	r2, #128	@ tmp202,
+ 221 0072 D203     		lsl	r2, r2, #15	@ tmp178, tmp202,
+ 222 0074 9A61     		str	r2, [r3, #24]	@ tmp178, D.4670_10->BSRR
+  54:.\src/dmx_transceiver.c **** 			OneShootTIM16(88);
+ 223              		.loc 1 54 0
+ 224 0076 5820     		mov	r0, #88	@,
+ 225 0078 FFF7FEFF 		bl	OneShootTIM16	@
+  55:.\src/dmx_transceiver.c **** 			break;
+ 226              		.loc 1 55 0
+ 227 007c 2DE0     		b	.L7	@
+ 228              	.L14:
+  56:.\src/dmx_transceiver.c **** 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 6
+
+
+  57:.\src/dmx_transceiver.c **** 		case PCKT_END_BREAK:
+  58:.\src/dmx_transceiver.c **** 			dmx_state++;
+ 229              		.loc 1 58 0
+ 230 007e 184B     		ldr	r3, .L21	@ tmp179,
+ 231 0080 1B78     		ldrb	r3, [r3]	@ tmp180, dmx_state
+ 232 0082 DBB2     		uxtb	r3, r3	@ dmx_state.5, tmp180
+ 233 0084 0133     		add	r3, r3, #1	@ tmp181,
+ 234 0086 DAB2     		uxtb	r2, r3	@ dmx_state.6, tmp181
+ 235 0088 154B     		ldr	r3, .L21	@ tmp182,
+ 236 008a 1A70     		strb	r2, [r3]	@ tmp183, dmx_state
+  59:.\src/dmx_transceiver.c **** 			DMX_TX_PIN_OFF;	//espero mark after break
+ 237              		.loc 1 59 0
+ 238 008c 164B     		ldr	r3, .L21+8	@ D.4673,
+ 239 008e 4022     		mov	r2, #64	@ tmp184,
+ 240 0090 9A61     		str	r2, [r3, #24]	@ tmp184, D.4673_13->BSRR
+  60:.\src/dmx_transceiver.c **** 			OneShootTIM16(8);
+ 241              		.loc 1 60 0
+ 242 0092 0820     		mov	r0, #8	@,
+ 243 0094 FFF7FEFF 		bl	OneShootTIM16	@
+  61:.\src/dmx_transceiver.c **** 			break;
+ 244              		.loc 1 61 0
+ 245 0098 1FE0     		b	.L7	@
+ 246              	.L15:
+  62:.\src/dmx_transceiver.c **** 
+  63:.\src/dmx_transceiver.c **** 		case PCKT_END_MARK:
+  64:.\src/dmx_transceiver.c **** 			dmx_state++;
+ 247              		.loc 1 64 0
+ 248 009a 114B     		ldr	r3, .L21	@ tmp185,
+ 249 009c 1B78     		ldrb	r3, [r3]	@ tmp186, dmx_state
+ 250 009e DBB2     		uxtb	r3, r3	@ dmx_state.7, tmp186
+ 251 00a0 0133     		add	r3, r3, #1	@ tmp187,
+ 252 00a2 DAB2     		uxtb	r2, r3	@ dmx_state.8, tmp187
+ 253 00a4 0E4B     		ldr	r3, .L21	@ tmp188,
+ 254 00a6 1A70     		strb	r2, [r3]	@ tmp189, dmx_state
+  65:.\src/dmx_transceiver.c **** 			UsartSendDMX();
+ 255              		.loc 1 65 0
+ 256 00a8 FFF7FEFF 		bl	UsartSendDMX	@
+  66:.\src/dmx_transceiver.c **** 			break;
+ 257              		.loc 1 66 0
+ 258 00ac 15E0     		b	.L7	@
+ 259              	.L16:
+  67:.\src/dmx_transceiver.c **** 
+  68:.\src/dmx_transceiver.c **** 		case PCKT_TRANSMITING:	//se deben haber transmitido el start code + los 512 canales
+  69:.\src/dmx_transceiver.c **** 			dmx_state = PCKT_END_TX;	//se a llama al terminar de transmitir con la USART con UPDATE
+ 260              		.loc 1 69 0
+ 261 00ae 0C4B     		ldr	r3, .L21	@ tmp190,
+ 262 00b0 0422     		mov	r2, #4	@ tmp191,
+ 263 00b2 1A70     		strb	r2, [r3]	@ tmp192, dmx_state
+  70:.\src/dmx_transceiver.c **** 			DMX_TX_PIN_OFF;
+ 264              		.loc 1 70 0
+ 265 00b4 0C4B     		ldr	r3, .L21+8	@ D.4676,
+ 266 00b6 4022     		mov	r2, #64	@ tmp193,
+ 267 00b8 9A61     		str	r2, [r3, #24]	@ tmp193, D.4676_16->BSRR
+  71:.\src/dmx_transceiver.c **** 			LED_OFF;
+ 268              		.loc 1 71 0
+ 269 00ba 0B4B     		ldr	r3, .L21+8	@ D.4677,
+ 270 00bc 8022     		mov	r2, #128	@ tmp199,
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 7
+
+
+ 271 00be 1204     		lsl	r2, r2, #16	@ tmp194, tmp199,
+ 272 00c0 9A61     		str	r2, [r3, #24]	@ tmp194, D.4677_17->BSRR
+  72:.\src/dmx_transceiver.c **** 			break;
+ 273              		.loc 1 72 0
+ 274 00c2 0AE0     		b	.L7	@
+ 275              	.L12:
+  73:.\src/dmx_transceiver.c **** 
+  74:.\src/dmx_transceiver.c **** 		case PCKT_END_TX:	//estado de espera luego de transmitir
+  75:.\src/dmx_transceiver.c **** 			break;
+  76:.\src/dmx_transceiver.c **** 
+  77:.\src/dmx_transceiver.c **** 		default:
+  78:.\src/dmx_transceiver.c **** 			dmx_state = PCKT_END_TX;
+ 276              		.loc 1 78 0
+ 277 00c4 064B     		ldr	r3, .L21	@ tmp195,
+ 278 00c6 0422     		mov	r2, #4	@ tmp196,
+ 279 00c8 1A70     		strb	r2, [r3]	@ tmp197, dmx_state
+  79:.\src/dmx_transceiver.c **** 			DMX_TX_PIN_OFF;
+ 280              		.loc 1 79 0
+ 281 00ca 074B     		ldr	r3, .L21+8	@ D.4678,
+ 282 00cc 4022     		mov	r2, #64	@ tmp198,
+ 283 00ce 9A61     		str	r2, [r3, #24]	@ tmp198, D.4678_18->BSRR
+  80:.\src/dmx_transceiver.c **** 			break;
+ 284              		.loc 1 80 0
+ 285 00d0 C046     		mov	r8, r8
+ 286 00d2 02E0     		b	.L7	@
+ 287              	.L19:
+  45:.\src/dmx_transceiver.c **** 		return;
+ 288              		.loc 1 45 0
+ 289 00d4 C046     		mov	r8, r8
+ 290 00d6 00E0     		b	.L7	@
+ 291              	.L20:
+  75:.\src/dmx_transceiver.c **** 			break;
+ 292              		.loc 1 75 0
+ 293 00d8 C046     		mov	r8, r8
+ 294              	.L7:
+  81:.\src/dmx_transceiver.c **** 	}
+  82:.\src/dmx_transceiver.c **** }
+ 295              		.loc 1 82 0
+ 296 00da 03B0     		add	sp, sp, #12	@,,
+ 297              		@ sp needed for prologue	@
+ 298 00dc 00BD     		pop	{pc}
+ 299              	.L22:
+ 300 00de C046     		.align	2
+ 301              	.L21:
+ 302 00e0 00000000 		.word	dmx_state
+ 303 00e4 00000000 		.word	.L18
+ 304 00e8 00040048 		.word	1207960576
+ 305              		.cfi_endproc
+ 306              	.LFE22:
+ 307              		.size	SendDMXPacket, .-SendDMXPacket
+ 308              		.text
+ 309              	.Letext0:
+ 310              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.7 2013q2\\bin\\../lib/gcc/arm-none-eab
+ 311              		.file 3 ".\\cmsis_boot/stm32f0xx.h"
+ 312              		.section	.debug_info,"",%progbits
+ 313              	.Ldebug_info0:
+ 314 0000 02030000 		.4byte	0x302
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 8
+
+
+ 315 0004 0200     		.2byte	0x2
+ 316 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 317 000a 04       		.byte	0x4
+ 318 000b 01       		.uleb128 0x1
+ 319 000c C8000000 		.4byte	.LASF30
+ 320 0010 01       		.byte	0x1
+ 321 0011 35010000 		.4byte	.LASF31
+ 322 0015 78010000 		.4byte	.LASF32
+ 323 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 324 001d 00000000 		.4byte	0
+ 325 0021 00000000 		.4byte	0
+ 326 0025 00000000 		.4byte	.Ldebug_line0
+ 327 0029 02       		.uleb128 0x2
+ 328 002a 01       		.byte	0x1
+ 329 002b 06       		.byte	0x6
+ 330 002c F2010000 		.4byte	.LASF0
+ 331 0030 02       		.uleb128 0x2
+ 332 0031 01       		.byte	0x1
+ 333 0032 08       		.byte	0x8
+ 334 0033 69000000 		.4byte	.LASF1
+ 335 0037 02       		.uleb128 0x2
+ 336 0038 02       		.byte	0x2
+ 337 0039 05       		.byte	0x5
+ 338 003a D6010000 		.4byte	.LASF2
+ 339 003e 03       		.uleb128 0x3
+ 340 003f E0010000 		.4byte	.LASF5
+ 341 0043 02       		.byte	0x2
+ 342 0044 36       		.byte	0x36
+ 343 0045 49000000 		.4byte	0x49
+ 344 0049 02       		.uleb128 0x2
+ 345 004a 02       		.byte	0x2
+ 346 004b 07       		.byte	0x7
+ 347 004c 89000000 		.4byte	.LASF3
+ 348 0050 02       		.uleb128 0x2
+ 349 0051 04       		.byte	0x4
+ 350 0052 05       		.byte	0x5
+ 351 0053 E9010000 		.4byte	.LASF4
+ 352 0057 03       		.uleb128 0x3
+ 353 0058 9C000000 		.4byte	.LASF6
+ 354 005c 02       		.byte	0x2
+ 355 005d 50       		.byte	0x50
+ 356 005e 62000000 		.4byte	0x62
+ 357 0062 02       		.uleb128 0x2
+ 358 0063 04       		.byte	0x4
+ 359 0064 07       		.byte	0x7
+ 360 0065 77000000 		.4byte	.LASF7
+ 361 0069 02       		.uleb128 0x2
+ 362 006a 08       		.byte	0x8
+ 363 006b 05       		.byte	0x5
+ 364 006c 6A010000 		.4byte	.LASF8
+ 365 0070 02       		.uleb128 0x2
+ 366 0071 08       		.byte	0x8
+ 367 0072 07       		.byte	0x7
+ 368 0073 1E010000 		.4byte	.LASF9
+ 369 0077 04       		.uleb128 0x4
+ 370 0078 04       		.byte	0x4
+ 371 0079 05       		.byte	0x5
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 9
+
+
+ 372 007a 696E7400 		.ascii	"int\000"
+ 373 007e 02       		.uleb128 0x2
+ 374 007f 04       		.byte	0x4
+ 375 0080 07       		.byte	0x7
+ 376 0081 BB000000 		.4byte	.LASF10
+ 377 0085 02       		.uleb128 0x2
+ 378 0086 04       		.byte	0x4
+ 379 0087 07       		.byte	0x7
+ 380 0088 4D010000 		.4byte	.LASF11
+ 381 008c 05       		.uleb128 0x5
+ 382 008d 57000000 		.4byte	0x57
+ 383 0091 06       		.uleb128 0x6
+ 384 0092 57000000 		.4byte	0x57
+ 385 0096 A1000000 		.4byte	0xa1
+ 386 009a 07       		.uleb128 0x7
+ 387 009b 85000000 		.4byte	0x85
+ 388 009f 01       		.byte	0x1
+ 389 00a0 00       		.byte	0
+ 390 00a1 05       		.uleb128 0x5
+ 391 00a2 3E000000 		.4byte	0x3e
+ 392 00a6 08       		.uleb128 0x8
+ 393 00a7 2C       		.byte	0x2c
+ 394 00a8 03       		.byte	0x3
+ 395 00a9 6902     		.2byte	0x269
+ 396 00ab 82010000 		.4byte	0x182
+ 397 00af 09       		.uleb128 0x9
+ 398 00b0 0D000000 		.4byte	.LASF12
+ 399 00b4 03       		.byte	0x3
+ 400 00b5 6B02     		.2byte	0x26b
+ 401 00b7 8C000000 		.4byte	0x8c
+ 402 00bb 02       		.byte	0x2
+ 403 00bc 23       		.byte	0x23
+ 404 00bd 00       		.uleb128 0
+ 405 00be 09       		.uleb128 0x9
+ 406 00bf 62000000 		.4byte	.LASF13
+ 407 00c3 03       		.byte	0x3
+ 408 00c4 6C02     		.2byte	0x26c
+ 409 00c6 A1000000 		.4byte	0xa1
+ 410 00ca 02       		.byte	0x2
+ 411 00cb 23       		.byte	0x23
+ 412 00cc 04       		.uleb128 0x4
+ 413 00cd 09       		.uleb128 0x9
+ 414 00ce 26000000 		.4byte	.LASF14
+ 415 00d2 03       		.byte	0x3
+ 416 00d3 6D02     		.2byte	0x26d
+ 417 00d5 3E000000 		.4byte	0x3e
+ 418 00d9 02       		.byte	0x2
+ 419 00da 23       		.byte	0x23
+ 420 00db 06       		.uleb128 0x6
+ 421 00dc 09       		.uleb128 0x9
+ 422 00dd B3000000 		.4byte	.LASF15
+ 423 00e1 03       		.byte	0x3
+ 424 00e2 6E02     		.2byte	0x26e
+ 425 00e4 8C000000 		.4byte	0x8c
+ 426 00e8 02       		.byte	0x2
+ 427 00e9 23       		.byte	0x23
+ 428 00ea 08       		.uleb128 0x8
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 10
+
+
+ 429 00eb 09       		.uleb128 0x9
+ 430 00ec 56010000 		.4byte	.LASF16
+ 431 00f0 03       		.byte	0x3
+ 432 00f1 6F02     		.2byte	0x26f
+ 433 00f3 8C000000 		.4byte	0x8c
+ 434 00f7 02       		.byte	0x2
+ 435 00f8 23       		.byte	0x23
+ 436 00f9 0C       		.uleb128 0xc
+ 437 00fa 0A       		.uleb128 0xa
+ 438 00fb 49445200 		.ascii	"IDR\000"
+ 439 00ff 03       		.byte	0x3
+ 440 0100 7002     		.2byte	0x270
+ 441 0102 A1000000 		.4byte	0xa1
+ 442 0106 02       		.byte	0x2
+ 443 0107 23       		.byte	0x23
+ 444 0108 10       		.uleb128 0x10
+ 445 0109 09       		.uleb128 0x9
+ 446 010a 30000000 		.4byte	.LASF17
+ 447 010e 03       		.byte	0x3
+ 448 010f 7102     		.2byte	0x271
+ 449 0111 3E000000 		.4byte	0x3e
+ 450 0115 02       		.byte	0x2
+ 451 0116 23       		.byte	0x23
+ 452 0117 12       		.uleb128 0x12
+ 453 0118 0A       		.uleb128 0xa
+ 454 0119 4F445200 		.ascii	"ODR\000"
+ 455 011d 03       		.byte	0x3
+ 456 011e 7202     		.2byte	0x272
+ 457 0120 A1000000 		.4byte	0xa1
+ 458 0124 02       		.byte	0x2
+ 459 0125 23       		.byte	0x23
+ 460 0126 14       		.uleb128 0x14
+ 461 0127 09       		.uleb128 0x9
+ 462 0128 3A000000 		.4byte	.LASF18
+ 463 012c 03       		.byte	0x3
+ 464 012d 7302     		.2byte	0x273
+ 465 012f 3E000000 		.4byte	0x3e
+ 466 0133 02       		.byte	0x2
+ 467 0134 23       		.byte	0x23
+ 468 0135 16       		.uleb128 0x16
+ 469 0136 09       		.uleb128 0x9
+ 470 0137 13000000 		.4byte	.LASF19
+ 471 013b 03       		.byte	0x3
+ 472 013c 7402     		.2byte	0x274
+ 473 013e 8C000000 		.4byte	0x8c
+ 474 0142 02       		.byte	0x2
+ 475 0143 23       		.byte	0x23
+ 476 0144 18       		.uleb128 0x18
+ 477 0145 09       		.uleb128 0x9
+ 478 0146 08000000 		.4byte	.LASF20
+ 479 014a 03       		.byte	0x3
+ 480 014b 7502     		.2byte	0x275
+ 481 014d 8C000000 		.4byte	0x8c
+ 482 0151 02       		.byte	0x2
+ 483 0152 23       		.byte	0x23
+ 484 0153 1C       		.uleb128 0x1c
+ 485 0154 0A       		.uleb128 0xa
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 11
+
+
+ 486 0155 41465200 		.ascii	"AFR\000"
+ 487 0159 03       		.byte	0x3
+ 488 015a 7602     		.2byte	0x276
+ 489 015c 82010000 		.4byte	0x182
+ 490 0160 02       		.byte	0x2
+ 491 0161 23       		.byte	0x23
+ 492 0162 20       		.uleb128 0x20
+ 493 0163 0A       		.uleb128 0xa
+ 494 0164 42525200 		.ascii	"BRR\000"
+ 495 0168 03       		.byte	0x3
+ 496 0169 7702     		.2byte	0x277
+ 497 016b A1000000 		.4byte	0xa1
+ 498 016f 02       		.byte	0x2
+ 499 0170 23       		.byte	0x23
+ 500 0171 28       		.uleb128 0x28
+ 501 0172 09       		.uleb128 0x9
+ 502 0173 44000000 		.4byte	.LASF21
+ 503 0177 03       		.byte	0x3
+ 504 0178 7802     		.2byte	0x278
+ 505 017a 3E000000 		.4byte	0x3e
+ 506 017e 02       		.byte	0x2
+ 507 017f 23       		.byte	0x23
+ 508 0180 2A       		.uleb128 0x2a
+ 509 0181 00       		.byte	0
+ 510 0182 05       		.uleb128 0x5
+ 511 0183 91000000 		.4byte	0x91
+ 512 0187 0B       		.uleb128 0xb
+ 513 0188 11010000 		.4byte	.LASF22
+ 514 018c 03       		.byte	0x3
+ 515 018d 7902     		.2byte	0x279
+ 516 018f A6000000 		.4byte	0xa6
+ 517 0193 08       		.uleb128 0x8
+ 518 0194 2C       		.byte	0x2c
+ 519 0195 03       		.byte	0x3
+ 520 0196 4A03     		.2byte	0x34a
+ 521 0198 8D020000 		.4byte	0x28d
+ 522 019c 0A       		.uleb128 0xa
+ 523 019d 43523100 		.ascii	"CR1\000"
+ 524 01a1 03       		.byte	0x3
+ 525 01a2 4C03     		.2byte	0x34c
+ 526 01a4 8C000000 		.4byte	0x8c
+ 527 01a8 02       		.byte	0x2
+ 528 01a9 23       		.byte	0x23
+ 529 01aa 00       		.uleb128 0
+ 530 01ab 0A       		.uleb128 0xa
+ 531 01ac 43523200 		.ascii	"CR2\000"
+ 532 01b0 03       		.byte	0x3
+ 533 01b1 4D03     		.2byte	0x34d
+ 534 01b3 8C000000 		.4byte	0x8c
+ 535 01b7 02       		.byte	0x2
+ 536 01b8 23       		.byte	0x23
+ 537 01b9 04       		.uleb128 0x4
+ 538 01ba 0A       		.uleb128 0xa
+ 539 01bb 43523300 		.ascii	"CR3\000"
+ 540 01bf 03       		.byte	0x3
+ 541 01c0 4E03     		.2byte	0x34e
+ 542 01c2 8C000000 		.4byte	0x8c
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 12
+
+
+ 543 01c6 02       		.byte	0x2
+ 544 01c7 23       		.byte	0x23
+ 545 01c8 08       		.uleb128 0x8
+ 546 01c9 0A       		.uleb128 0xa
+ 547 01ca 42525200 		.ascii	"BRR\000"
+ 548 01ce 03       		.byte	0x3
+ 549 01cf 4F03     		.2byte	0x34f
+ 550 01d1 A1000000 		.4byte	0xa1
+ 551 01d5 02       		.byte	0x2
+ 552 01d6 23       		.byte	0x23
+ 553 01d7 0C       		.uleb128 0xc
+ 554 01d8 09       		.uleb128 0x9
+ 555 01d9 30000000 		.4byte	.LASF17
+ 556 01dd 03       		.byte	0x3
+ 557 01de 5003     		.2byte	0x350
+ 558 01e0 3E000000 		.4byte	0x3e
+ 559 01e4 02       		.byte	0x2
+ 560 01e5 23       		.byte	0x23
+ 561 01e6 0E       		.uleb128 0xe
+ 562 01e7 09       		.uleb128 0x9
+ 563 01e8 AE000000 		.4byte	.LASF23
+ 564 01ec 03       		.byte	0x3
+ 565 01ed 5103     		.2byte	0x351
+ 566 01ef A1000000 		.4byte	0xa1
+ 567 01f3 02       		.byte	0x2
+ 568 01f4 23       		.byte	0x23
+ 569 01f5 10       		.uleb128 0x10
+ 570 01f6 09       		.uleb128 0x9
+ 571 01f7 3A000000 		.4byte	.LASF18
+ 572 01fb 03       		.byte	0x3
+ 573 01fc 5203     		.2byte	0x352
+ 574 01fe 3E000000 		.4byte	0x3e
+ 575 0202 02       		.byte	0x2
+ 576 0203 23       		.byte	0x23
+ 577 0204 12       		.uleb128 0x12
+ 578 0205 09       		.uleb128 0x9
+ 579 0206 C7010000 		.4byte	.LASF24
+ 580 020a 03       		.byte	0x3
+ 581 020b 5303     		.2byte	0x353
+ 582 020d 8C000000 		.4byte	0x8c
+ 583 0211 02       		.byte	0x2
+ 584 0212 23       		.byte	0x23
+ 585 0213 14       		.uleb128 0x14
+ 586 0214 0A       		.uleb128 0xa
+ 587 0215 52515200 		.ascii	"RQR\000"
+ 588 0219 03       		.byte	0x3
+ 589 021a 5403     		.2byte	0x354
+ 590 021c A1000000 		.4byte	0xa1
+ 591 0220 02       		.byte	0x2
+ 592 0221 23       		.byte	0x23
+ 593 0222 18       		.uleb128 0x18
+ 594 0223 09       		.uleb128 0x9
+ 595 0224 44000000 		.4byte	.LASF21
+ 596 0228 03       		.byte	0x3
+ 597 0229 5503     		.2byte	0x355
+ 598 022b 3E000000 		.4byte	0x3e
+ 599 022f 02       		.byte	0x2
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 13
+
+
+ 600 0230 23       		.byte	0x23
+ 601 0231 1A       		.uleb128 0x1a
+ 602 0232 0A       		.uleb128 0xa
+ 603 0233 49535200 		.ascii	"ISR\000"
+ 604 0237 03       		.byte	0x3
+ 605 0238 5603     		.2byte	0x356
+ 606 023a 8C000000 		.4byte	0x8c
+ 607 023e 02       		.byte	0x2
+ 608 023f 23       		.byte	0x23
+ 609 0240 1C       		.uleb128 0x1c
+ 610 0241 0A       		.uleb128 0xa
+ 611 0242 49435200 		.ascii	"ICR\000"
+ 612 0246 03       		.byte	0x3
+ 613 0247 5703     		.2byte	0x357
+ 614 0249 8C000000 		.4byte	0x8c
+ 615 024d 02       		.byte	0x2
+ 616 024e 23       		.byte	0x23
+ 617 024f 20       		.uleb128 0x20
+ 618 0250 0A       		.uleb128 0xa
+ 619 0251 52445200 		.ascii	"RDR\000"
+ 620 0255 03       		.byte	0x3
+ 621 0256 5803     		.2byte	0x358
+ 622 0258 A1000000 		.4byte	0xa1
+ 623 025c 02       		.byte	0x2
+ 624 025d 23       		.byte	0x23
+ 625 025e 24       		.uleb128 0x24
+ 626 025f 09       		.uleb128 0x9
+ 627 0260 4E000000 		.4byte	.LASF25
+ 628 0264 03       		.byte	0x3
+ 629 0265 5903     		.2byte	0x359
+ 630 0267 3E000000 		.4byte	0x3e
+ 631 026b 02       		.byte	0x2
+ 632 026c 23       		.byte	0x23
+ 633 026d 26       		.uleb128 0x26
+ 634 026e 0A       		.uleb128 0xa
+ 635 026f 54445200 		.ascii	"TDR\000"
+ 636 0273 03       		.byte	0x3
+ 637 0274 5A03     		.2byte	0x35a
+ 638 0276 A1000000 		.4byte	0xa1
+ 639 027a 02       		.byte	0x2
+ 640 027b 23       		.byte	0x23
+ 641 027c 28       		.uleb128 0x28
+ 642 027d 09       		.uleb128 0x9
+ 643 027e 58000000 		.4byte	.LASF26
+ 644 0282 03       		.byte	0x3
+ 645 0283 5B03     		.2byte	0x35b
+ 646 0285 3E000000 		.4byte	0x3e
+ 647 0289 02       		.byte	0x2
+ 648 028a 23       		.byte	0x23
+ 649 028b 2A       		.uleb128 0x2a
+ 650 028c 00       		.byte	0
+ 651 028d 0B       		.uleb128 0xb
+ 652 028e 18000000 		.4byte	.LASF27
+ 653 0292 03       		.byte	0x3
+ 654 0293 5C03     		.2byte	0x35c
+ 655 0295 93010000 		.4byte	0x193
+ 656 0299 0C       		.uleb128 0xc
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 14
+
+
+ 657 029a 01       		.byte	0x1
+ 658 029b 00000000 		.4byte	.LASF28
+ 659 029f 01       		.byte	0x1
+ 660 02a0 15       		.byte	0x15
+ 661 02a1 01       		.byte	0x1
+ 662 02a2 00000000 		.4byte	.LFB20
+ 663 02a6 18000000 		.4byte	.LFE20
+ 664 02aa 00000000 		.4byte	.LLST0
+ 665 02ae 01       		.byte	0x1
+ 666 02af 0C       		.uleb128 0xc
+ 667 02b0 01       		.byte	0x1
+ 668 02b1 BE010000 		.4byte	.LASF29
+ 669 02b5 01       		.byte	0x1
+ 670 02b6 1C       		.byte	0x1c
+ 671 02b7 01       		.byte	0x1
+ 672 02b8 00000000 		.4byte	.LFB21
+ 673 02bc 18000000 		.4byte	.LFE21
+ 674 02c0 20000000 		.4byte	.LLST1
+ 675 02c4 01       		.byte	0x1
+ 676 02c5 0D       		.uleb128 0xd
+ 677 02c6 01       		.byte	0x1
+ 678 02c7 5C010000 		.4byte	.LASF33
+ 679 02cb 01       		.byte	0x1
+ 680 02cc 24       		.byte	0x24
+ 681 02cd 01       		.byte	0x1
+ 682 02ce 00000000 		.4byte	.LFB22
+ 683 02d2 EC000000 		.4byte	.LFE22
+ 684 02d6 40000000 		.4byte	.LLST2
+ 685 02da 01       		.byte	0x1
+ 686 02db EE020000 		.4byte	0x2ee
+ 687 02df 0E       		.uleb128 0xe
+ 688 02e0 A5000000 		.4byte	.LASF34
+ 689 02e4 01       		.byte	0x1
+ 690 02e5 24       		.byte	0x24
+ 691 02e6 30000000 		.4byte	0x30
+ 692 02ea 02       		.byte	0x2
+ 693 02eb 91       		.byte	0x91
+ 694 02ec 77       		.sleb128 -9
+ 695 02ed 00       		.byte	0
+ 696 02ee 0F       		.uleb128 0xf
+ 697 02ef CC010000 		.4byte	.LASF35
+ 698 02f3 01       		.byte	0x1
+ 699 02f4 11       		.byte	0x11
+ 700 02f5 00030000 		.4byte	0x300
+ 701 02f9 01       		.byte	0x1
+ 702 02fa 05       		.byte	0x5
+ 703 02fb 03       		.byte	0x3
+ 704 02fc 00000000 		.4byte	dmx_state
+ 705 0300 05       		.uleb128 0x5
+ 706 0301 30000000 		.4byte	0x30
+ 707 0305 00       		.byte	0
+ 708              		.section	.debug_abbrev,"",%progbits
+ 709              	.Ldebug_abbrev0:
+ 710 0000 01       		.uleb128 0x1
+ 711 0001 11       		.uleb128 0x11
+ 712 0002 01       		.byte	0x1
+ 713 0003 25       		.uleb128 0x25
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 15
+
+
+ 714 0004 0E       		.uleb128 0xe
+ 715 0005 13       		.uleb128 0x13
+ 716 0006 0B       		.uleb128 0xb
+ 717 0007 03       		.uleb128 0x3
+ 718 0008 0E       		.uleb128 0xe
+ 719 0009 1B       		.uleb128 0x1b
+ 720 000a 0E       		.uleb128 0xe
+ 721 000b 55       		.uleb128 0x55
+ 722 000c 06       		.uleb128 0x6
+ 723 000d 11       		.uleb128 0x11
+ 724 000e 01       		.uleb128 0x1
+ 725 000f 52       		.uleb128 0x52
+ 726 0010 01       		.uleb128 0x1
+ 727 0011 10       		.uleb128 0x10
+ 728 0012 06       		.uleb128 0x6
+ 729 0013 00       		.byte	0
+ 730 0014 00       		.byte	0
+ 731 0015 02       		.uleb128 0x2
+ 732 0016 24       		.uleb128 0x24
+ 733 0017 00       		.byte	0
+ 734 0018 0B       		.uleb128 0xb
+ 735 0019 0B       		.uleb128 0xb
+ 736 001a 3E       		.uleb128 0x3e
+ 737 001b 0B       		.uleb128 0xb
+ 738 001c 03       		.uleb128 0x3
+ 739 001d 0E       		.uleb128 0xe
+ 740 001e 00       		.byte	0
+ 741 001f 00       		.byte	0
+ 742 0020 03       		.uleb128 0x3
+ 743 0021 16       		.uleb128 0x16
+ 744 0022 00       		.byte	0
+ 745 0023 03       		.uleb128 0x3
+ 746 0024 0E       		.uleb128 0xe
+ 747 0025 3A       		.uleb128 0x3a
+ 748 0026 0B       		.uleb128 0xb
+ 749 0027 3B       		.uleb128 0x3b
+ 750 0028 0B       		.uleb128 0xb
+ 751 0029 49       		.uleb128 0x49
+ 752 002a 13       		.uleb128 0x13
+ 753 002b 00       		.byte	0
+ 754 002c 00       		.byte	0
+ 755 002d 04       		.uleb128 0x4
+ 756 002e 24       		.uleb128 0x24
+ 757 002f 00       		.byte	0
+ 758 0030 0B       		.uleb128 0xb
+ 759 0031 0B       		.uleb128 0xb
+ 760 0032 3E       		.uleb128 0x3e
+ 761 0033 0B       		.uleb128 0xb
+ 762 0034 03       		.uleb128 0x3
+ 763 0035 08       		.uleb128 0x8
+ 764 0036 00       		.byte	0
+ 765 0037 00       		.byte	0
+ 766 0038 05       		.uleb128 0x5
+ 767 0039 35       		.uleb128 0x35
+ 768 003a 00       		.byte	0
+ 769 003b 49       		.uleb128 0x49
+ 770 003c 13       		.uleb128 0x13
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 16
+
+
+ 771 003d 00       		.byte	0
+ 772 003e 00       		.byte	0
+ 773 003f 06       		.uleb128 0x6
+ 774 0040 01       		.uleb128 0x1
+ 775 0041 01       		.byte	0x1
+ 776 0042 49       		.uleb128 0x49
+ 777 0043 13       		.uleb128 0x13
+ 778 0044 01       		.uleb128 0x1
+ 779 0045 13       		.uleb128 0x13
+ 780 0046 00       		.byte	0
+ 781 0047 00       		.byte	0
+ 782 0048 07       		.uleb128 0x7
+ 783 0049 21       		.uleb128 0x21
+ 784 004a 00       		.byte	0
+ 785 004b 49       		.uleb128 0x49
+ 786 004c 13       		.uleb128 0x13
+ 787 004d 2F       		.uleb128 0x2f
+ 788 004e 0B       		.uleb128 0xb
+ 789 004f 00       		.byte	0
+ 790 0050 00       		.byte	0
+ 791 0051 08       		.uleb128 0x8
+ 792 0052 13       		.uleb128 0x13
+ 793 0053 01       		.byte	0x1
+ 794 0054 0B       		.uleb128 0xb
+ 795 0055 0B       		.uleb128 0xb
+ 796 0056 3A       		.uleb128 0x3a
+ 797 0057 0B       		.uleb128 0xb
+ 798 0058 3B       		.uleb128 0x3b
+ 799 0059 05       		.uleb128 0x5
+ 800 005a 01       		.uleb128 0x1
+ 801 005b 13       		.uleb128 0x13
+ 802 005c 00       		.byte	0
+ 803 005d 00       		.byte	0
+ 804 005e 09       		.uleb128 0x9
+ 805 005f 0D       		.uleb128 0xd
+ 806 0060 00       		.byte	0
+ 807 0061 03       		.uleb128 0x3
+ 808 0062 0E       		.uleb128 0xe
+ 809 0063 3A       		.uleb128 0x3a
+ 810 0064 0B       		.uleb128 0xb
+ 811 0065 3B       		.uleb128 0x3b
+ 812 0066 05       		.uleb128 0x5
+ 813 0067 49       		.uleb128 0x49
+ 814 0068 13       		.uleb128 0x13
+ 815 0069 38       		.uleb128 0x38
+ 816 006a 0A       		.uleb128 0xa
+ 817 006b 00       		.byte	0
+ 818 006c 00       		.byte	0
+ 819 006d 0A       		.uleb128 0xa
+ 820 006e 0D       		.uleb128 0xd
+ 821 006f 00       		.byte	0
+ 822 0070 03       		.uleb128 0x3
+ 823 0071 08       		.uleb128 0x8
+ 824 0072 3A       		.uleb128 0x3a
+ 825 0073 0B       		.uleb128 0xb
+ 826 0074 3B       		.uleb128 0x3b
+ 827 0075 05       		.uleb128 0x5
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 17
+
+
+ 828 0076 49       		.uleb128 0x49
+ 829 0077 13       		.uleb128 0x13
+ 830 0078 38       		.uleb128 0x38
+ 831 0079 0A       		.uleb128 0xa
+ 832 007a 00       		.byte	0
+ 833 007b 00       		.byte	0
+ 834 007c 0B       		.uleb128 0xb
+ 835 007d 16       		.uleb128 0x16
+ 836 007e 00       		.byte	0
+ 837 007f 03       		.uleb128 0x3
+ 838 0080 0E       		.uleb128 0xe
+ 839 0081 3A       		.uleb128 0x3a
+ 840 0082 0B       		.uleb128 0xb
+ 841 0083 3B       		.uleb128 0x3b
+ 842 0084 05       		.uleb128 0x5
+ 843 0085 49       		.uleb128 0x49
+ 844 0086 13       		.uleb128 0x13
+ 845 0087 00       		.byte	0
+ 846 0088 00       		.byte	0
+ 847 0089 0C       		.uleb128 0xc
+ 848 008a 2E       		.uleb128 0x2e
+ 849 008b 00       		.byte	0
+ 850 008c 3F       		.uleb128 0x3f
+ 851 008d 0C       		.uleb128 0xc
+ 852 008e 03       		.uleb128 0x3
+ 853 008f 0E       		.uleb128 0xe
+ 854 0090 3A       		.uleb128 0x3a
+ 855 0091 0B       		.uleb128 0xb
+ 856 0092 3B       		.uleb128 0x3b
+ 857 0093 0B       		.uleb128 0xb
+ 858 0094 27       		.uleb128 0x27
+ 859 0095 0C       		.uleb128 0xc
+ 860 0096 11       		.uleb128 0x11
+ 861 0097 01       		.uleb128 0x1
+ 862 0098 12       		.uleb128 0x12
+ 863 0099 01       		.uleb128 0x1
+ 864 009a 40       		.uleb128 0x40
+ 865 009b 06       		.uleb128 0x6
+ 866 009c 9642     		.uleb128 0x2116
+ 867 009e 0C       		.uleb128 0xc
+ 868 009f 00       		.byte	0
+ 869 00a0 00       		.byte	0
+ 870 00a1 0D       		.uleb128 0xd
+ 871 00a2 2E       		.uleb128 0x2e
+ 872 00a3 01       		.byte	0x1
+ 873 00a4 3F       		.uleb128 0x3f
+ 874 00a5 0C       		.uleb128 0xc
+ 875 00a6 03       		.uleb128 0x3
+ 876 00a7 0E       		.uleb128 0xe
+ 877 00a8 3A       		.uleb128 0x3a
+ 878 00a9 0B       		.uleb128 0xb
+ 879 00aa 3B       		.uleb128 0x3b
+ 880 00ab 0B       		.uleb128 0xb
+ 881 00ac 27       		.uleb128 0x27
+ 882 00ad 0C       		.uleb128 0xc
+ 883 00ae 11       		.uleb128 0x11
+ 884 00af 01       		.uleb128 0x1
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 18
+
+
+ 885 00b0 12       		.uleb128 0x12
+ 886 00b1 01       		.uleb128 0x1
+ 887 00b2 40       		.uleb128 0x40
+ 888 00b3 06       		.uleb128 0x6
+ 889 00b4 9642     		.uleb128 0x2116
+ 890 00b6 0C       		.uleb128 0xc
+ 891 00b7 01       		.uleb128 0x1
+ 892 00b8 13       		.uleb128 0x13
+ 893 00b9 00       		.byte	0
+ 894 00ba 00       		.byte	0
+ 895 00bb 0E       		.uleb128 0xe
+ 896 00bc 05       		.uleb128 0x5
+ 897 00bd 00       		.byte	0
+ 898 00be 03       		.uleb128 0x3
+ 899 00bf 0E       		.uleb128 0xe
+ 900 00c0 3A       		.uleb128 0x3a
+ 901 00c1 0B       		.uleb128 0xb
+ 902 00c2 3B       		.uleb128 0x3b
+ 903 00c3 0B       		.uleb128 0xb
+ 904 00c4 49       		.uleb128 0x49
+ 905 00c5 13       		.uleb128 0x13
+ 906 00c6 02       		.uleb128 0x2
+ 907 00c7 0A       		.uleb128 0xa
+ 908 00c8 00       		.byte	0
+ 909 00c9 00       		.byte	0
+ 910 00ca 0F       		.uleb128 0xf
+ 911 00cb 34       		.uleb128 0x34
+ 912 00cc 00       		.byte	0
+ 913 00cd 03       		.uleb128 0x3
+ 914 00ce 0E       		.uleb128 0xe
+ 915 00cf 3A       		.uleb128 0x3a
+ 916 00d0 0B       		.uleb128 0xb
+ 917 00d1 3B       		.uleb128 0x3b
+ 918 00d2 0B       		.uleb128 0xb
+ 919 00d3 49       		.uleb128 0x49
+ 920 00d4 13       		.uleb128 0x13
+ 921 00d5 3F       		.uleb128 0x3f
+ 922 00d6 0C       		.uleb128 0xc
+ 923 00d7 02       		.uleb128 0x2
+ 924 00d8 0A       		.uleb128 0xa
+ 925 00d9 00       		.byte	0
+ 926 00da 00       		.byte	0
+ 927 00db 00       		.byte	0
+ 928              		.section	.debug_loc,"",%progbits
+ 929              	.Ldebug_loc0:
+ 930              	.LLST0:
+ 931 0000 00000000 		.4byte	.LFB20
+ 932 0004 02000000 		.4byte	.LCFI0
+ 933 0008 0200     		.2byte	0x2
+ 934 000a 7D       		.byte	0x7d
+ 935 000b 00       		.sleb128 0
+ 936 000c 02000000 		.4byte	.LCFI0
+ 937 0010 18000000 		.4byte	.LFE20
+ 938 0014 0200     		.2byte	0x2
+ 939 0016 7D       		.byte	0x7d
+ 940 0017 08       		.sleb128 8
+ 941 0018 00000000 		.4byte	0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 19
+
+
+ 942 001c 00000000 		.4byte	0
+ 943              	.LLST1:
+ 944 0020 00000000 		.4byte	.LFB21
+ 945 0024 02000000 		.4byte	.LCFI1
+ 946 0028 0200     		.2byte	0x2
+ 947 002a 7D       		.byte	0x7d
+ 948 002b 00       		.sleb128 0
+ 949 002c 02000000 		.4byte	.LCFI1
+ 950 0030 18000000 		.4byte	.LFE21
+ 951 0034 0200     		.2byte	0x2
+ 952 0036 7D       		.byte	0x7d
+ 953 0037 08       		.sleb128 8
+ 954 0038 00000000 		.4byte	0
+ 955 003c 00000000 		.4byte	0
+ 956              	.LLST2:
+ 957 0040 00000000 		.4byte	.LFB22
+ 958 0044 02000000 		.4byte	.LCFI2
+ 959 0048 0200     		.2byte	0x2
+ 960 004a 7D       		.byte	0x7d
+ 961 004b 00       		.sleb128 0
+ 962 004c 02000000 		.4byte	.LCFI2
+ 963 0050 04000000 		.4byte	.LCFI3
+ 964 0054 0200     		.2byte	0x2
+ 965 0056 7D       		.byte	0x7d
+ 966 0057 04       		.sleb128 4
+ 967 0058 04000000 		.4byte	.LCFI3
+ 968 005c EC000000 		.4byte	.LFE22
+ 969 0060 0200     		.2byte	0x2
+ 970 0062 7D       		.byte	0x7d
+ 971 0063 10       		.sleb128 16
+ 972 0064 00000000 		.4byte	0
+ 973 0068 00000000 		.4byte	0
+ 974              		.section	.debug_aranges,"",%progbits
+ 975 0000 2C000000 		.4byte	0x2c
+ 976 0004 0200     		.2byte	0x2
+ 977 0006 00000000 		.4byte	.Ldebug_info0
+ 978 000a 04       		.byte	0x4
+ 979 000b 00       		.byte	0
+ 980 000c 0000     		.2byte	0
+ 981 000e 0000     		.2byte	0
+ 982 0010 00000000 		.4byte	.LFB20
+ 983 0014 18000000 		.4byte	.LFE20-.LFB20
+ 984 0018 00000000 		.4byte	.LFB21
+ 985 001c 18000000 		.4byte	.LFE21-.LFB21
+ 986 0020 00000000 		.4byte	.LFB22
+ 987 0024 EC000000 		.4byte	.LFE22-.LFB22
+ 988 0028 00000000 		.4byte	0
+ 989 002c 00000000 		.4byte	0
+ 990              		.section	.debug_ranges,"",%progbits
+ 991              	.Ldebug_ranges0:
+ 992 0000 00000000 		.4byte	.LFB20
+ 993 0004 18000000 		.4byte	.LFE20
+ 994 0008 00000000 		.4byte	.LFB21
+ 995 000c 18000000 		.4byte	.LFE21
+ 996 0010 00000000 		.4byte	.LFB22
+ 997 0014 EC000000 		.4byte	.LFE22
+ 998 0018 00000000 		.4byte	0
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 20
+
+
+ 999 001c 00000000 		.4byte	0
+ 1000              		.section	.debug_line,"",%progbits
+ 1001              	.Ldebug_line0:
+ 1002 0000 37010000 		.section	.debug_str,"MS",%progbits,1
+ 1002      0200D400 
+ 1002      00000201 
+ 1002      FB0E0D00 
+ 1002      01010101 
+ 1003              	.LASF28:
+ 1004 0000 444D585F 		.ascii	"DMX_Ena\000"
+ 1004      456E6100 
+ 1005              	.LASF20:
+ 1006 0008 4C434B52 		.ascii	"LCKR\000"
+ 1006      00
+ 1007              	.LASF12:
+ 1008 000d 4D4F4445 		.ascii	"MODER\000"
+ 1008      5200
+ 1009              	.LASF19:
+ 1010 0013 42535252 		.ascii	"BSRR\000"
+ 1010      00
+ 1011              	.LASF27:
+ 1012 0018 55534152 		.ascii	"USART_TypeDef\000"
+ 1012      545F5479 
+ 1012      70654465 
+ 1012      6600
+ 1013              	.LASF14:
+ 1014 0026 52455345 		.ascii	"RESERVED0\000"
+ 1014      52564544 
+ 1014      3000
+ 1015              	.LASF17:
+ 1016 0030 52455345 		.ascii	"RESERVED1\000"
+ 1016      52564544 
+ 1016      3100
+ 1017              	.LASF18:
+ 1018 003a 52455345 		.ascii	"RESERVED2\000"
+ 1018      52564544 
+ 1018      3200
+ 1019              	.LASF21:
+ 1020 0044 52455345 		.ascii	"RESERVED3\000"
+ 1020      52564544 
+ 1020      3300
+ 1021              	.LASF25:
+ 1022 004e 52455345 		.ascii	"RESERVED4\000"
+ 1022      52564544 
+ 1022      3400
+ 1023              	.LASF26:
+ 1024 0058 52455345 		.ascii	"RESERVED5\000"
+ 1024      52564544 
+ 1024      3500
+ 1025              	.LASF13:
+ 1026 0062 4F545950 		.ascii	"OTYPER\000"
+ 1026      455200
+ 1027              	.LASF1:
+ 1028 0069 756E7369 		.ascii	"unsigned char\000"
+ 1028      676E6564 
+ 1028      20636861 
+ 1028      7200
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 21
+
+
+ 1029              	.LASF7:
+ 1030 0077 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1030      20756E73 
+ 1030      69676E65 
+ 1030      6420696E 
+ 1030      7400
+ 1031              	.LASF3:
+ 1032 0089 73686F72 		.ascii	"short unsigned int\000"
+ 1032      7420756E 
+ 1032      7369676E 
+ 1032      65642069 
+ 1032      6E7400
+ 1033              	.LASF6:
+ 1034 009c 75696E74 		.ascii	"uint32_t\000"
+ 1034      33325F74 
+ 1034      00
+ 1035              	.LASF34:
+ 1036 00a5 6E65775F 		.ascii	"new_func\000"
+ 1036      66756E63 
+ 1036      00
+ 1037              	.LASF23:
+ 1038 00ae 47545052 		.ascii	"GTPR\000"
+ 1038      00
+ 1039              	.LASF15:
+ 1040 00b3 4F535045 		.ascii	"OSPEEDR\000"
+ 1040      45445200 
+ 1041              	.LASF10:
+ 1042 00bb 756E7369 		.ascii	"unsigned int\000"
+ 1042      676E6564 
+ 1042      20696E74 
+ 1042      00
+ 1043              	.LASF30:
+ 1044 00c8 474E5520 		.ascii	"GNU C 4.7.4 20130613 (release) [ARM/embedded-4_7-br"
+ 1044      4320342E 
+ 1044      372E3420 
+ 1044      32303133 
+ 1044      30363133 
+ 1045 00fb 616E6368 		.ascii	"anch revision 200083]\000"
+ 1045      20726576 
+ 1045      6973696F 
+ 1045      6E203230 
+ 1045      30303833 
+ 1046              	.LASF22:
+ 1047 0111 4750494F 		.ascii	"GPIO_TypeDef\000"
+ 1047      5F547970 
+ 1047      65446566 
+ 1047      00
+ 1048              	.LASF9:
+ 1049 011e 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1049      206C6F6E 
+ 1049      6720756E 
+ 1049      7369676E 
+ 1049      65642069 
+ 1050              	.LASF31:
+ 1051 0135 2E5C7372 		.ascii	".\\src\\dmx_transceiver.c\000"
+ 1051      635C646D 
+ 1051      785F7472 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 22
+
+
+ 1051      616E7363 
+ 1051      65697665 
+ 1052              	.LASF11:
+ 1053 014d 73697A65 		.ascii	"sizetype\000"
+ 1053      74797065 
+ 1053      00
+ 1054              	.LASF16:
+ 1055 0156 50555044 		.ascii	"PUPDR\000"
+ 1055      5200
+ 1056              	.LASF33:
+ 1057 015c 53656E64 		.ascii	"SendDMXPacket\000"
+ 1057      444D5850 
+ 1057      61636B65 
+ 1057      7400
+ 1058              	.LASF8:
+ 1059 016a 6C6F6E67 		.ascii	"long long int\000"
+ 1059      206C6F6E 
+ 1059      6720696E 
+ 1059      7400
+ 1060              	.LASF32:
+ 1061 0178 433A5C55 		.ascii	"C:\\Users\\Mariano\\Documents\\Proyectos\\eclipse_s"
+ 1061      73657273 
+ 1061      5C4D6172 
+ 1061      69616E6F 
+ 1061      5C446F63 
+ 1062 01a6 746D3332 		.ascii	"tm32\\Planolux_DMX512_P1\000"
+ 1062      5C506C61 
+ 1062      6E6F6C75 
+ 1062      785F444D 
+ 1062      58353132 
+ 1063              	.LASF29:
+ 1064 01be 444D585F 		.ascii	"DMX_Disa\000"
+ 1064      44697361 
+ 1064      00
+ 1065              	.LASF24:
+ 1066 01c7 52544F52 		.ascii	"RTOR\000"
+ 1066      00
+ 1067              	.LASF35:
+ 1068 01cc 646D785F 		.ascii	"dmx_state\000"
+ 1068      73746174 
+ 1068      6500
+ 1069              	.LASF2:
+ 1070 01d6 73686F72 		.ascii	"short int\000"
+ 1070      7420696E 
+ 1070      7400
+ 1071              	.LASF5:
+ 1072 01e0 75696E74 		.ascii	"uint16_t\000"
+ 1072      31365F74 
+ 1072      00
+ 1073              	.LASF4:
+ 1074 01e9 6C6F6E67 		.ascii	"long int\000"
+ 1074      20696E74 
+ 1074      00
+ 1075              	.LASF0:
+ 1076 01f2 7369676E 		.ascii	"signed char\000"
+ 1076      65642063 
+ 1076      68617200 
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 23
+
+
+ 1077              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.7.4 20130613 (release) [ARM/embedded-4_7-br
+ARM GAS  C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 dmx_transceiver.c
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:54     .bss.dmx_state:00000000 dmx_state
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:55     .bss.dmx_state:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:57     .text.DMX_Ena:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:62     .text.DMX_Ena:00000000 DMX_Ena
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:87     .text.DMX_Ena:00000014 $d
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:92     .text.DMX_Disa:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:97     .text.DMX_Disa:00000000 DMX_Disa
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:121    .text.DMX_Disa:00000014 $d
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:126    .text.SendDMXPacket:00000000 $t
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:131    .text.SendDMXPacket:00000000 SendDMXPacket
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:191    .rodata.SendDMXPacket:00000000 $d
+C:\Users\Mariano\AppData\Local\Temp\ccZCsQIT.s:302    .text.SendDMXPacket:000000e0 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+EXTIOn
+EXTIOff
+OneShootTIM16
+UsartSendDMX
