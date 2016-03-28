@@ -1,0 +1,10 @@
+*.lst
+*.hex
+*.map
+*.bin
+*.o
+
+dimmer_model.*
+rdm_responder.*
+rdm_util.*
+transceiver.*
