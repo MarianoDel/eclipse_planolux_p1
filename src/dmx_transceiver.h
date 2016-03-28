@@ -24,4 +24,6 @@ void SendDMXPacket (unsigned char);
 void DMX_Ena(void);
 void DMX_Disa(void);
 
+void UpdateRDMResponder(void);
+
 #endif /* DMX_TRANSCEIVER_H_ */

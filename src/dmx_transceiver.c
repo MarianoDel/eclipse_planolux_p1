@@ -11,7 +11,8 @@
 #include "stm32f0x_uart.h"
 #include "stm32f0x_gpio.h"
 
-
+//--- VARIABLES EXTERNAS ---//
+extern volatile unsigned char RDM_packet_flag;
 
 //--- VARIABLES GLOBALES ---//
 volatile unsigned char dmx_state = 0;
@@ -32,6 +33,16 @@ void DMX_Disa(void)
 	USART1->CR1 &= ~USART_CR1_UE;
 }
 
+//revisa si existe paquete RDM y que hacer con el mismo
+//
+void UpdateRDMResponder(void)
+{
+	if (RDM_packet_flag)
+	{
+
+		RDM_packet_flag = 0;
+	}
+}
 
 void SendDMXPacket (unsigned char new_func)
 {

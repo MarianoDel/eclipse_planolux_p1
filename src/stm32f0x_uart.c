@@ -181,10 +181,6 @@ void USART1_IRQHandler(void)
 						Packet_Detected_Flag = 1;
 						LED_OFF;	//termina paquete
 					}
-
-					if (DMX_channel_received < 512)
-					{
-					}
 				}	//fin if PCKT_RDM
 
 			}	//fin else dmx_channel_received
