@@ -136,9 +136,11 @@ void USART1_IRQHandler(void)
 
 						if (DMX_channel_received >= (DMX_channel_selected + DMX_channel_quantity))
 						{
+							//en data[0] siempre copio el ch0, depues los elegidos
+							data[0] = data1[0];
 							for (i=0; i<DMX_channel_quantity; i++)
 							{
-								data[i] = data1[(DMX_channel_selected) + i];
+								data[i+1] = data1[(DMX_channel_selected) + i];
 							}
 							//--- Reception end ---//
 							DMX_channel_received = 0;

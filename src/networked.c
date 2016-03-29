@@ -122,9 +122,9 @@ unsigned char FuncNetworked (unsigned char jump_menu)
 				//llego un paquete DMX
 				DMX_packet_flag = 0;
 
-				//en data tengo la info
-				Update_TIM3_CH1 (data[0]);
-				networked_ii = data[0];
+				//en data[1] tengo la info del ch1
+				Update_TIM3_CH1 (data[1]);
+				networked_ii = data[1];
 			}
 
 
