@@ -117,6 +117,8 @@ SRC += .\src\main_menu.c
 SRC += .\src\standalone.c
 SRC += .\src\grouped.c
 SRC += .\src\networked.c
+## RDM libraries
+SRC += .\src\rdm_util.c
 ## System Support
 #SRC += .\cmsis_boot\system_stm32f0xx.c
 #SRC += $(DISCOVERY)\stm32f0_discovery.c
