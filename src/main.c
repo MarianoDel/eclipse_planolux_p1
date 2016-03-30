@@ -95,7 +95,7 @@ volatile unsigned char DMX_channel_quantity = 4;
 
 volatile unsigned char data1[512];
 //static unsigned char data_back[10];
-volatile unsigned char data[10];
+volatile unsigned char data[256];
 
 // ------- Externals de los timers -------
 //volatile unsigned short prog_timer = 0;

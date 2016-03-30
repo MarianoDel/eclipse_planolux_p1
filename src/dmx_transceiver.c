@@ -11,8 +11,13 @@
 #include "stm32f0x_uart.h"
 #include "stm32f0x_gpio.h"
 
+#include "rdm_util.h"
+
 //--- VARIABLES EXTERNAS ---//
 extern volatile unsigned char RDM_packet_flag;
+extern volatile unsigned char data1[];
+extern volatile unsigned char data[];
+
 
 //--- VARIABLES GLOBALES ---//
 volatile unsigned char dmx_state = 0;
@@ -39,7 +44,11 @@ void UpdateRDMResponder(void)
 {
 	if (RDM_packet_flag)
 	{
-
+		//voy a revisar si el paquete tiene buen checksum
+		if (RDMUtil_VerifyChecksum((unsigned char *)data, data[1]) == true)
+			LED_ON;
+		else
+			LED_OFF;
 		RDM_packet_flag = 0;
 	}
 }
