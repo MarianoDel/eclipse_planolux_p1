@@ -42,11 +42,19 @@ void DMX_Disa(void)
 //
 void UpdateRDMResponder(void)
 {
+	RDMHeader * p_header;
+
+	p_header = (RDMHeader *) data;
 	if (RDM_packet_flag)
 	{
 		//voy a revisar si el paquete tiene buen checksum
 		if (RDMUtil_VerifyChecksum((unsigned char *)data, data[1]) == true)
+		{
 			LED_ON;
+			//reviso si es unicast
+			if (RDMUtil_IsUnicast(p_header->dest_uid) == true)
+				LED_OFF;
+		}
 		else
 			LED_OFF;
 		RDM_packet_flag = 0;
