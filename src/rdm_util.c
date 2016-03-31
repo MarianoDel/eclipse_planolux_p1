@@ -63,6 +63,19 @@ bool RDMUtil_VerifyChecksum(const uint8_t *frame, unsigned int size) {
           ShortLSB(checksum) == frame[message_length + 1]);
 }
 
+
+bool RDMUtil_VerifyChecksumK(const uint8_t *frame, unsigned int size) {
+  if (size < sizeof(RDMKirnoHeader) + (unsigned int) RDM_CHECKSUM_LENGTH ||
+      frame[2] + (unsigned int) RDM_CHECKSUM_LENGTH != size) {
+    return false;
+  }
+
+  uint8_t message_length = frame[MESSAGE_LENGTH_OFFSET];
+  uint16_t checksum = Checksum(frame, message_length);
+  return (ShortMSB(checksum) == frame[message_length] &&
+          ShortLSB(checksum) == frame[message_length + 1]);
+}
+
 int RDMUtil_AppendChecksum(uint8_t *frame) {
   uint8_t message_length = frame[MESSAGE_LENGTH_OFFSET];
   uint16_t checksum = Checksum(frame, message_length);

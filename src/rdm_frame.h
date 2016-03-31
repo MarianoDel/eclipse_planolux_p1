@@ -30,13 +30,23 @@
 #include <stdint.h>
 #include "rdm.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//NUEVA ESTRUCTURA RDM KIRNO
+typedef struct {
+  uint8_t start_code;
+  uint8_t message_length;
+  uint8_t dest_uid[UID_LENGTH];
+  uint8_t src_uid[UID_LENGTH];
+  uint8_t port_id;
 
-/**
- * @brief The common RDM header.
- */
+  //-- DUB internals --
+  uint8_t command_class;
+  uint16_t param_id;
+  uint8_t param_data_length;
+  // optional param data
+  // checksum [2];
+} RDMKirnoHeader;
+
+//ESTRUCTURA ORIGINAL
 typedef struct {
   uint8_t start_code;
   uint8_t sub_start_code;
@@ -54,10 +64,6 @@ typedef struct {
   // checksum [2];
 } __attribute__((packed)) RDMHeader;
 
-
-#ifdef __cplusplus
-}
-#endif
 
 /**
  * @}

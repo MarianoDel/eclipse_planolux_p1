@@ -85,6 +85,7 @@ bool RDMUtil_IsUnicast(const uint8_t uid[UID_LENGTH]);
  * return false.
  */
 bool RDMUtil_VerifyChecksum(const uint8_t *frame, unsigned int size);
+bool RDMUtil_VerifyChecksumK(const uint8_t *frame, unsigned int size);
 
 /**
  * @brief Append the RDM checksum for a frame.
