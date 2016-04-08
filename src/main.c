@@ -932,6 +932,7 @@ int main(void)
 	else
 		jump_the_menu = RESP_YES;
 
+	Update_TIM3_CH2 (255);
 	//Wait_ms(2000);
 	while (1)
 	{
