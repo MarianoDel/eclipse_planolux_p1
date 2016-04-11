@@ -76,6 +76,8 @@ extern volatile unsigned char data[];
 volatile unsigned char * pdmx;
 
 //--- Private variables ---//
+volatile unsigned short rdm_bytes_left = 0;
+
 //Reception buffer.
 
 //Transmission buffer.
@@ -95,50 +97,95 @@ void USART1_IRQHandler(void)
 	unsigned char dummy;
 
 	/* USART in mode Receiver --------------------------------------------------*/
-	//if (USART_GetITStatus(USARTx, USART_IT_RXNE) == SET)
 	if (USART1->ISR & USART_ISR_RXNE)
 	{
 		//RX DMX
-		//data0 = USART_ReceiveData(USART3);
 		dummy = USART1->RDR & 0x0FF;
 
-		if (dmx_receive_flag)
+		if (dmx_receive_flag != PCKT_NOT_READY)
 		{
-			if (DMX_channel_received == 0)		//empieza paquete
-				LED_ON;
-
-			//TODO: aca ver si es DMX o RDM
-			if (DMX_channel_received < 511)
+			if (DMX_channel_received == 0)		//empieza paquete me fijo si es DMX o RDM
 			{
-				data1[DMX_channel_received] = dummy;
+				LED_ON;
+				if (dummy == 0xCC)	//es RDM
+				{
+					dmx_receive_flag = PCKT_RDM;
+					rdm_bytes_left = 0;
+				}
+				else if (dummy == 0x00)	//es DMX
+				{
+					dmx_receive_flag = PCKT_DMX;
+				}
+				else
+				{
+					LED_OFF;
+					return;		//no se que es vuelvo
+				}
+				data1[0] = dummy;
 				DMX_channel_received++;
 			}
 			else
-				DMX_channel_received = 0;
-
-			//TODO: revisar canales 510 + 4
-			if (DMX_channel_received >= (DMX_channel_selected + DMX_channel_quantity))
 			{
-				//los paquetes empiezan en 0 pero no lo verifico
-				for (i=0; i<DMX_channel_quantity; i++)
+				//estoy recibiendo un paquete, segun cual sea me fijo el final
+				if (dmx_receive_flag == PCKT_DMX)
 				{
-					data[i] = data1[(DMX_channel_selected) + i];
-				}
+					if (DMX_channel_received < 512)
+					{
+						data1[DMX_channel_received] = dummy;
+						DMX_channel_received++;
 
-				/*
-				if ((data[0] < 10) || (data[0] > 240))	//revisa el error de salto de canal
-					LED2_ON;
-				else
-					LED2_OFF;	//trata de encontrar el error de deteccion de trama
-				*/
+						if (DMX_channel_received >= (DMX_channel_selected + DMX_channel_quantity))
+						{
+							//en data[0] siempre copio el ch0, depues los elegidos
+							data[0] = data1[0];
+							for (i=0; i<DMX_channel_quantity; i++)
+							{
+								data[i+1] = data1[(DMX_channel_selected) + i];
+							}
+							//--- Reception end ---//
+							DMX_channel_received = 0;
+							dmx_receive_flag = PCKT_NOT_READY;
+							Packet_Detected_Flag = 1;
+							LED_OFF;	//termina paquete
+						}
+					}
+					else
+					{
+						//debe ser algun error
+						DMX_channel_received = 0;
+						dmx_receive_flag = PCKT_NOT_READY;
+						LED_OFF;	//termina paquete
+					}
+				}	//fin if PCKT_DMX
 
-				//--- Reception end ---//
-				DMX_channel_received = 0;
-				//USARTx_RX_DISA;
-				dmx_receive_flag = 0;
-				Packet_Detected_Flag = 1;
-				LED_OFF;	//termina paquete
-			}
+				if (dmx_receive_flag == PCKT_RDM)	//estoy recibiendo paquete RDM
+				{
+					if (DMX_channel_received == 1)		//el segundo byte es el largo de paquete
+					{
+						rdm_bytes_left = dummy;
+						data1[DMX_channel_received] = dummy;
+						DMX_channel_received++;
+					}
+					else if (DMX_channel_received < rdm_bytes_left)	//bytes sucesivos
+					{
+						data1[DMX_channel_received] = dummy;
+						DMX_channel_received++;
+					}
+					else	//termina paquete RDM
+					{
+						for (i = 0; i < rdm_bytes_left; i++)	//backup info
+						{
+							data[i] = data1[i];
+						}
+						//--- Reception end ---//
+						DMX_channel_received = 0;
+						dmx_receive_flag = PCKT_NOT_READY;
+						Packet_Detected_Flag = 1;
+						LED_OFF;	//termina paquete
+					}
+				}	//fin if PCKT_RDM
+
+			}	//fin else dmx_channel_received
 		}
 		else
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos

@@ -67,14 +67,67 @@ void GPIO_Config (void)
 	//10: Pull-down
 	//11: Reserved
 
-
-#ifdef GPIOA_ENABLE
-
+#ifdef VER_1_2
 	//--- GPIO A ---//
 	if (!GPIOA_CLK)
 		GPIOA_CLK_ON;
 
+	temp = GPIOA->MODER;	//2 bits por pin
+	temp &= 0x0C000000;		//PA0 - PA5 out push_pull; PA6 PA7 alternate function;
+	temp |= 0x0168A555;		//PA8 input; PA9 PA10 alternativa; PA11 PA12 out push_pull; PA14 PA15 input
+	GPIOA->MODER = temp;
+
+	temp = GPIOA->OTYPER;	//1 bit por pin
+	temp &= 0xFFFFE700;
+	temp |= 0x00000000;		//PA0 a PA7 push pull; PA11 PA12 push pull
+	GPIOA->OTYPER = temp;
+
+	temp = GPIOA->OSPEEDR;	//2 bits por pin
+	temp &= 0xFC3F0000;
+	temp |= 0x00000000;		//low speed
+	GPIOA->OSPEEDR = temp;
+
+	temp = GPIOA->PUPDR;	//2 bits por pin
+	temp &= 0x0FFFFFFF;
+	temp |= 0x50000000;		//PA14 PA15 con pullup
+	GPIOA->PUPDR = temp;
+
+	//Alternate Fuction
+	//GPIOA->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
+
+	//--- GPIO B ---//
+	if (!GPIOB_CLK)
+		GPIOB_CLK_ON;
+
+	temp = GPIOB->MODER;	//2 bits por pin
+	temp &= 0xFFFF0030;		//PB0 PB1 analog input; PB3 input; PB4 output; PB5 input; PB6 PB7 output
+	temp |= 0x0000510F;
+	GPIOB->MODER = temp;
+
+	temp = GPIOB->OTYPER;	//1 bit por pin
+	temp &= 0xFFFFFF3F;
+	temp |= 0x00000040;		//PB6 open drain PB7 push pull
+	GPIOB->OTYPER = temp;
+
+	temp = GPIOB->OSPEEDR;	//2 bits por pin
+	temp &= 0xFFFF0FFF;
+	temp |= 0x00000000;		//low speed
+	GPIOB->OSPEEDR = temp;
+
+	temp = GPIOB->PUPDR;	//2 bits por pin
+	temp &= 0xFFFFF33F;		//PB3 PB5 pull up
+	temp |= 0x00000440;
+	GPIOB->PUPDR = temp;
+
+	//Alternate Fuction
+	//GPIOB->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
+#endif
+
 #ifdef VER_1_0
+	//--- GPIO A ---//
+	if (!GPIOA_CLK)
+		GPIOA_CLK_ON;
+
 	temp = GPIOA->MODER;	//2 bits por pin
 	temp &= 0x3C000000;		//PA0 - PA5 out push_pull; PA6 alternate function; PA7 out push pull;
 	temp |= 0x01686555;		//PA8 input; PA9 PA10 alternativa; PA11 PA12 out push_pull; PA15 input
@@ -94,16 +147,11 @@ void GPIO_Config (void)
 	temp &= 0x3FFFFFFF;
 	temp |= 0x40000000;		//PA15 con pullup
 	GPIOA->PUPDR = temp;
-#endif
+
 
 
 	//Alternate Fuction
 	//GPIOA->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
-
-
-#endif
-
-#ifdef GPIOB_ENABLE
 
 	//--- GPIO B ---//
 	if (!GPIOB_CLK)
@@ -131,7 +179,6 @@ void GPIO_Config (void)
 
 	//Alternate Fuction
 	//GPIOB->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
-
 #endif
 
 #ifdef GPIOF_ENABLE

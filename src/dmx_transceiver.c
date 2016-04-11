@@ -11,6 +11,12 @@
 #include "stm32f0x_uart.h"
 #include "stm32f0x_gpio.h"
 
+#include "rdm_util.h"
+
+//--- VARIABLES EXTERNAS ---//
+extern volatile unsigned char RDM_packet_flag;
+extern volatile unsigned char data1[];
+extern volatile unsigned char data[];
 
 
 //--- VARIABLES GLOBALES ---//
@@ -32,6 +38,28 @@ void DMX_Disa(void)
 	USART1->CR1 &= ~USART_CR1_UE;
 }
 
+//revisa si existe paquete RDM y que hacer con el mismo
+//
+void UpdateRDMResponder(void)
+{
+	RDMKirnoHeader * p_header;
+
+	p_header = (RDMKirnoHeader *) data;
+	if (RDM_packet_flag)
+	{
+		//voy a revisar si el paquete tiene buen checksum
+		if (RDMUtil_VerifyChecksumK((unsigned char *)data, data[1]) == true)
+		{
+			LED_ON;
+			//reviso si es unicast
+			if (RDMUtil_IsUnicast(p_header->dest_uid) == true)
+				LED_OFF;
+		}
+		else
+			LED_OFF;
+		RDM_packet_flag = 0;
+	}
+}
 
 void SendDMXPacket (unsigned char new_func)
 {

@@ -12,6 +12,8 @@
 #include "stm32f0xx.h"
 #include "stm32f0x_gpio.h"
 
+#include "dmx_transceiver.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -30,7 +32,7 @@ extern volatile unsigned short standalone_enable_menu_timer;
 
 extern const char * s_blank_line [];
 
-extern volatile unsigned char Packet_Detected_Flag;
+extern volatile unsigned char DMX_packet_flag;
 extern volatile unsigned short DMX_channel_selected;
 extern volatile unsigned char DMX_channel_quantity;
 
@@ -115,14 +117,14 @@ unsigned char FuncNetworked (unsigned char jump_menu)
 		case NETWORKED_WORKING:
 			//me quedo aca hasta que me saquen por menu
 
-			if (Packet_Detected_Flag)
+			if (DMX_packet_flag)
 			{
 				//llego un paquete DMX
-				Packet_Detected_Flag = 0;
+				DMX_packet_flag = 0;
 
-				//en data tengo la info
-				Update_TIM3_CH1 (data[0]);
-				networked_ii = data[0];
+				//en data[1] tengo la info del ch1
+				Update_TIM3_CH1 (data[1]);
+				networked_ii = data[1];
 			}
 
 
@@ -240,6 +242,8 @@ unsigned char FuncNetworked (unsigned char jump_menu)
 
 	if (CheckS1() > S_HALF)
 		resp = RESP_CHANGE_ALL_UP;
+
+	UpdateRDMResponder();
 
 	return resp;
 }

@@ -31,6 +31,11 @@
 #define USARTx_RX_ENA	USARTx->CR1 &= 0xfffffffb
 #define USARTx_RX_DISA	USARTx->CR1 |= 0x04
 
+//modos de recepcion de paquetes
+#define PCKT_NOT_READY		0
+#define PCKT_DMX			1
+#define PCKT_RDM			2
+
 //--- Exported functions ---//
 void USART1Config(void);
 void USART1_IRQHandler(void);

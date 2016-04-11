@@ -86,6 +86,8 @@ volatile unsigned short wait_ms_var = 0;
 
 // ------- Externals del DMX -------
 volatile unsigned char Packet_Detected_Flag;
+volatile unsigned char DMX_packet_flag;
+volatile unsigned char RDM_packet_flag;
 volatile unsigned char dmx_receive_flag = 0;
 volatile unsigned short DMX_channel_received = 0;
 volatile unsigned short DMX_channel_selected = 1;
@@ -93,7 +95,7 @@ volatile unsigned char DMX_channel_quantity = 4;
 
 volatile unsigned char data1[512];
 //static unsigned char data_back[10];
-volatile unsigned char data[10];
+volatile unsigned char data[256];
 
 // ------- Externals de los timers -------
 //volatile unsigned short prog_timer = 0;
@@ -213,7 +215,7 @@ unsigned char vd4 [LARGO_F + 1];
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
 void Update_PWM (unsigned short);
-
+void UpdatePackets (void);
 // ------- del display -------
 
 
@@ -930,6 +932,7 @@ int main(void)
 	else
 		jump_the_menu = RESP_YES;
 
+	Update_TIM3_CH2 (255);
 	//Wait_ms(2000);
 	while (1)
 	{
@@ -994,6 +997,7 @@ int main(void)
 
 		UpdateSwitches();
 		UpdateACSwitch();
+		UpdatePackets();
 
 
 	//--- FIN PRUEBA FUNCION MAIN_MENU
@@ -1002,7 +1006,19 @@ int main(void)
 	return 0;
 }
 
+void UpdatePackets (void)
+{
+	if (Packet_Detected_Flag)
+	{
+		if (data[0] == 0x00)
+			DMX_packet_flag = 1;
 
+		if (data[0] == 0xCC)
+			RDM_packet_flag = 1;
+
+		Packet_Detected_Flag = 0;
+	}
+}
 //--- End of Main ---//
 void Update_PWM (unsigned short pwm)
 {
