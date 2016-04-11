@@ -897,12 +897,13 @@ unsigned char FuncStandAloneCert (void)
 
 			//TODO: leer estructura y verificar funcion cargar valore sdefualt o ultimos seleccioneados
 			memcpy(&StandAloneStruct_local, &StandAloneStruct_constant, sizeof(StandAloneStruct_local));
-			MenuStandAloneReset();
+			MenuStandAloneResetCert();
 			standalone_selections = MENU_OFF;
 			standalone_state++;
 			break;
 
 		case STAND_ALONE_SHOW_CONF:
+			/*
 			resp_down = ShowConfStandAlone();
 
 			if (resp_down == RESP_FINISH)
@@ -910,6 +911,8 @@ unsigned char FuncStandAloneCert (void)
 				standalone_state = STAND_ALONE_UPDATE;
 				standalone_selections = MENU_ON;
 			}
+			*/
+			standalone_state = STAND_ALONE_UPDATE;
 			break;
 
 		case STAND_ALONE_UPDATE:
@@ -1128,118 +1131,197 @@ unsigned char FuncStandAloneCert (void)
 			break;
 	}
 
-
-	//veo el menu solo si alguien toca los botones o timeout
-	switch (standalone_selections)
-	{
-		case MENU_ON:
-			//estado normal
-			//resp_down = MenuStandAlone(MENU_NORMAL);
-			resp_down = MenuStandAlone();
-
-			if (resp_down == RESP_WORKING)	//alguien esta tratando de seleccionar algo, le doy tiempo
-				standalone_enable_menu_timer = TT_MENU_TIMEOUT;
-
-			if (resp_down == RESP_SELECTED)	//se selecciono algo
-			{
-				standalone_enable_menu_timer = TT_MENU_TIMEOUT;
-				//standalone_state = STAND_ALONE_INIT;
-				if (RELAY)
-					standalone_state = STAND_ALONE_ON;
-				else
-					standalone_state = STAND_ALONE_OFF;
-				standalone_selections++;
-			}
-
-			if (!standalone_enable_menu_timer)	//ya mostre el menu mucho tiempo, lo apago
-			{
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *)s_blank_line);
-				LCD_2DO_RENGLON;
-				LCDTransmitStr((const char *)s_blank_line);
-				standalone_selections = MENU_OFF;
-			}
-			break;
-
-		case MENU_SELECTED:
-			//estado algo seleccionado espero update
-			resp_down = FuncShowBlink ((const char *) "Something Select", (const char *) "Updating Values", 1, BLINK_NO);
-
-			if (resp_down == RESP_FINISH)
-			{
-				standalone_state = STAND_ALONE_UPDATE;
-				standalone_selections = MENU_ON;
-			}
-			break;
-
-		case MENU_OFF:
-			//estado menu apagado
-			if ((CheckS1() > S_NO) || (CheckS2() > S_NO))
-			{
-				standalone_enable_menu_timer = TT_MENU_TIMEOUT;			//vuelvo a mostrar
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "wait to free    ");
-
-				standalone_selections++;
-
-				if (standalone_state == STAND_ALONE_SHOW_CONF)
-					ShowConfStandAloneResetEnd();
-			}
-			break;
-
-		case MENU_WAIT_FREE:
-			if ((CheckS1() == S_NO) && (CheckS2() == S_NO))
-			{
-				standalone_selections = MENU_ON;
-				//voy a activar el Menu
-				//me fijo en ue parte del Menu estaba
-				//TODO ES UNA CHANCHADA, PERO BUENO...
-				if (standalone_menu_state <= STAND_ALONE_MENU_RAMP_ON_DIMMING)
-				{
-					//salgo directo
-					LCD_2DO_RENGLON;
-					LCDTransmitStr((const char *) "Cont.     Select");
-				}
-				else
-				{
-					if (standalone_menu_state <= STAND_ALONE_MENU_MOV_SENS_SELECTED_2)
-					{
-						standalone_menu_state = STAND_ALONE_MENU_MOV_SENS;
-					}
-					else if (standalone_menu_state <= STAND_ALONE_MENU_LDR_SELECTED_5)
-					{
-						standalone_menu_state = STAND_ALONE_MENU_LDR;
-					}
-					else if (standalone_menu_state <= STAND_ALONE_MENU_MAX_DIMMING_SELECTED_1)
-					{
-						standalone_menu_state = STAND_ALONE_MENU_MAX_DIMMING;
-					}
-					else if (standalone_menu_state <= STAND_ALONE_MENU_MIN_DIMMING_SELECTED_1)
-					{
-						standalone_menu_state = STAND_ALONE_MENU_MIN_DIMMING;
-					}
-					else if (standalone_menu_state <= STAND_ALONE_MENU_RAMP_ON_START_SELECTED_1)
-					{
-						standalone_menu_state =STAND_ALONE_MENU_RAMP_ON_START;
-					}
-					else if (standalone_menu_state <= STAND_ALONE_MENU_RAMP_ON_DIMMING_SELECTED_1)
-					{
-						standalone_menu_state = STAND_ALONE_MENU_RAMP_ON_DIMMING;
-					}
-					FuncOptionsReset ();
-					FuncShowSelectv2Reset ();
-					FuncChangeReset ();
-				}
-			}
-			break;
-
-		default:
-			standalone_selections = 0;
-			break;
-	}
+	//solo uso segundo renglon para el MenuStandAloneCert()
+	MenuStandAloneCert();
 
 	if (CheckS1() > S_HALF)
 		resp = RESP_CHANGE_ALL_UP;
 
 	return resp;
+}
+
+void MenuStandAloneCert(void)
+{
+
+	switch (standalone_menu_state)
+	{
+		case STAND_ALONE_MENU_CERT_INIT_0:
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Check Conf...   ");
+			standalone_menu_state++;
+			break;
+
+		case STAND_ALONE_MENU_CERT_INIT_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_DOWN;
+			}
+			break;
+
+		case STAND_ALONE_MENU_CERT_INIT_UP:
+			if (CheckS2() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_INIT_DOWN:
+			if (CheckS1() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_TEMP_0:
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Board Temp:     ");
+			standalone_menu_state++;
+			break;
+
+		case STAND_ALONE_MENU_CERT_TEMP_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_DOWN;
+			}
+			break;
+
+		case STAND_ALONE_MENU_CERT_TEMP_UP:
+			if (CheckS2() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_TEMP_DOWN:
+			if (CheckS1() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_CURRENT_0:
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Driver Curr:    ");
+			standalone_menu_state++;
+			break;
+
+		case STAND_ALONE_MENU_CERT_CURRENT_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_DOWN;
+			}
+			break;
+
+		case STAND_ALONE_MENU_CERT_CURRENT_UP:
+			if (CheckS2() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_CURRENT_DOWN:
+			if (CheckS1() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_UPTIME_0:
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Uptime:        ");
+			standalone_menu_state++;
+			break;
+
+		case STAND_ALONE_MENU_CERT_UPTIME_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_DOWN;
+			}
+			break;
+
+		case STAND_ALONE_MENU_CERT_UPTIME_UP:
+			if (CheckS2() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_1TO10_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_UPTIME_DOWN:
+			if (CheckS1() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_1TO10_0:
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Uptime:        ");
+			standalone_menu_state++;
+			break;
+
+		case STAND_ALONE_MENU_CERT_1TO10_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_1TO10_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_1TO10_DOWN;
+			}
+			break;
+
+		case STAND_ALONE_MENU_CERT_1TO10_UP:
+			if (CheckS2() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_1TO10_DOWN:
+			if (CheckS1() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_0;
+
+			break;
+
+		default:
+			standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_0;
+			break;
+	}
+}
+
+void MenuStandAloneResetCert(void)
+{
+	standalone_menu_state = STAND_ALONE_MENU_INIT;
 }

@@ -91,9 +91,28 @@ typedef struct StandAlone
 #define DIM_UP		0
 #define DIM_DOWN	1
 
-//#define TT_RISING_FALLING	5		//update del 1 a 10V (rampa subida y bajada)
-//#define TT_RISING_FALLING_FIRST_TIME	20
-//#define TT_STARTING			400		//tarda 940 msegs en arrancar la fuente MAS O MENOS OK
+//estados del menu STAND_ALONE CERT
+#define STAND_ALONE_MENU_CERT_INIT_0			0
+#define STAND_ALONE_MENU_CERT_INIT_1			1
+#define STAND_ALONE_MENU_CERT_INIT_UP			2
+#define STAND_ALONE_MENU_CERT_INIT_DOWN			3
+#define STAND_ALONE_MENU_CERT_TEMP_0			4
+#define STAND_ALONE_MENU_CERT_TEMP_1			5
+#define STAND_ALONE_MENU_CERT_TEMP_UP			6
+#define STAND_ALONE_MENU_CERT_TEMP_DOWN			7
+#define STAND_ALONE_MENU_CERT_CURRENT_0			8
+#define STAND_ALONE_MENU_CERT_CURRENT_1			9
+#define STAND_ALONE_MENU_CERT_CURRENT_UP		10
+#define STAND_ALONE_MENU_CERT_CURRENT_DOWN		11
+#define STAND_ALONE_MENU_CERT_UPTIME_0			12
+#define STAND_ALONE_MENU_CERT_UPTIME_1			13
+#define STAND_ALONE_MENU_CERT_UPTIME_UP			14
+#define STAND_ALONE_MENU_CERT_UPTIME_DOWN		15
+#define STAND_ALONE_MENU_CERT_1TO10_0			16
+#define STAND_ALONE_MENU_CERT_1TO10_1			17
+#define STAND_ALONE_MENU_CERT_1TO10_UP			18
+#define STAND_ALONE_MENU_CERT_1TO10_DOWN		19
+
 
 #define TT_RISING_FALLING	1		//update del 1 a 10V (rampa subida y bajada)
 #define TT_RISING_FALLING_FIRST_TIME	1
@@ -118,5 +137,7 @@ void ShowConfStandAloneResetEnd(void);
 
 //para certificaciones
 unsigned char FuncStandAloneCert (void);
+void MenuStandAloneCert(void);
+void MenuStandAloneResetCert(void);
 
 #endif /* STANDALONE_H_ */

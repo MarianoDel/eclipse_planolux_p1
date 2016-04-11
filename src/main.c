@@ -246,17 +246,8 @@ int main(void)
 {
 	unsigned char i;
 	unsigned short ii;
-	unsigned char sw_state = 0;
-	unsigned char main_state = 0;
-	unsigned char last_function;
-	unsigned char last_program, last_program_deep;
-	unsigned short last_channel;
-	unsigned short current_temp = 0;
-	char s_lcd [20];
-	unsigned char last_percent = 0;
-	unsigned char last_spect = 0;
 	unsigned char resp = RESP_CONTINUE;
-	unsigned char jump_the_menu = RESP_NO_CHANGE;
+
 
 #ifdef WITH_GRANDMASTER
 	unsigned short acc = 0;
@@ -297,28 +288,6 @@ int main(void)
 		}
 	}
 
-
-	 //PRUEBA LED Y OE
-	/*
-	 while (1)
-	 {
-		 if (LED)
-		 {
-//			 CTRL_BKL_ON;
-			 LED_OFF;
-		 }
-		 else
-		 {
-			 LED_ON;
-//			 CTRL_BKL_OFF;
-		 }
-
-		 Wait_ms(150);
-	 }
-	 */
-
-	 //FIN PRUEBA LED Y OE
-
 	//TIM Configuration.
 	TIM_3_Init();
 	TIM_14_Init();
@@ -353,7 +322,6 @@ int main(void)
 	USART1Config();
 	EXTIOff();
 	*/
-
 
 	Update_TIM3_CH2 (255);
 
