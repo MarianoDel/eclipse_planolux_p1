@@ -116,6 +116,7 @@ void MenuStandAloneReset (void);
 void ShowConfStandAloneReset(void);
 void ShowConfStandAloneResetEnd(void);
 
-
+//para certificaciones
+unsigned char FuncStandAloneCert (void);
 
 #endif /* STANDALONE_H_ */
