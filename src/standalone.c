@@ -21,6 +21,8 @@
 /* Externals variables ---------------------------------------------------------*/
 extern volatile unsigned short standalone_timer;
 extern volatile unsigned short standalone_enable_menu_timer;
+extern volatile unsigned short minutes;
+extern volatile unsigned short scroll1_timer;
 
 extern const char * s_blank_line [];
 
@@ -40,8 +42,14 @@ unsigned char standalone_show_conf = 0;
 
 unsigned short standalone_last_temp = 0;
 unsigned short standalone_last_current = 0;
+unsigned short standalone_last_minutes = 0;
+unsigned short standalone_last_1to10 = 0;
 
 const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
+
+float fcalc = 0.0;
+#define K_1TO10	0.0392
+
 
 StandAlone_Typedef StandAloneStruct_local;
 #define standalone_dimming_top StandAloneStruct_local.max_dimmer_value_dmx
@@ -1146,6 +1154,9 @@ void MenuStandAloneCert(void)
 {
 	char s_lcd [20];
 	unsigned short local_meas = 0;
+	short one_int = 0;
+	short one_dec = 0;
+
 
 	switch (standalone_menu_state)
 	{
@@ -1206,12 +1217,13 @@ void MenuStandAloneCert(void)
 			local_meas = GetTemp();
 			if (standalone_last_temp != local_meas)
 			{
+				standalone_last_temp = local_meas;
 				LCD_2DO_RENGLON;
-				LCDTransmitStr((const char *) "Brd Temp: ");
+				LCDTransmitStr((const char *) "Brd Temp:       ");
+				local_meas = ConvertTemp(local_meas);
 				sprintf(s_lcd, "%d", local_meas);
 				Lcd_SetDDRAM(0x40 + 10);
 				LCDTransmitStr(s_lcd);
-				standalone_last_temp = local_meas;
 			}
 			break;
 
@@ -1272,8 +1284,11 @@ void MenuStandAloneCert(void)
 			break;
 
 		case STAND_ALONE_MENU_CERT_UPTIME_0:
-			LCD_2DO_RENGLON;
-			LCDTransmitStr((const char *) "Uptime:        ");
+			if (!minutes)						//para forzar arranque
+				standalone_last_minutes = 1;
+			else
+				standalone_last_minutes = 0;
+
 			standalone_menu_state++;
 			break;
 
@@ -1291,6 +1306,17 @@ void MenuStandAloneCert(void)
 				LCDTransmitStr((const char *) "    menu down   ");
 				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_DOWN;
 			}
+
+			if (standalone_last_minutes != minutes)
+			{
+				standalone_last_minutes = minutes;
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "Uptime:         ");
+				sprintf(s_lcd, "%d min", minutes);
+				Lcd_SetDDRAM(0x40 + 8);
+				LCDTransmitStr(s_lcd);
+			}
+
 			break;
 
 		case STAND_ALONE_MENU_CERT_UPTIME_UP:
@@ -1306,8 +1332,7 @@ void MenuStandAloneCert(void)
 			break;
 
 		case STAND_ALONE_MENU_CERT_1TO10_0:
-			LCD_2DO_RENGLON;
-			LCDTransmitStr((const char *) "1 to 10V:        ");
+			standalone_last_1to10 = 65000;		//fuerzo el update
 			standalone_menu_state++;
 			break;
 
@@ -1324,6 +1349,29 @@ void MenuStandAloneCert(void)
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((const char *) "    menu down   ");
 				standalone_menu_state = STAND_ALONE_MENU_CERT_1TO10_DOWN;
+			}
+
+			//refresco una ve por segundo
+			if (!scroll1_timer)
+			{
+				scroll1_timer = 500;
+				local_meas = TIM3->CCR1;
+				if (standalone_last_1to10 != local_meas)
+				{
+					standalone_last_1to10 = local_meas;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "1 to 10V:       ");
+					fcalc = local_meas;
+					fcalc = fcalc * K_1TO10;
+					one_int = (short) fcalc;
+					fcalc = fcalc - one_int;
+					fcalc = fcalc * 10;
+					one_dec = (short) fcalc;
+
+					sprintf(s_lcd, "%02d.%01d V", one_int, one_dec);
+					Lcd_SetDDRAM(0x40 + 10);
+					LCDTransmitStr(s_lcd);
+				}
 			}
 			break;
 

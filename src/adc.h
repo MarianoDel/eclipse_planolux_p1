@@ -12,9 +12,13 @@
 #define RCC_ADC_CLK_ON 		RCC->APB2ENR |= 0x00000200
 #define RCC_ADC_CLK_OFF 	RCC->APB2ENR &= ~0x00000200
 
-#define ADC_CH0		0x00000001
-#define ADC_CH1		0x00000002
-#define ADC_CH2		0x00000004
+
+/* Temperature sensor calibration value address */
+#define TEMP110_CAL_ADDR ((uint16_t*) ((uint32_t) 0x1FFFF7C2))
+#define TEMP30_CAL_ADDR ((uint16_t*) ((uint32_t) 0x1FFFF7B8))
+//#define VDD_CALIB ((uint16_t) (330))
+//#define VDD_APPLI ((uint16_t) (300))
+
 
 unsigned short ADC_Conf (void);
 unsigned short ReadADC1 (unsigned int);
@@ -24,5 +28,6 @@ unsigned short ReadADC1Check (unsigned char);
 void UpdateTemp(void);
 unsigned short GetTemp (void);
 void AdcConfig (void);
+short ConvertTemp (unsigned short);
 
 #endif /* ADC_H_ */

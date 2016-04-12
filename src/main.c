@@ -112,6 +112,7 @@ volatile unsigned short standalone_enable_menu_timer;
 //volatile unsigned short standalone_menu_timer;
 volatile unsigned char grouped_master_timeout_timer;
 volatile unsigned short take_temp_sample = 0;
+volatile unsigned short minutes = 0;
 
 // ------- Externals de los modos -------
 StandAlone_Typedef const StandAloneStruct_constant =
@@ -181,8 +182,8 @@ volatile unsigned char filter_timer;
 //volatile unsigned char door_filter;
 //volatile unsigned char take_sample;
 //volatile unsigned char move_relay;
-//volatile unsigned char secs = 0;
-//volatile unsigned short minutes = 0;
+volatile unsigned short secs = 0;
+
 
 // ------- del display -------
 unsigned char v_opt [10];
@@ -216,7 +217,6 @@ void UpdatePackets (void);
 
 
 
-
 // ------- del DMX -------
 extern void EXTI4_15_IRQHandler(void);
 #define DMX_TIMEOUT	20
@@ -243,6 +243,8 @@ int main(void)
 	unsigned char i;
 	unsigned short ii;
 	unsigned char resp = RESP_CONTINUE;
+	unsigned short local_meas, local_meas_last;
+	char s_lcd [20];
 
 
 #ifdef WITH_GRANDMASTER
@@ -323,6 +325,56 @@ int main(void)
 	*/
 
 	Update_TIM3_CH2 (255);
+
+	//---------- Prueba temp --------//
+	/*
+	while (1)
+	{
+		local_meas = GetTemp();
+		if (local_meas != local_meas_last)
+		{
+			LED_ON;
+			local_meas_last = local_meas;
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "Brd Temp:       ");
+			local_meas = ConvertTemp(local_meas);
+			sprintf(s_lcd, "%d", local_meas);
+			Lcd_SetDDRAM(0x40 + 10);
+			LCDTransmitStr(s_lcd);
+			LED_OFF;
+		}
+
+		UpdateTemp();
+	}
+	*/
+	//---------- Fin prueba temp --------//
+
+	//---------- Prueba 1 to 10V --------//
+	/*
+	local_meas = 0;
+	while (1)
+	{
+		LCD_2DO_RENGLON;
+		LCDTransmitStr((const char *) "1 to 10V:       ");
+		fcalc = local_meas;
+		fcalc = fcalc * K_1TO10;
+		one_int = (short) fcalc;
+		fcalc = fcalc - one_int;
+		fcalc = fcalc * 10;
+		one_dec = (short) fcalc;
+
+		sprintf(s_lcd, "%02d.%01d V", one_int, one_dec);
+		Lcd_SetDDRAM(0x40 + 10);
+		LCDTransmitStr(s_lcd);
+
+		Wait_ms (1000);
+		if (local_meas <= 255)
+			local_meas = 0;
+		else
+			local_meas++;
+	}
+	*/
+	//---------- Fin prueba 1 to 10V --------//
 
 	while (1)
 	{
@@ -555,19 +607,15 @@ void TimingDelay_Decrement(void)
 	if (standalone_enable_menu_timer)
 		standalone_enable_menu_timer--;
 
-	/*
-	//cuenta 1 segundo
-	if (button_timer_internal)
-		button_timer_internal--;
-	else
+
+	//cuenta de a 1 minuto
+	if (secs > 59999)	//pasaron 1 min
 	{
-		if (button_timer)
-		{
-			button_timer--;
-			button_timer_internal = 1000;
-		}
+		minutes++;
+		secs = 0;
 	}
-	*/
+	else
+		secs++;
 }
 
 

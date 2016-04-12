@@ -69,6 +69,9 @@ void AdcConfig (void)
 	//ADC1->CHSELR |= ADC_Channel_0 | ADC_Channel_1;
 	//ADC1->CHSELR |= ADC_Channel_2;	//individuales andan todos
 
+	//habilito sensado de temperatura
+	ADC->CCR |= ADC_CCR_TSEN;
+
 #ifdef ADC_WITH_INT
 	//set interrupts
 	ADC1->IER |= ADC_IT_EOC;
@@ -292,4 +295,21 @@ unsigned short GetTemp (void)
 	}
 
 	return last_temp;
+}
+
+short ConvertTemp (unsigned short t_sample)
+{
+	short dy = 110 - 30;
+	short dt = 0;
+	short temp = 0;
+
+	dt = *TEMP110_CAL_ADDR - *TEMP30_CAL_ADDR;
+
+	temp = t_sample - *TEMP30_CAL_ADDR;
+	temp = temp * dy;
+	temp = temp / dt;
+	//temp = temp + 30;
+	temp = temp + 20;	//resto 10 para compensar por temperatura exterior
+
+	return temp;
 }
