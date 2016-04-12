@@ -39,6 +39,7 @@ unsigned char standalone_menu_state = 0;
 unsigned char standalone_show_conf = 0;
 
 unsigned short standalone_last_temp = 0;
+unsigned short standalone_last_current = 0;
 
 const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
 
@@ -1144,7 +1145,7 @@ unsigned char FuncStandAloneCert (void)
 void MenuStandAloneCert(void)
 {
 	char s_lcd [20];
-	unsigned short local_temp = 0;
+	unsigned short local_meas = 0;
 
 	switch (standalone_menu_state)
 	{
@@ -1202,15 +1203,15 @@ void MenuStandAloneCert(void)
 				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_DOWN;
 			}
 
-			local_temp = GetTemp();
-			if (standalone_last_temp != local_temp)
+			local_meas = GetTemp();
+			if (standalone_last_temp != local_meas)
 			{
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((const char *) "Brd Temp: ");
-				sprintf(s_lcd, "%d", local_temp);
+				sprintf(s_lcd, "%d", local_meas);
 				Lcd_SetDDRAM(0x40 + 10);
 				LCDTransmitStr(s_lcd);
-				standalone_last_temp = local_temp;
+				standalone_last_temp = local_meas;
 			}
 			break;
 
@@ -1227,8 +1228,7 @@ void MenuStandAloneCert(void)
 			break;
 
 		case STAND_ALONE_MENU_CERT_CURRENT_0:
-			LCD_2DO_RENGLON;
-			LCDTransmitStr((const char *) "Driver Curr:    ");
+			standalone_last_current = 0;
 			standalone_menu_state++;
 			break;
 
@@ -1245,6 +1245,17 @@ void MenuStandAloneCert(void)
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((const char *) "    menu down   ");
 				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_DOWN;
+			}
+
+			local_meas = GetIGrid();
+			if (standalone_last_current != local_meas)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "Driver Curr:    ");
+				sprintf(s_lcd, "%d", local_meas);
+				Lcd_SetDDRAM(0x40 + 12);
+				LCDTransmitStr(s_lcd);
+				standalone_last_current = local_meas;
 			}
 			break;
 
