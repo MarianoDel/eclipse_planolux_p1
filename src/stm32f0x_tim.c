@@ -238,7 +238,7 @@ void TIM_17_Init (void)
 		RCC_TIM17_CLK_ON;
 
 	//Configuracion del timer.
-	TIM17->ARR = 200;		//200us
+	TIM17->ARR = 400;		//200us
 	TIM17->CNT = 0;
 	TIM17->PSC = 47;
 

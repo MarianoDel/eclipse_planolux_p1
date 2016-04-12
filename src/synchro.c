@@ -210,7 +210,7 @@ void UpdateIGrid (void)
 	if (igrid_timer)	//cada 200us
 	{
 		igrid_timer = 0;
-		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//100 es toda la senoidal 112 es un ciclo y un octavo
+		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//50 es toda la senoidal 60 es un ciclo y un octavo
 		{
 			medida = ReadADC1(ADC_Channel_8);
 			//reviso si es un maximo
@@ -230,6 +230,11 @@ void UpdateIGrid (void)
 			min_igrid_last = min_igrid;
 			max_igrid = 2048;
 			min_igrid = 2048;
+
+			//ajusto para referencia en 1.81V
+			//max_igrid = 2256;
+			//min_igrid = 2256;
+
 			igrid_update_samples = 0;
 		}
 	}

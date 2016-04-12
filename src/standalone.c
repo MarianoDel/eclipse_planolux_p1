@@ -49,6 +49,7 @@ const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
 
 float fcalc = 0.0;
 #define K_1TO10	0.0392
+#define K_CURR	0.000127
 
 
 StandAlone_Typedef StandAloneStruct_local;
@@ -1259,16 +1260,29 @@ void MenuStandAloneCert(void)
 				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_DOWN;
 			}
 
-			local_meas = GetIGrid();
-			if (standalone_last_current != local_meas)
+			//refresco dos veces por segundo
+			if (!scroll1_timer)
 			{
-				LCD_2DO_RENGLON;
-				LCDTransmitStr((const char *) "Driver Curr:    ");
-				sprintf(s_lcd, "%d", local_meas);
-				Lcd_SetDDRAM(0x40 + 12);
-				LCDTransmitStr(s_lcd);
-				standalone_last_current = local_meas;
+				scroll1_timer = 500;
+				local_meas = GetIGrid();
+				if (standalone_last_current != local_meas)
+				{
+					standalone_last_current = local_meas;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "Drvr Cur:       ");
+					fcalc = local_meas;
+					fcalc = fcalc * K_CURR;
+					one_int = (short) fcalc;
+					fcalc = fcalc - one_int;
+					fcalc = fcalc * 1000;
+					one_dec = (short) fcalc;
+
+					sprintf(s_lcd, "%01d.%03d A", one_int, one_dec);
+					Lcd_SetDDRAM(0x40 + 10);
+					LCDTransmitStr(s_lcd);
+				}
 			}
+
 			break;
 
 		case STAND_ALONE_MENU_CERT_CURRENT_UP:
@@ -1351,7 +1365,7 @@ void MenuStandAloneCert(void)
 				standalone_menu_state = STAND_ALONE_MENU_CERT_1TO10_DOWN;
 			}
 
-			//refresco una ve por segundo
+			//refresco dos veces por segundo
 			if (!scroll1_timer)
 			{
 				scroll1_timer = 500;

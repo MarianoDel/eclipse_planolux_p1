@@ -25,7 +25,7 @@
 #define VGRID_SAMPLES_RESET		576
 
 // ------- para determinar IGrid -------
-#define IGRID_SAMPLES_RESET		112		//tengo muestras cada 200us 100 son 1 ciclo completo
+#define IGRID_SAMPLES_RESET		60		//tengo muestras cada 400us 50 son 1 ciclo completo
 
 
 //----------- TENSIONES DE LA ENTRADA CC -----------//
