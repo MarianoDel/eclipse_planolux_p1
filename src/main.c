@@ -111,6 +111,7 @@ volatile unsigned short standalone_timer;
 volatile unsigned short standalone_enable_menu_timer;
 //volatile unsigned short standalone_menu_timer;
 volatile unsigned char grouped_master_timeout_timer;
+volatile unsigned short take_temp_sample = 0;
 
 // ------- Externals de los modos -------
 StandAlone_Typedef const StandAloneStruct_constant =
@@ -157,11 +158,6 @@ Networked_Typedef const NetworkedStruct_constant =
 unsigned char saved_mode;
 
 // ------- para determinar igrid -------
-unsigned short max_igrid_last;
-unsigned short max_igrid;
-unsigned short min_igrid_last;
-unsigned short min_igrid;
-unsigned short igrid_update_samples;
 volatile unsigned char igrid_timer = 0;
 
 // ------- del display LCD -------
@@ -288,11 +284,14 @@ int main(void)
 		}
 	}
 
+	//ADC Configuration
+	AdcConfig();
+
 	//TIM Configuration.
 	TIM_3_Init();
 	TIM_14_Init();
 	TIM_16_Init();		//para OneShoot() cuando funciona en modo master
-	//Timer_4_Init();
+	TIM_17_Init();		//lo uso para el ADC de Igrid
 
 	//--- PRUEBA DISPLAY LCD ---
 	EXTIOff ();
@@ -333,6 +332,8 @@ int main(void)
 		UpdateSwitches();
 		UpdateACSwitch();
 		UpdatePackets();
+		UpdateTemp();
+		UpdateIGrid();		//OJO que LCD lleva algo de tiempo y quita determinacion
 
 	}	//termina while(1)
 
@@ -527,14 +528,11 @@ void TimingDelay_Decrement(void)
 //	if (prog_timer)
 //		prog_timer--;
 
-//	if (take_sample)
-//		take_sample--;
+	if (take_temp_sample)
+		take_temp_sample--;
 
 	if (filter_timer)
 		filter_timer--;
-
-	if (igrid_timer)
-		igrid_timer--;
 
 	if (grouped_master_timeout_timer)
 		grouped_master_timeout_timer--;

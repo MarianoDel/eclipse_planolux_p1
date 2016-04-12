@@ -27,6 +27,9 @@ extern volatile unsigned char timer_1seg;
 extern volatile unsigned short timer_led_comm;
 extern volatile unsigned short wait_ms_var;
 
+// ------- para determinar igrid -------
+extern volatile unsigned char igrid_timer;
+
 //--- VARIABLES GLOBALES ---//
 
 volatile unsigned short timer_1000 = 0;
@@ -198,9 +201,6 @@ void TIM16_IRQHandler (void)	//es one shoot
 
 void TIM_16_Init (void)
 {
-
-	//NVIC_InitTypeDef NVIC_InitStructure;
-
 	if (!RCC_TIM16_CLK)
 		RCC_TIM16_CLK_ON;
 
@@ -213,10 +213,6 @@ void TIM_16_Init (void)
 	TIM16->DIER |= TIM_DIER_UIE;
 	TIM16->CR1 |= TIM_CR1_URS | TIM_CR1_OPM;	//solo int cuando hay overflow y one shot
 
-	//NVIC_InitStructure.NVIC_IRQChannel = TIM16_IRQn;
-	//NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
-	//NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	//NVIC_Init(&NVIC_InitStructure);
 	NVIC_EnableIRQ(TIM16_IRQn);
 	NVIC_SetPriority(TIM16_IRQn, 7);
 }
@@ -227,42 +223,31 @@ void OneShootTIM16 (unsigned short a)
 	TIM16->CR1 |= TIM_CR1_CEN;
 }
 
-void TIM17_IRQHandler (void)	//100uS
+void TIM17_IRQHandler (void)	//200uS
 {
-
-	//if (GPIOA_PIN0_OUT)
-	//	GPIOA_PIN0_OFF;
-	//else
-	//	GPIOA_PIN0_ON;
+	igrid_timer = 1;
 
 	if (TIM17->SR & 0x01)
-		//bajar flag
-		TIM17->SR = 0x00;
+		TIM17->SR = 0x00;		//bajar flag
 }
 
 
 void TIM_17_Init (void)
 {
-
-	NVIC_InitTypeDef NVIC_InitStructure;
-
 	if (!RCC_TIM17_CLK)
 		RCC_TIM17_CLK_ON;
 
 	//Configuracion del timer.
-	TIM17->ARR = 2000; //10m
+	TIM17->ARR = 200;		//200us
 	TIM17->CNT = 0;
-	TIM17->PSC = 479;
-	TIM17->EGR = TIM_EGR_UG;
+	TIM17->PSC = 47;
 
-	// Enable timer ver UDIS
+	// Enable timer interrupt ver UDIS
 	TIM17->DIER |= TIM_DIER_UIE;
-	TIM17->CR1 |= TIM_CR1_CEN;
+	TIM17->CR1 |= TIM_CR1_URS | TIM_CR1_CEN;	//solo int cuando hay overflow y one shot
 
-	NVIC_InitStructure.NVIC_IRQChannel = TIM17_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_EnableIRQ(TIM17_IRQn);
+	NVIC_SetPriority(TIM17_IRQn, 8);
 }
 
 //--- end of file ---//

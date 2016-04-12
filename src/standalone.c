@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "stm32f0x_gpio.h"
+#include "adc.h"
 
 
 /* Externals variables ---------------------------------------------------------*/
@@ -37,7 +38,7 @@ unsigned char standalone_dimming_last_slope = 0;
 unsigned char standalone_menu_state = 0;
 unsigned char standalone_show_conf = 0;
 
-
+unsigned short standalone_last_temp = 0;
 
 const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
 
@@ -886,7 +887,7 @@ void ShowConfStandAloneResetEnd(void)
 unsigned char FuncStandAloneCert (void)
 {
 	unsigned char resp = RESP_CONTINUE;
-	unsigned char resp_down = RESP_CONTINUE;
+//	unsigned char resp_down = RESP_CONTINUE;
 
 	switch (standalone_state)
 	{
@@ -1142,6 +1143,8 @@ unsigned char FuncStandAloneCert (void)
 
 void MenuStandAloneCert(void)
 {
+	char s_lcd [20];
+	unsigned short local_temp = 0;
 
 	switch (standalone_menu_state)
 	{
@@ -1180,9 +1183,8 @@ void MenuStandAloneCert(void)
 			break;
 
 		case STAND_ALONE_MENU_CERT_TEMP_0:
-			LCD_2DO_RENGLON;
-			LCDTransmitStr((const char *) "Board Temp:     ");
 			standalone_menu_state++;
+			standalone_last_temp = 0;	//fuerzo el cambio
 			break;
 
 		case STAND_ALONE_MENU_CERT_TEMP_1:
@@ -1198,6 +1200,17 @@ void MenuStandAloneCert(void)
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((const char *) "    menu down   ");
 				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_DOWN;
+			}
+
+			local_temp = GetTemp();
+			if (standalone_last_temp != local_temp)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "Brd Temp: ");
+				sprintf(s_lcd, "%d", local_temp);
+				Lcd_SetDDRAM(0x40 + 10);
+				LCDTransmitStr(s_lcd);
+				standalone_last_temp = local_temp;
 			}
 			break;
 
@@ -1283,7 +1296,7 @@ void MenuStandAloneCert(void)
 
 		case STAND_ALONE_MENU_CERT_1TO10_0:
 			LCD_2DO_RENGLON;
-			LCDTransmitStr((const char *) "Uptime:        ");
+			LCDTransmitStr((const char *) "1 to 10V:        ");
 			standalone_menu_state++;
 			break;
 

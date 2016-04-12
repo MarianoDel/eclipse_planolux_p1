@@ -117,4 +117,3 @@ unsigned char CheckS2 (void)
 	return S_NO;
 }
 
-

@@ -30,12 +30,17 @@ extern unsigned short v_vgrid [4];
 extern unsigned short vgrid_update_samples;
 */
 // ------- para determinar igrid -------
-extern unsigned short max_igrid_last;
-extern unsigned short max_igrid;
-extern unsigned short min_igrid_last;
-extern unsigned short min_igrid;
-extern unsigned short igrid_update_samples;
 extern volatile unsigned char igrid_timer;
+
+// ------- Globales para determinar IGrid() -------
+unsigned short max_igrid_last = 0;
+unsigned short min_igrid_last = 0;
+unsigned short max_igrid = 0;
+unsigned short min_igrid = 0;
+unsigned char igrid_update_samples = 0;
+
+
+
 /*
 // ------- para determinar frecuencia -------
 extern unsigned short fgrid_mean;
@@ -202,10 +207,10 @@ void UpdateIGrid (void)
 {
 	unsigned short medida = 0;
 
-	if (!igrid_timer)
+	if (igrid_timer)	//cada 200us
 	{
-		igrid_timer = 1;
-		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//16 o 20 es toda la senoidal 22 es un ciclo y un octavo
+		igrid_timer = 0;
+		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//100 es toda la senoidal 112 es un ciclo y un octavo
 		{
 			medida = ReadADC1(ADC_Channel_8);
 			//reviso si es un maximo

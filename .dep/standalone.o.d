@@ -23,7 +23,7 @@ src\standalone.o: src\standalone.c src\standalone.h src\lcd.h src\hard.h \
  c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/arm-none-eabi/4.7.4/../../../../arm-none-eabi/include/sys/stdio.h \
  c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/arm-none-eabi/4.7.4/../../../../arm-none-eabi/include/string.h \
  c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/arm-none-eabi/4.7.4/../../../../arm-none-eabi/include/sys/string.h \
- src\stm32f0x_gpio.h
+ src\stm32f0x_gpio.h src\adc.h
 
 src\standalone.h:
 
@@ -84,3 +84,5 @@ c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/ar
 c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/arm-none-eabi/4.7.4/../../../../arm-none-eabi/include/sys/string.h:
 
 src\stm32f0x_gpio.h:
+
+src\adc.h:

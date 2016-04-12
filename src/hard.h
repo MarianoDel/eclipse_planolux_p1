@@ -223,6 +223,11 @@
 #define FUNCTION_MAN	2
 #define FUNCTION_CAT	FUNCTION_MAN
 
+
+
+
+
+
 // ------- de los switches -------
 void UpdateSwitches (void);
 unsigned char CheckS1 (void);
@@ -230,5 +235,9 @@ unsigned char CheckS2 (void);
 void UpdateACSwitch (void);
 unsigned char CheckACSw (void);
 
+void UpdateIGrid (void);
+unsigned short GetIGrid (void);
+unsigned char CheckIGrid (void);
+unsigned short MAFilterFast (unsigned short, unsigned short *);
 
 #endif /* HARD_H_ */

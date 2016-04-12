@@ -21,5 +21,8 @@ unsigned short ReadADC1 (unsigned int);
 unsigned short ReadADC1_SameSampleTime (unsigned int);
 void SetADC1_SampleTime (void);
 unsigned short ReadADC1Check (unsigned char);
+void UpdateTemp(void);
+unsigned short GetTemp (void);
+void AdcConfig (void);
 
 #endif /* ADC_H_ */

@@ -23,7 +23,10 @@
 //#define VGRID_MIN			2700	//equivale a 2160mVpp	180Vrms
 #define VGRID_MIN			3046	//equivale a 200Vrms
 #define VGRID_SAMPLES_RESET		576
-#define IGRID_SAMPLES_RESET		22
+
+// ------- para determinar IGrid -------
+#define IGRID_SAMPLES_RESET		112		//tengo muestras cada 200us 100 son 1 ciclo completo
+
 
 //----------- TENSIONES DE LA ENTRADA CC -----------//
 //en frio 320Vcc 1020mV
