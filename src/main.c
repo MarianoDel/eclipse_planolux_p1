@@ -38,7 +38,7 @@
 #include "stm32f0xx_spi.h"
 //#include "stm32f0xx_syscfg.h"
 #include "stm32f0xx_tim.h"
-#include "stm32f0xx_usart.h"
+//#include "stm32f0xx_usart.h"
 //#include "stm32f0xx_wwdg.h"
 #include "system_stm32f0xx.h"
 #include "stm32f0xx_it.h"
@@ -51,7 +51,7 @@
 //--- My includes ---//
 #include "stm32f0x_gpio.h"
 #include "stm32f0x_tim.h"
-#include "stm32f0x_uart.h"
+#include "uart.h"
 
 #include "hard.h"
 //#include "main.h"
@@ -67,6 +67,8 @@
 #include "standalone.h"
 #include "grouped.h"
 #include "networked.h"
+
+#include "gsm_engine.h"
 
 //--- VARIABLES EXTERNAS ---//
 volatile unsigned char timer_1seg = 0;
@@ -215,7 +217,8 @@ void Update_PWM (unsigned short);
 void UpdatePackets (void);
 // ------- del display -------
 
-
+// ------- del GSM Engine -------
+void dbg_cb( char *response );
 
 // ------- del DMX -------
 extern void EXTI4_15_IRQHandler(void);
@@ -316,15 +319,27 @@ int main(void)
 	//TODO: PARA PRUEBAS UTILIZAR BRANCH MASTER
 	//ESTE SOLO INCLUYE FUNCIONES DE PRE CERTIFICACION
 	//DE PRODUCCION Y PARA PRUEBAS EN DMX
-	/*
-	Packet_Detected_Flag = 0;
-	DMX_channel_selected = 1;
-	DMX_channel_quantity = 4;
+
+	//Packet_Detected_Flag = 0;
+	//DMX_channel_selected = 1;
+	//DMX_channel_quantity = 4;
 	USART1Config();
 	EXTIOff();
-	*/
+
 
 	Update_TIM3_CH2 (255);
+
+	//---------- Prueba GSM_Engine --------//
+    //system_init();
+    gsm_engine_init( dbg_cb );
+
+    at_cmd( "AT" );
+
+    while( 1 )
+    {
+        gsm_process();
+    }
+    //---------- Fin Prueba GSM_Engine --------//
 
 	//---------- Prueba temp --------//
 	/*
@@ -620,5 +635,15 @@ void TimingDelay_Decrement(void)
 
 
 
+void dbg_cb( char *response )
+{
+	unsigned char dummy = 0;
 
+    //UART1_Write_Text( " < CALLBACK >\r\n" );
+    //UART1_Write_Text( response );
+
+    //dummys
+    dummy = strlen (response);
+
+}
 

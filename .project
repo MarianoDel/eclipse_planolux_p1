@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>GSM_Engine</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/GSM_Engine/library</locationURI>
+		</link>
+		<link>
 			<name>STM32F0xx_StdPeriph_Driver</name>
 			<type>2</type>
 			<location>C:/Users/Mariano/Documents/Proyectos/eclipse_stm32/STM32F0xx_StdPeriph_Lib_V1.3.1/Libraries/STM32F0xx_StdPeriph_Driver</location>

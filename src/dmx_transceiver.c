@@ -8,7 +8,7 @@
 #include "hard.h"
 #include "stm32f0xx.h"
 #include "stm32f0x_tim.h"
-#include "stm32f0x_uart.h"
+#include "uart.h"
 #include "stm32f0x_gpio.h"
 
 #include "rdm_util.h"

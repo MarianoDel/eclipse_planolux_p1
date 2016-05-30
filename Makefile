@@ -32,10 +32,11 @@ MCU  = cortex-m0
 DADEFS =
  
 # List all default directories to look for include files here
-DINCDIR = .\src
+DINCDIR = 	.\src \
+			..\GSM_Engine\library\include
  
 # List the default directory to look for the libraries here
-DLIBDIR =
+DLIBDIR = ..\GSM_Engine\library
  
 # List all default libraries here
 DLIBS =
@@ -107,7 +108,7 @@ SRC += .\src\stm32f0x_gpio.c
 SRC += .\src\stm32f0x_tim.c
 #SRC += .\src\spi.c
 SRC += .\src\adc.c
-SRC += .\src\stm32f0x_uart.c
+SRC += .\src\uart.c
 SRC += .\src\flash_program.c
 SRC += .\src\lcd.c
 SRC += .\src\synchro.c
@@ -127,6 +128,14 @@ SRC += .\src\rdm_util.c
 #SRC += .\startup_src\syscalls.c
 SRC += $(CORELIBDIR)\core_cm0.c
 ## used parts of the STM-Library
+## used part of GSM_Library
+SRC += $(DLIBDIR)\src\at_parser.c
+SRC += $(DLIBDIR)\src\at_timer.c
+SRC += $(DLIBDIR)\src\gsm_adapter.c
+SRC += $(DLIBDIR)\src\gsm_engine.c
+SRC += $(DLIBDIR)\src\gsm_hal.c
+## Other Peripherals
+SRC += .\src\HLK_RM04.c
 
 # List ASM source files here
 ASRC = .\cmsis_boot\startup\startup_stm32f0xx.s

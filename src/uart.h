@@ -39,9 +39,13 @@
 //--- Exported functions ---//
 void USART1Config(void);
 void USART1_IRQHandler(void);
-void USART1Send(unsigned char);
+void USARTSendSingle(unsigned char);
 
 void UsartSendDMX (void);
+
+void USARTSend(char *);
+void USARTSendUnsigned(unsigned char *, unsigned char);
+
 
 #endif //--- End ---//
 
