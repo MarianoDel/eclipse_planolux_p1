@@ -16,32 +16,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx.h"
-#include "stm32f0xx_conf.h"
 #include "stm32f0xx_adc.h"
-//#include "stm32f0xx_can.h"
-//#include "stm32f0xx_cec.h"
-//#include "stm32f0xx_comp.h"
-//#include "stm32f0xx_crc.h"
-//#include "stm32f0xx_crs.h"
-//#include "stm32f0xx_dac.h"
-//#include "stm32f0xx_dbgmcu.h"
-//#include "stm32f0xx_dma.h"
-//#include "stm32f0xx_exti.h"
-//#include "stm32f0xx_flash.h"
-#include "stm32f0xx_gpio.h"
-//#include "stm32f0xx_i2c.h"
-//#include "stm32f0xx_iwdg.h"
-#include "stm32f0xx_misc.h"
-//#include "stm32f0xx_pwr.h"
-#include "stm32f0xx_rcc.h"
-//#include "stm32f0xx_rtc.h"
-#include "stm32f0xx_spi.h"
-//#include "stm32f0xx_syscfg.h"
-#include "stm32f0xx_tim.h"
-//#include "stm32f0xx_usart.h"
-//#include "stm32f0xx_wwdg.h"
-#include "system_stm32f0xx.h"
-#include "stm32f0xx_it.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -52,10 +27,7 @@
 #include "stm32f0x_gpio.h"
 #include "stm32f0x_tim.h"
 #include "uart.h"
-
 #include "hard.h"
-//#include "main.h"
-
 #include "lcd.h"
 
 #include "core_cm0.h"
@@ -328,6 +300,19 @@ int main(void)
 
 
 	Update_TIM3_CH2 (255);
+	DMX_TX_PIN_OFF;
+
+	//---------- Prueba USART --------//
+
+    while( 1 )
+    {
+    	LED_ON;
+    	USARTSendSingle('M');
+    	LED_OFF;
+        Wait_ms(500);
+    }
+
+    //---------- Fin Prueba USART --------//
 
 	//---------- Prueba GSM_Engine --------//
     //system_init();
