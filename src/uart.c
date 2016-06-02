@@ -46,6 +46,7 @@ extern volatile unsigned char data1[];
 //static unsigned char data_back[10];
 extern volatile unsigned char data[];
 
+
 #define data512		data1
 #define data256		data
 volatile unsigned char * pdmx;
@@ -73,90 +74,13 @@ void USART1_IRQHandler(void)
 		//RX DMX
 		dummy = USART1->RDR & 0x0FF;
 
-		if (dmx_receive_flag != PCKT_NOT_READY)
+		if (HLK_Mode() == AT_MODE)
 		{
-			if (DMX_channel_received == 0)		//empieza paquete me fijo si es DMX o RDM
-			{
-				LED_ON;
-				if (dummy == 0xCC)	//es RDM
-				{
-					dmx_receive_flag = PCKT_RDM;
-					rdm_bytes_left = 0;
-				}
-				else if (dummy == 0x00)	//es DMX
-				{
-					dmx_receive_flag = PCKT_DMX;
-				}
-				else
-				{
-					LED_OFF;
-					return;		//no se que es vuelvo
-				}
-				data1[0] = dummy;
-				DMX_channel_received++;
-			}
-			else
-			{
-				//estoy recibiendo un paquete, segun cual sea me fijo el final
-				if (dmx_receive_flag == PCKT_DMX)
-				{
-					if (DMX_channel_received < 512)
-					{
-						data1[DMX_channel_received] = dummy;
-						DMX_channel_received++;
-
-						if (DMX_channel_received >= (DMX_channel_selected + DMX_channel_quantity))
-						{
-							//en data[0] siempre copio el ch0, depues los elegidos
-							data[0] = data1[0];
-							for (i=0; i<DMX_channel_quantity; i++)
-							{
-								data[i+1] = data1[(DMX_channel_selected) + i];
-							}
-							//--- Reception end ---//
-							DMX_channel_received = 0;
-							dmx_receive_flag = PCKT_NOT_READY;
-							Packet_Detected_Flag = 1;
-							LED_OFF;	//termina paquete
-						}
-					}
-					else
-					{
-						//debe ser algun error
-						DMX_channel_received = 0;
-						dmx_receive_flag = PCKT_NOT_READY;
-						LED_OFF;	//termina paquete
-					}
-				}	//fin if PCKT_DMX
-
-				if (dmx_receive_flag == PCKT_RDM)	//estoy recibiendo paquete RDM
-				{
-					if (DMX_channel_received == 1)		//el segundo byte es el largo de paquete
-					{
-						rdm_bytes_left = dummy;
-						data1[DMX_channel_received] = dummy;
-						DMX_channel_received++;
-					}
-					else if (DMX_channel_received < rdm_bytes_left)	//bytes sucesivos
-					{
-						data1[DMX_channel_received] = dummy;
-						DMX_channel_received++;
-					}
-					else	//termina paquete RDM
-					{
-						for (i = 0; i < rdm_bytes_left; i++)	//backup info
-						{
-							data[i] = data1[i];
-						}
-						//--- Reception end ---//
-						DMX_channel_received = 0;
-						dmx_receive_flag = PCKT_NOT_READY;
-						Packet_Detected_Flag = 1;
-						LED_OFF;	//termina paquete
-					}
-				}	//fin if PCKT_RDM
-
-			}	//fin else dmx_channel_received
+			HLK_ATModeRx(dummy);
+		}
+		else if (HLK_Mode() == TRANSPARENT_MODE)
+		{
+			HLK_TransparentModeRx(dummy);
 		}
 		else
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
@@ -396,7 +320,7 @@ void USART1Config(void)
 
 	GPIOA->AFR[1] |= 0x0000110;	//PA10 -> AF1 PA9 -> AF1
 
-	USART1->BRR = USART_9600;
+	USART1->BRR = USART_115200;
 //	USART1->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
 //	USART1->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_UE;	//SIN TX
 	USART1->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;	//para pruebas TX

@@ -40,6 +40,7 @@
 #include "grouped.h"
 #include "networked.h"
 
+#include "HLK_RM04.h"
 #include "gsm_engine.h"
 
 //--- VARIABLES EXTERNAS ---//
@@ -67,9 +68,9 @@ volatile unsigned short DMX_channel_received = 0;
 volatile unsigned short DMX_channel_selected = 1;
 volatile unsigned char DMX_channel_quantity = 4;
 
-volatile unsigned char data1[512];
+volatile unsigned char data1[SIZEOF_DATA1];
 //static unsigned char data_back[10];
-volatile unsigned char data[256];
+volatile unsigned char data[SIZEOF_DATA];
 
 // ------- Externals de los timers -------
 //volatile unsigned short prog_timer = 0;
@@ -143,6 +144,13 @@ unsigned short s1;
 unsigned short s2;
 unsigned short sac;
 unsigned char sac_aux;
+
+// ------- Externals del HLK_RM04 -------
+#ifdef HLK_RM04_PRESENT
+unsigned short hlk_timeout = 0;
+unsigned char hlk_mini_timeout = 0;
+unsigned char hlk_answer;
+#endif
 
 
 //--- VARIABLES GLOBALES ---//
@@ -284,12 +292,9 @@ int main(void)
 	Wait_ms(100);
 	CTRL_BKL_ON;
 
-	//while (FuncShowBlink ((const char *) "  PLANOLUX LLC  ", (const char *) "  Smart Driver  ", 2, BLINK_NO) != RESP_FINISH);
-	while (FuncShowBlink ((const char *) "Kirno Technology", (const char *) "  Smart Driver  ", 2, BLINK_NO) != RESP_FINISH);
+	while (FuncShowBlink ((const char *) "Kirno Technology", (const char *) " WiFi Test V1.0 ", 2, BLINK_NO) != RESP_FINISH);
 	LED_OFF;
 
-	//TODO: PARA PRUEBAS UTILIZAR BRANCH MASTER
-	//ESTE SOLO INCLUYE FUNCIONES DE PRE CERTIFICACION
 	//DE PRODUCCION Y PARA PRUEBAS EN DMX
 
 	//Packet_Detected_Flag = 0;
@@ -304,27 +309,64 @@ int main(void)
 
 	//---------- Prueba USART --------//
 
-    while( 1 )
-    {
-    	LED_ON;
-    	USARTSendSingle('M');
-    	LED_OFF;
-        Wait_ms(500);
-    }
+//    while( 1 )
+//    {
+//    	LED_ON;
+//    	USARTSendSingle('M');
+//    	LED_OFF;
+//        Wait_ms(500);
+//    }
 
     //---------- Fin Prueba USART --------//
 
 	//---------- Prueba GSM_Engine --------//
     //system_init();
-    gsm_engine_init( dbg_cb );
+//    gsm_engine_init( dbg_cb );
+//
+//    at_cmd( "AT" );
+//
+//    while( 1 )
+//    {
+//        gsm_process();
+//    }
+    //---------- Fin Prueba GSM_Engine --------//
 
-    at_cmd( "AT" );
-
+	//---------- Prueba AT HLK_RM04 --------//
+	ii = 0;
     while( 1 )
     {
-        gsm_process();
+    	if (!timer_standby)
+    	{
+    		if (!ii)
+    		{
+    			HLKToATMode(CMD_RESET);
+    			ii = 1;
+    		}
+
+    		i = HLKToATMode(CMD_PROC);
+    		if ( i != RESP_CONTINUE)
+    		{
+    			timer_standby = 20000;		//espero 20 segs
+    			if (i == RESP_TIMEOUT)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "HLK: Timeout    ");
+					ii = 0;
+				}
+
+    			if (i == RESP_OK)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "HLK: in AT Mode ");
+					ii = 0;
+				}
+    		}
+    	}
+
+    	//Procesos continuos
+    	HLK_ATProcess ();
     }
-    //---------- Fin Prueba GSM_Engine --------//
+    //---------- Fin Prueba AT HLK_RM04 --------//
 
 	//---------- Prueba temp --------//
 	/*
@@ -606,6 +648,14 @@ void TimingDelay_Decrement(void)
 
 	if (standalone_enable_menu_timer)
 		standalone_enable_menu_timer--;
+
+#ifdef HLK_RM04_PRESENT
+	if (hlk_timeout)
+		hlk_timeout--;
+
+	if (hlk_mini_timeout)
+		hlk_mini_timeout--;
+#endif
 
 
 	//cuenta de a 1 minuto

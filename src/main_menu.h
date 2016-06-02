@@ -47,6 +47,13 @@
 #define RESP_NO				12
 #define RESP_NO_CHANGE		13
 
+#define RESP_OK				20
+#define RESP_NOK			21
+#define RESP_NO_ANSWER		22
+#define RESP_TIMEOUT		23
+
+
+
 //estados de la funcion SHOW SELECT
 #define SHOW_SELECT_INIT				0
 #define SHOW_SELECT_1					1

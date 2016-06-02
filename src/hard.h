@@ -10,8 +10,8 @@
 
 
 //-------- Defines For Configuration -------------
-//#define VER_1_0
-#define VER_1_2
+#define VER_1_0
+//#define VER_1_2
 
 
 //-------- End Of Defines For Configuration ------
@@ -223,6 +223,11 @@
 #define FUNCTION_MAN	2
 #define FUNCTION_CAT	FUNCTION_MAN
 
+#define SIZEOF_DATA1	512
+#define SIZEOF_DATA		256
+#define SIZEOF_DATA512	SIZEOF_DATA1
+#define SIZEOF_DATA256	SIZEOF_DATA
+
 
 
 
@@ -241,3 +246,4 @@ unsigned char CheckIGrid (void);
 unsigned short MAFilterFast (unsigned short, unsigned short *);
 
 #endif /* HARD_H_ */
+
