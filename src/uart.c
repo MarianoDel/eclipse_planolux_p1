@@ -67,6 +67,7 @@ void USART1_IRQHandler(void)
 {
 	unsigned short i;
 	unsigned char dummy;
+	unsigned char mode = 0;
 
 	/* USART in mode Receiver --------------------------------------------------*/
 	if (USART1->ISR & USART_ISR_RXNE)
@@ -74,11 +75,12 @@ void USART1_IRQHandler(void)
 		//RX DMX
 		dummy = USART1->RDR & 0x0FF;
 
-		if (HLK_Mode() == AT_MODE)
+		mode = HLK_Mode();
+		if ((mode == AT_MODE) || (mode == GOING_AT_MODE))
 		{
 			HLK_ATModeRx(dummy);
 		}
-		else if (HLK_Mode() == TRANSPARENT_MODE)
+		else if (mode == TRANSPARENT_MODE)
 		{
 			HLK_TransparentModeRx(dummy);
 		}
@@ -293,7 +295,9 @@ void USARTSend(char * send)
 	{
 		//TODO: revisar si estoy enviando y apagar int para actualizar pdmx
 		strcpy((char*)pdmx, (const char *)send);
-		pdmx += i;
+		//TODO: no muevo el puntero, me lo mueve la interrupcion
+		//pdmx += i;
+
 
 		USART1->CR1 |= USART_CR1_TXEIE;
 	}
@@ -325,6 +329,7 @@ void USART1Config(void)
 //	USART1->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_UE;	//SIN TX
 	USART1->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;	//para pruebas TX
 
+	pdmx = &data512[0];
 	NVIC_EnableIRQ(USART1_IRQn);
 	NVIC_SetPriority(USART1_IRQn, 5);
 }

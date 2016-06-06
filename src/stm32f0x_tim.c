@@ -109,9 +109,17 @@ void TIM_3_Init (void)
 	TIM3->CR1 = 0x00;		//clk int / 1; upcounting
 	TIM3->CR2 = 0x00;		//igual al reset
 //	TIM3->CCMR2 = 0x7070;			//CH4 y CH3 output PWM mode 2
+#ifdef VER_1_0
+	TIM3->CCMR1 = 0x0060;			//CH1 PWM mode 2
+	TIM3->CCMR2 = 0x0000;			//
+	TIM3->CCER |= TIM_CCER_CC1E;	//CH1 enable on pin
+#endif
+
+#ifdef VER_1_2
 	TIM3->CCMR1 = 0x6060;			//CH1 CH2 PWM mode 2
 	TIM3->CCMR2 = 0x0000;			//
 	TIM3->CCER |= TIM_CCER_CC1E | TIM_CCER_CC2E;	//CH1 enable on pin
+#endif
 	TIM3->ARR = 255;
 	//TIM3->ARR = 1023;		//para probar parte baja de placa mosfet (comparar con placa china)
 	TIM3->CNT = 0;
@@ -131,9 +139,15 @@ void TIM_3_Init (void)
 
 	//Configuracion Pines
 	//Alternate Fuction
+#ifdef VER_1_0
+	GPIOA->AFR[0] = 0x01000000;	//PA6 -> AF1
+	//GPIOB->AFR[0] = 0x00000011;	//PB1 -> AF1; PB0 -> AF1
+#endif
+
+#ifdef VER_1_2
 	GPIOA->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
 	//GPIOB->AFR[0] = 0x00000011;	//PB1 -> AF1; PB0 -> AF1
-
+#endif
 }
 
 void TIM_6_Init (void)

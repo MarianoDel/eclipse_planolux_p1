@@ -27,6 +27,7 @@ extern volatile unsigned char data[];
 
 
 //--- Globals -------------------------------------//
+
 void (* pCallBack) (char *);
 
 unsigned char hlk_command_state = 0;
@@ -55,7 +56,8 @@ unsigned char HLKToATMode (unsigned char p)
 			hlk_timeout = TT_HLK_AT_MODE;
 			hlk_timeout_cnt = 0;
 			hlk_command_state = COMM_TO_AT;
-			hlk_mode = UNKNOW_MODE;
+			//hlk_mode = UNKNOW_MODE;
+			hlk_mode = GOING_AT_MODE;
 			break;
 
 		case COMM_TO_AT:
@@ -63,12 +65,13 @@ unsigned char HLKToATMode (unsigned char p)
 			{
 				HLK_PIN_OFF;
 				hlk_command_state = COMM_AT_ANSWER;
-				SendCommandWithAnswer((const char *) "at+ver=?", CheckVersion);	//blanquea hlk_answer
+				SendCommandWithAnswer((const char *) "at+ver=?\r\n", CheckVersion);	//blanquea hlk_answer
+				hlk_timeout = 3000;
 			}
 			break;
 
 		case COMM_AT_ANSWER:
-			if (hlk_answer == RESP_TIMEOUT)
+			if ((hlk_answer == RESP_TIMEOUT) || (!hlk_timeout))
 			{
 				if (hlk_timeout_cnt >= 3)
 					resp = RESP_TIMEOUT;
@@ -79,8 +82,28 @@ unsigned char HLKToATMode (unsigned char p)
 				}
 			}
 
-			if (hlk_answer == RESP_OK)
+			if (hlk_answer == RESP_READY)
 			{
+				hlk_command_state = COMM_WAIT_PARSER;
+				HLKPreParser(data256);
+			}
+			break;
+
+		case COMM_WAIT_PARSER:
+			if ((hlk_answer == RESP_TIMEOUT) || (!hlk_timeout))
+			{
+				if (hlk_timeout_cnt >= 3)
+					resp = RESP_TIMEOUT;
+				else
+				{
+					hlk_timeout_cnt++;
+					hlk_command_state = COMM_TO_AT;
+				}
+			}
+
+			if (hlk_answer == RESP_READY)
+			{
+				hlk_command_state = COMM_WAIT_PARSER;
 				hlk_mode = AT_MODE;
 				resp = RESP_OK;
 			}
@@ -105,7 +128,6 @@ void SendCommandWithAnswer(const char * str, void (*pCall) (char * answer))
 	pCallBack = pCall;
 
 	USARTSend((char *) str);
-	USARTSend((char *) (const char *) "END");
 }
 
 void CheckVersion (char * answer)
@@ -134,7 +156,7 @@ void HLK_ATProcess (void)
 	{
 		at_start = 0;
 		at_finish = 0;
-		hlk_answer = RESP_OK;
+		hlk_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
 	}
 }
 
@@ -144,7 +166,7 @@ void HLK_ATModeRx (unsigned char d)
 	//tengo que ver en que parte del AT estoy
 	if (!at_start)
 	{
-		if (d == 'A')
+		if ((d == 'A') || (d == 'a'))
 		{
 			prx = (unsigned char *) data256;
 			*prx = d;
@@ -155,7 +177,7 @@ void HLK_ATModeRx (unsigned char d)
 	}
 	else if (at_start)
 	{
-		if (d == '\n')
+		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
 			at_finish = 1;
 
 		*prx = d;
@@ -163,7 +185,9 @@ void HLK_ATModeRx (unsigned char d)
 			prx++;
 		else
 		{
+			//recibi demasiados bytes juntos
 			//salgo por error
+			prx = (unsigned char *) data256;
 			hlk_answer = RESP_NOK;
 		}
 	}
@@ -174,3 +198,22 @@ void HLK_TransparentModeRx (unsigned char d)
 
 }
 
+void HLKPreParser(unsigned char * d)
+{
+	unsigned char i;
+	unsigned char * l;
+
+	l = d;
+	for (i = 0; i < SIZEOF_DATA256; i++)
+	{
+		if (*d != '\0')
+		{
+			if ((*d < '') &&
+		}
+		else
+		{
+			*l = '\0';
+			i = SIZEOF_DATA256;
+		}
+	}
+}

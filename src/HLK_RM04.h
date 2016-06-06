@@ -25,13 +25,14 @@
 #define CMD_RESET	0
 #define CMD_PROC	1
 
-#define HLK_PIN_ON	SW_TX
-#define HLK_PIN_OFF	SW_RX
+#define HLK_PIN_ON	SW_RX
+#define HLK_PIN_OFF	SW_TX
 
 //--- Modos del HLK -----------------------------------------//
 #define UNKNOW_MODE				0
 #define AT_MODE					1
 #define TRANSPARENT_MODE		2
+#define GOING_AT_MODE			3
 
 #define USART_CALLER	0
 #define PROCESS_CALLER	1

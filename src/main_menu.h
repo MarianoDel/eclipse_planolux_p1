@@ -51,6 +51,7 @@
 #define RESP_NOK			21
 #define RESP_NO_ANSWER		22
 #define RESP_TIMEOUT		23
+#define RESP_READY			24
 
 
 

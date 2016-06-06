@@ -269,6 +269,10 @@ int main(void)
 		}
 	}
 
+	//Pin OFF HLK
+	HLK_PIN_OFF;
+	Wait_ms(6000);	//espero ue bootee la placa wifi
+
 	//ADC Configuration
 	AdcConfig();
 
@@ -311,10 +315,21 @@ int main(void)
 
 //    while( 1 )
 //    {
-//    	LED_ON;
+//
 //    	USARTSendSingle('M');
-//    	LED_OFF;
 //        Wait_ms(500);
+//
+//        if (CTRL_BKL)
+//        {
+//        	LED_OFF;
+//        	CTRL_BKL_OFF;
+//        }
+//        else
+//        {
+//        	LED_ON;
+//        	CTRL_BKL_ON;
+//        }
+//
 //    }
 
     //---------- Fin Prueba USART --------//
@@ -332,13 +347,25 @@ int main(void)
     //---------- Fin Prueba GSM_Engine --------//
 
 	//---------- Prueba AT HLK_RM04 --------//
+//	USARTSendSingle('M');
+//	Wait_ms(100);
+	USARTSend("HLK_RM04 Test...\r\n");
+	Wait_ms(100);
 	ii = 0;
     while( 1 )
     {
     	if (!timer_standby)
     	{
+    		if (CTRL_BKL)
+    			CTRL_BKL_OFF;
+    		else
+    			CTRL_BKL_ON;
+
     		if (!ii)
     		{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Ask to AT Mode  ");
+
     			HLKToATMode(CMD_RESET);
     			ii = 1;
     		}

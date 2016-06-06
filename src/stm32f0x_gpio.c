@@ -130,12 +130,12 @@ void GPIO_Config (void)
 
 	temp = GPIOA->MODER;	//2 bits por pin
 	temp &= 0x3C000000;		//PA0 - PA5 out push_pull; PA6 alternate function; PA7 out push pull;
-	temp |= 0x01686555;		//PA8 input; PA9 PA10 alternativa; PA11 PA12 out push_pull; PA15 input
+	temp |= 0x01686555;		//PA8 input; PA9 PA10 alternativa; PA11 out push_pull; PA12 out open drain; PA15 input
 	GPIOA->MODER = temp;
 
 	temp = GPIOA->OTYPER;	//1 bit por pin
-	temp &= 0xFFFFE700;
-	temp |= 0x00000000;		//PA0 a PA7 push pull; PA11 PA12 push pull
+	temp &= 0xFCFFE700;
+	temp |= 0x01000000;		//PA0 a PA7 push pull; PA11 push pull; PA12 open drain
 	GPIOA->OTYPER = temp;
 
 	temp = GPIOA->OSPEEDR;	//2 bits por pin
