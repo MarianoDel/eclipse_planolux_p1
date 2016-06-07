@@ -227,6 +227,7 @@ int main(void)
 	unsigned short ii;
 	unsigned char resp = RESP_CONTINUE;
 	unsigned short local_meas, local_meas_last;
+	unsigned char main_state = 0;
 	char s_lcd [20];
 
 
@@ -349,45 +350,72 @@ int main(void)
 	//---------- Prueba AT HLK_RM04 --------//
 //	USARTSendSingle('M');
 //	Wait_ms(100);
-	USARTSend("HLK_RM04 Test...\r\n");
-	Wait_ms(100);
-	ii = 0;
     while( 1 )
     {
-    	if (!timer_standby)
+    	switch (main_state)
     	{
-    		if (CTRL_BKL)
-    			CTRL_BKL_OFF;
-    		else
-    			CTRL_BKL_ON;
+			case MAIN_INIT:
+				USARTSend("HLK_RM04 Test...\r\n");
+				timer_standby = 100;
+				main_state++;
+				break;
 
-    		if (!ii)
-    		{
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "Ask to AT Mode  ");
+			case MAIN_INIT_1:
+				if (!timer_standby)
+				{
+					main_state++;
 
-    			HLKToATMode(CMD_RESET);
-    			ii = 1;
-    		}
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Ask to AT Mode  ");
+	    			HLKToATMode(CMD_RESET);
+				}
+				break;
 
-    		i = HLKToATMode(CMD_PROC);
-    		if ( i != RESP_CONTINUE)
-    		{
-    			timer_standby = 20000;		//espero 20 segs
-    			if (i == RESP_TIMEOUT)
+			case MAIN_ASK_AT:
+				resp = HLKToATMode(CMD_PROC);
+
+    			if (resp == RESP_TIMEOUT)
     			{
 					LCD_2DO_RENGLON;
 					LCDTransmitStr((const char *) "HLK: Timeout    ");
-					ii = 0;
 				}
 
-    			if (i == RESP_OK)
+    			if (resp == RESP_OK)
     			{
 					LCD_2DO_RENGLON;
 					LCDTransmitStr((const char *) "HLK: in AT Mode ");
-					ii = 0;
+					main_state = MAIN_AT_CONFIG_0;
 				}
-    		}
+				break;
+
+			case MAIN_AT_CONFIG_0:
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Go netmode = 3  ");
+				resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_RESET);
+				main_state = MAIN_AT_CONFIG_0B;
+				break;
+
+			case MAIN_AT_CONFIG_0B:
+				resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_PROC);
+
+    			if (resp == RESP_TIMEOUT)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "HLK: Timeout    ");
+				}
+
+    			if (resp == RESP_OK)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "HLK: netmode = 3");
+					while (1);
+				}
+				break;
+
+			default:
+				main_state = MAIN_INIT;
+				break;
+
     	}
 
     	//Procesos continuos

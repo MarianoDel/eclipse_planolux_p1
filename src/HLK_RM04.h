@@ -16,11 +16,15 @@
 #define TT_HLK_AT_MODE		300
 #define TT_HLK_RESET		6000
 #define TT_HLK_AT_MINI		5		//timeout de esopera de chars luego de una comienzo
+#define TT_AT_1SEG			1000
 
 //--- Estados para el HLK -----------------------------------//
-#define COMM_INIT		0
-#define COMM_TO_AT		1
-#define COMM_AT_ANSWER	2
+#define COMM_INIT			0
+#define COMM_TO_AT			1
+#define COMM_AT_ANSWER		2
+#define COMM_WAIT_PARSER	3
+#define COMM_WAIT_ANSWER	4
+#define COMM_VERIFY_ANSWER	5
 
 #define CMD_RESET	0
 #define CMD_PROC	1
@@ -44,10 +48,13 @@ void SendCommandWithAnswer(const char *, void (*pCall) (char *));
 
 unsigned char HLK_Mode(void);
 void HLK_ATModeRx (unsigned char);
+unsigned char SendCommandWaitAnswer (const char *, unsigned char);
 void HLK_TransparentModeRx (unsigned char);
 void HLK_ATProcess (void);
 unsigned char HLKToATMode (unsigned char);
-
+void HLKPreParser(unsigned char *);
+unsigned char HLKVerifyVersion(unsigned char *);
 
 #endif /* HLK_RM04_H_ */
+
 

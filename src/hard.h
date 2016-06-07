@@ -173,6 +173,10 @@
 
 //ESTADOS DEL PROGRAMA PRINCIPAL
 #define MAIN_INIT				0
+#define MAIN_INIT_1				1
+#define MAIN_ASK_AT				2
+#define MAIN_AT_CONFIG_0		3
+#define MAIN_AT_CONFIG_0B		4
 
 #define MAIN_STAND_ALONE		10
 #define MAIN_GROUPED			11

@@ -84,29 +84,78 @@ unsigned char HLKToATMode (unsigned char p)
 
 			if (hlk_answer == RESP_READY)
 			{
-				hlk_command_state = COMM_WAIT_PARSER;
-				HLKPreParser(data256);
+				//hlk_command_state = COMM_WAIT_PARSER;
+				HLKPreParser((unsigned char *)data256);
+
+				resp = HLKVerifyVersion((unsigned char *)data256);
+
+				if (resp == RESP_OK)
+					hlk_mode = AT_MODE;
+				else
+					hlk_mode = UNKNOW_MODE;
 			}
 			break;
 
-		case COMM_WAIT_PARSER:
+		default:
+			hlk_command_state = COMM_INIT;
+			break;
+	}
+
+	return resp;
+}
+
+unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanquea hlk_answer
+{
+	unsigned char i, length = 0;
+	unsigned char resp = RESP_CONTINUE;
+	char s_comm [20];
+
+	if (p == CMD_RESET)
+	{
+		hlk_command_state = COMM_INIT;
+		return resp;
+	}
+
+	switch (hlk_command_state)
+	{
+		case COMM_INIT:
+			hlk_command_state = COMM_WAIT_ANSWER;
+			SendCommandWithAnswer(comm, CheckVersion);	//blanquea hlk_answer
+			hlk_timeout = TT_AT_1SEG;
+			break;
+
+		case COMM_WAIT_ANSWER:
 			if ((hlk_answer == RESP_TIMEOUT) || (!hlk_timeout))
 			{
-				if (hlk_timeout_cnt >= 3)
-					resp = RESP_TIMEOUT;
-				else
-				{
-					hlk_timeout_cnt++;
-					hlk_command_state = COMM_TO_AT;
-				}
+				resp = RESP_TIMEOUT;
 			}
 
 			if (hlk_answer == RESP_READY)
+				hlk_command_state = COMM_VERIFY_ANSWER;
+
+			break;
+
+		case COMM_VERIFY_ANSWER:
+			for (i = 0; i < sizeof(s_comm); i++)	//copio hasta el primer \r
 			{
-				hlk_command_state = COMM_WAIT_PARSER;
-				hlk_mode = AT_MODE;
-				resp = RESP_OK;
+				if (comm[i] != '\r')
+					s_comm[i] = comm[i];
+				else
+				{
+					length = i + 1;
+					s_comm[i] = '\0';
+					i = sizeof(s_comm);
+				}
 			}
+
+			HLKPreParser((unsigned char *)data256);
+			if (strncmp(s_comm, (char *)data256, length) == 0)
+			{
+				if ((*(data256 + length + 1) == 'o') && (*(data256 + length + 1) == 'k'))
+					resp = RESP_OK;
+			}
+			else
+				resp = RESP_NOK;
 			break;
 
 		default:
@@ -128,18 +177,6 @@ void SendCommandWithAnswer(const char * str, void (*pCall) (char * answer))
 	pCallBack = pCall;
 
 	USARTSend((char *) str);
-}
-
-void CheckVersion (char * answer)
-{
-	unsigned char comp = 0;
-
-	comp = strncmp (answer, (const char *) "VER 1.8", (sizeof ((const char *) "VER 1.8")) - 1);
-
-	if (comp == 0)
-		hlk_answer = RESP_OK;
-	else
-		hlk_answer = RESP_NOK;
 }
 
 unsigned char HLK_Mode(void)
@@ -172,7 +209,6 @@ void HLK_ATModeRx (unsigned char d)
 			*prx = d;
 			prx++;
 			at_start = 1;
-			hlk_mini_timeout = TT_HLK_AT_MINI;
 		}
 	}
 	else if (at_start)
@@ -191,6 +227,9 @@ void HLK_ATModeRx (unsigned char d)
 			hlk_answer = RESP_NOK;
 		}
 	}
+
+	//mientras reciba bytes hago update del timer
+	hlk_mini_timeout = TT_HLK_AT_MINI;
 }
 
 void HLK_TransparentModeRx (unsigned char d)
@@ -208,12 +247,45 @@ void HLKPreParser(unsigned char * d)
 	{
 		if (*d != '\0')
 		{
-			if ((*d < '') &&
+			if ((*d > 31) && (*d < 127))		//todos los codigos numeros y letras
+			{
+				*l = *d;
+				l++;
+			}
+			d++;
 		}
 		else
 		{
 			*l = '\0';
-			i = SIZEOF_DATA256;
+			break;
 		}
 	}
 }
+
+unsigned char HLKVerifyVersion(unsigned char * d)
+{
+	char comp;
+
+	//primero reviso el echo del at
+	comp = strncmp ((char *) d, (const char *) "at+ver=?", (sizeof ((const char *) "at+ver=?")) - 1);
+	if (comp == 0)
+	{
+		//ahora reviso solo algunos valores
+		if ((*(d+8) == 'V') && (*(d+10) == '.') && (*(d+13) == '('))
+			return RESP_OK;
+	}
+	return RESP_NOK;
+}
+
+void CheckVersion (char * answer)
+{
+	unsigned char comp = 0;
+
+	comp = strncmp (answer, (const char *) "VER 1.8", (sizeof ((const char *) "VER 1.8")) - 1);
+
+	if (comp == 0)
+		hlk_answer = RESP_OK;
+	else
+		hlk_answer = RESP_NOK;
+}
+
