@@ -108,7 +108,7 @@ unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanq
 {
 	unsigned char i, length = 0;
 	unsigned char resp = RESP_CONTINUE;
-	char s_comm [20];
+	char s_comm [80];
 
 	if (p == CMD_RESET)
 	{
@@ -142,7 +142,7 @@ unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanq
 					s_comm[i] = comm[i];
 				else
 				{
-					length = i + 1;
+					length = i;
 					s_comm[i] = '\0';
 					i = sizeof(s_comm);
 				}
@@ -151,7 +151,7 @@ unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanq
 			HLKPreParser((unsigned char *)data256);
 			if (strncmp(s_comm, (char *)data256, length) == 0)
 			{
-				if ((*(data256 + length + 1) == 'o') && (*(data256 + length + 1) == 'k'))
+				if ((*(data256 + length) == 'o') && (*(data256 + length + 1) == 'k'))
 					resp = RESP_OK;
 			}
 			else

@@ -177,6 +177,11 @@
 #define MAIN_ASK_AT				2
 #define MAIN_AT_CONFIG_0		3
 #define MAIN_AT_CONFIG_0B		4
+#define MAIN_AT_CONFIG_1		5
+#define MAIN_AT_CONFIG_1B		6
+#define MAIN_AT_CONFIG_2		7
+#define MAIN_AT_CONFIG_2B		8
+#define MAIN_ERROR				9
 
 #define MAIN_STAND_ALONE		10
 #define MAIN_GROUPED			11
