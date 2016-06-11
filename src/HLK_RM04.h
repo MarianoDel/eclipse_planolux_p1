@@ -41,6 +41,35 @@
 #define USART_CALLER	0
 #define PROCESS_CALLER	1
 
+enum HlkConfigState
+{
+	CONF_INIT = 0,
+	CONF_ASK_AT,
+	CONF_AT_CONFIG_0,
+	CONF_AT_CONFIG_0B,
+	CONF_AT_CONFIG_1,
+	CONF_AT_CONFIG_1B,
+	CONF_AT_CONFIG_2,
+	CONF_AT_CONFIG_2B,
+	CONF_AT_CONFIG_3,
+	CONF_AT_CONFIG_3B,
+	CONF_AT_CONFIG_4,
+	CONF_AT_CONFIG_4B,
+	CONF_AT_CONFIG_5,
+	CONF_AT_CONFIG_5B,
+	CONF_AT_CONFIG_6,
+	CONF_AT_CONFIG_6B,
+	CONF_AT_CONFIG_7,
+	CONF_AT_CONFIG_7B,
+	CONF_AT_CONFIG_8,
+	CONF_AT_CONFIG_8B
+};
+
+enum HlkEnaState
+{
+	ENA_INIT = 0,
+	ENA_ASK_AT
+};
 
 //--- Funciones del Modulo -----------------------------------//
 void CheckVersion (char *);
@@ -54,6 +83,8 @@ void HLK_ATProcess (void);
 unsigned char HLKToATMode (unsigned char);
 void HLKPreParser(unsigned char *);
 unsigned char HLKVerifyVersion(unsigned char *);
+unsigned char HLK_SendConfig (unsigned char);
+unsigned char HLK_EnableNewConn (unsigned char);
 
 #endif /* HLK_RM04_H_ */
 

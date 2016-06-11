@@ -36,7 +36,195 @@ unsigned char hlk_mode = UNKNOW_MODE;
 volatile unsigned char * prx;
 volatile unsigned char at_start = 0;
 volatile unsigned char at_finish = 0;
+enum HlkConfigState hlk_config_state = CONF_INIT;
 
+unsigned char HLK_EnableNewConn (unsigned char p)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	if (p == CMD_RESET)
+	{
+		hlk_config_state = ENA_INIT;
+		return resp;
+	}
+
+	switch (hlk_config_state)
+	{
+		case ENA_INIT:
+			hlk_config_state++;
+			resp = SendCommandWaitAnswer((const char *) "at+reconn=1\r\n", CMD_RESET);
+			break;
+
+		case ENA_ASK_AT:
+			resp = SendCommandWaitAnswer((const char *) "at+reconn=1\r\n", CMD_PROC);;
+			break;
+
+		default:
+			hlk_config_state = ENA_INIT;
+			break;
+	}
+	return resp;
+}
+
+unsigned char HLK_SendConfig (unsigned char p)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	if (p == CMD_RESET)
+	{
+		hlk_config_state = CONF_INIT;
+		return resp;
+	}
+
+	switch (hlk_config_state)
+	{
+		case CONF_INIT:
+			hlk_config_state++;
+			HLKToATMode(CMD_RESET);
+			break;
+
+		case CONF_ASK_AT:
+			resp = HLKToATMode(CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_0;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_0:
+			resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_0B;
+			break;
+
+		case CONF_AT_CONFIG_0B:
+			resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_1;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_1:
+			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_1B;
+			break;
+
+		case CONF_AT_CONFIG_1B:
+			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_2;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_2:
+			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_2B;
+			break;
+
+		case CONF_AT_CONFIG_2B:
+			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_3;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_3:
+			resp = SendCommandWaitAnswer((const char *) "at+net_ip=192.168.1.254,255.255.255.0,192.168.1.1\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_3B;
+			break;
+
+		case CONF_AT_CONFIG_3B:
+			resp = SendCommandWaitAnswer((const char *) "at+net_ip=192.168.1.254,255.255.255.0,192.168.1.1\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_4;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_4:
+			resp = SendCommandWaitAnswer((const char *) "at+dhcpd_ip=192.168.1.100,192.168.1.200,255.255.255.0,192.168.1.254\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_4B;
+			break;
+
+		case CONF_AT_CONFIG_4B:
+			resp = SendCommandWaitAnswer((const char *) "at+dhcpd_ip=192.168.1.100,192.168.1.200,255.255.255.0,192.168.1.254\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_5;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_5:
+			resp = SendCommandWaitAnswer((const char *) "at+dhcpd=1\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_5B;
+			break;
+
+		case CONF_AT_CONFIG_5B:
+			resp = SendCommandWaitAnswer((const char *) "at+dhcpd=1\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_6;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_6:
+			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_6B;
+			break;
+
+		case CONF_AT_CONFIG_6B:
+			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_7;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_7:
+			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_RESET);
+			hlk_config_state = CONF_AT_CONFIG_7B;
+			break;
+
+		case CONF_AT_CONFIG_7B:
+			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				hlk_config_state = CONF_AT_CONFIG_8;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_8:
+			USARTSend((char *) (const char *) "at+net_commit=1\r\n");
+			resp = RESP_OK;
+			break;
+
+		default:
+			hlk_config_state = CONF_INIT;
+			break;
+	}
+
+	return resp;
+}
 
 unsigned char HLKToATMode (unsigned char p)
 {

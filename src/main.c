@@ -366,13 +366,13 @@ int main(void)
 					main_state++;
 
 					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "Ask to AT Mode  ");
-	    			HLKToATMode(CMD_RESET);
+					LCDTransmitStr((const char *) "Send to HLK Conf");
+					resp = HLK_SendConfig (CMD_RESET);
 				}
 				break;
 
-			case MAIN_ASK_AT:
-				resp = HLKToATMode(CMD_PROC);
+			case MAIN_SENDING_CONF:
+				resp = HLK_SendConfig (CMD_PROC);
 
     			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
     			{
@@ -387,99 +387,67 @@ int main(void)
 
     			if (resp == RESP_OK)
     			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "HLK: Configured ");
+					timer_standby = 20000;								//TODO: ojo 20000 va bien
+																		//con 10000 tiene que pegar una vuelta por los comandos AT
+					main_state = MAIN_WAIT_CONNECT_0;
+				}
+				break;
+
+			case MAIN_WAIT_CONNECT_0:
+				if (!timer_standby)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Enable connect  ");
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_blank_line);
+					resp = HLK_EnableNewConn (CMD_RESET);
+					main_state = MAIN_WAIT_CONNECT_1;
+				}
+				break;
+
+			case MAIN_WAIT_CONNECT_1:
+				resp = HLK_EnableNewConn (CMD_PROC);
+
+				if (resp == RESP_OK)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Waiting new conn");
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_blank_line);
+					main_state = MAIN_WAIT_CONNECT_2;
+				}
+
+				if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+				{
+					LCD_2DO_RENGLON;
+					if (resp == RESP_TIMEOUT)
+					{
+						LCDTransmitStr((const char *) "HLK: Timeout    ");
+						main_state = MAIN_WAIT_CONNECT_0;
+					}
+					else
+					{
+						LCDTransmitStr((const char *) "HLK: Error go AT");
+						main_state = MAIN_WAIT_CONNECT_3;
+						resp = HLKToATMode (CMD_RESET);
+					}
+					timer_standby = 10000;
+				}
+    			break;
+
+			case MAIN_WAIT_CONNECT_2:
+    			break;
+
+			case MAIN_WAIT_CONNECT_3:
+				resp = HLKToATMode (CMD_PROC);
+
+				if (resp == RESP_OK)
+				{
 					LCD_2DO_RENGLON;
 					LCDTransmitStr((const char *) "HLK: in AT Mode ");
-					main_state = MAIN_AT_CONFIG_0;
-				}
-				break;
-
-			case MAIN_AT_CONFIG_0:
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "Go netmode = 3  ");
-				resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_RESET);
-				main_state = MAIN_AT_CONFIG_0B;
-				break;
-
-			case MAIN_AT_CONFIG_0B:
-				resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_PROC);
-
-    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
-    			{
-					LCD_2DO_RENGLON;
-					if (resp == RESP_TIMEOUT)
-						LCDTransmitStr((const char *) "HLK: Timeout    ");
-					else
-						LCDTransmitStr((const char *) "HLK: Error      ");
-
-					main_state = MAIN_ERROR;
-					timer_standby = 20000;	//20 segundos de error
-				}
-
-    			if (resp == RESP_OK)
-    			{
-					LCD_2DO_RENGLON;
-					LCDTransmitStr((const char *) "HLK: netmode = 3");
-					main_state = MAIN_AT_CONFIG_1;
-				}
-    			break;
-
-			case MAIN_AT_CONFIG_1:
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "Go wifi conf    ");
-				resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_RESET);
-				main_state = MAIN_AT_CONFIG_1B;
-				break;
-
-			case MAIN_AT_CONFIG_1B:
-				resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_PROC);
-
-    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
-    			{
-					LCD_2DO_RENGLON;
-					if (resp == RESP_TIMEOUT)
-						LCDTransmitStr((const char *) "HLK: Timeout    ");
-					else
-						LCDTransmitStr((const char *) "HLK: Error      ");
-
-					main_state = MAIN_ERROR;
-					timer_standby = 20000;	//20 segundos de error
-				}
-
-    			if (resp == RESP_OK)
-    			{
-					LCD_2DO_RENGLON;
-					LCDTransmitStr((const char *) "HLK: WIFI act   ");
-					main_state = MAIN_AT_CONFIG_2;
-				}
-    			break;
-
-			case MAIN_AT_CONFIG_2:
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "Go wifi conf    ");
-				resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_RESET);
-				main_state = MAIN_AT_CONFIG_2B;
-				break;
-
-			case MAIN_AT_CONFIG_2B:
-				resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_PROC);
-
-    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
-    			{
-					LCD_2DO_RENGLON;
-					if (resp == RESP_TIMEOUT)
-						LCDTransmitStr((const char *) "HLK: Timeout    ");
-					else
-						LCDTransmitStr((const char *) "HLK: Error      ");
-
-					main_state = MAIN_ERROR;
-					timer_standby = 20000;	//20 segundos de error
-				}
-
-    			if (resp == RESP_OK)
-    			{
-					LCD_2DO_RENGLON;
-					LCDTransmitStr((const char *) "HLK: WIFI act   ");
-					while(1);
+					main_state = MAIN_WAIT_CONNECT_0;
 				}
     			break;
 
