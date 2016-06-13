@@ -121,7 +121,10 @@ unsigned char HLK_GoTransparent (unsigned char p)
 	if (p == CMD_ONLY_CHECK)
 	{
 		if (HLK_Mode() != TRANSPARENT_MODE)
+		{
 			USARTSend((char *) (const char *) "at+out_trans=0\r\n");
+			hlk_mode = TRANSPARENT_MODE;
+		}
 		resp = RESP_OK;
 	}
 	return resp;
@@ -488,16 +491,22 @@ void HLK_TransparentModeRx (unsigned char d)
 {
 	if (!hlk_transparent_finish)	//si llego un byte cuando todavia estoy analizando, lo pierdo
 	{
-		if (d == '\n')		//cuando veo final de linea aviso
-			hlk_transparent_finish = 1;
-
-		*prx = d;
-		if (prx < &data256[SIZEOF_DATA256])
-			prx++;
-		else
+		if (d != '\n')
 		{
-			//recibi demasiados bytes juntos sin final de linea
+			*prx = d;
+			if (prx < &data256[SIZEOF_DATA256])
+				prx++;
+			else
+			{
+				//recibi demasiados bytes juntos sin final de linea
+				prx = (unsigned char *) data256;
+			}
+		}
+		else	//cuando veo final de linea aviso
+		{
+			*prx = '\0';
 			prx = (unsigned char *) data256;
+			hlk_transparent_finish = 1;
 		}
 	}
 }

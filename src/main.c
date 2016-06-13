@@ -471,7 +471,15 @@ int main(void)
 					if (tcp_msg != NONE_MSG)	//es un mensaje valido
 						tcp_kalive_timer = TT_KALIVE;
 
+					if (tcp_msg == KEEP_ALIVE)
+					{
+						USARTSend((char *) (const char *) "kAL_ACK\r\n");
+					}
 
+					if (tcp_msg == GET_A)	//tira error en apk de android
+					{
+//						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
+					}
 
 				}
     			break;
