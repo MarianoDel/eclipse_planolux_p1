@@ -23,5 +23,8 @@ enum TcpMessages
 
 //--- Module Functions ----------------------------//
 enum TcpMessages CheckTCPMessage(char *, unsigned char *, unsigned char *);
+void ReadPcktR(unsigned char *, unsigned short, unsigned char *);
+void ReadPcktS(unsigned char *);
+unsigned short GetValue (unsigned char *);
 
 #endif /* TCP_TRANSCEIVER_H_ */

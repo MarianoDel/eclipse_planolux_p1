@@ -481,6 +481,16 @@ int main(void)
 //						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
 					}
 
+					if (tcp_msg == ROOM_BRIGHT)
+					{
+						USARTSend((char *) (const char *) "ACK\r\n");
+					}
+
+					if (tcp_msg == LAMP_BRIGHT)
+					{
+						USARTSend((char *) (const char *) "ACK\r\n");
+					}
+
 				}
     			break;
 
