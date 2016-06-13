@@ -42,6 +42,7 @@
 
 #include "HLK_RM04.h"
 #include "gsm_engine.h"
+#include "tcp_transceiver.h"
 
 //--- VARIABLES EXTERNAS ---//
 volatile unsigned char timer_1seg = 0;
@@ -230,6 +231,7 @@ int main(void)
 	unsigned short local_meas, local_meas_last;
 	unsigned char main_state = 0;
 	char s_lcd [20];
+	enum TcpMessages tcp_msg = NONE_MSG;
 
 
 #ifdef WITH_GRANDMASTER
@@ -460,6 +462,7 @@ int main(void)
 				if (hlk_transparent_finish)
 				{
 					//tengo un mensage reviso cual es
+					tcp_msg = CheckTCPMessage(data);
 
 				}
     			break;

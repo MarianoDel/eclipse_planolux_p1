@@ -34,7 +34,8 @@ src\main.o: src\main.c cmsis_boot/stm32f0xx.h cmsis_core/core_cm0.h \
  ..\GSM_Engine\library\include/at_parser.h \
  ..\GSM_Engine\library\include/at_timer.h \
  ..\GSM_Engine\library\include/gsm_adapter.h \
- ..\GSM_Engine\library\include/gsm_hal.h src/stm32f0x_tim.h
+ ..\GSM_Engine\library\include/gsm_hal.h src/stm32f0x_tim.h \
+ src\tcp_transceiver.h
 
 cmsis_boot/stm32f0xx.h:
 
@@ -135,3 +136,5 @@ c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/ar
 ..\GSM_Engine\library\include/gsm_hal.h:
 
 src/stm32f0x_tim.h:
+
+src\tcp_transceiver.h:

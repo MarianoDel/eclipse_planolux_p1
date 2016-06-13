@@ -118,6 +118,7 @@ SRC += .\src\main_menu.c
 SRC += .\src\standalone.c
 SRC += .\src\grouped.c
 SRC += .\src\networked.c
+SRC += .\src\tcp_transceiver.c
 ## RDM libraries
 SRC += .\src\rdm_util.c
 ## System Support
