@@ -28,6 +28,7 @@
 
 #define CMD_RESET	0
 #define CMD_PROC	1
+#define CMD_ONLY_CHECK	2
 
 #define HLK_PIN_ON	SW_RX
 #define HLK_PIN_OFF	SW_TX
@@ -71,6 +72,14 @@ enum HlkEnaState
 	ENA_ASK_AT
 };
 
+enum HlkTranspState
+{
+	TRANSP_INIT = 0,
+	TRANSP_INIT1,
+	TRANSP_GOTRANSP,
+	TRANSP_GOTRANSP_WAIT
+};
+
 //--- Funciones del Modulo -----------------------------------//
 void CheckVersion (char *);
 void SendCommandWithAnswer(const char *, void (*pCall) (char *));
@@ -85,6 +94,7 @@ void HLKPreParser(unsigned char *);
 unsigned char HLKVerifyVersion(unsigned char *);
 unsigned char HLK_SendConfig (unsigned char);
 unsigned char HLK_EnableNewConn (unsigned char);
+unsigned char HLK_GoTransparent (unsigned char);
 
 #endif /* HLK_RM04_H_ */
 

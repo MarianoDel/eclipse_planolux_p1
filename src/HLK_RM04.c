@@ -18,6 +18,7 @@
 extern unsigned short hlk_timeout;
 extern unsigned char hlk_mini_timeout;
 extern unsigned char hlk_answer;
+extern unsigned char hlk_transparent_finish;
 
 extern volatile unsigned char data1[];
 extern volatile unsigned char data[];
@@ -62,6 +63,66 @@ unsigned char HLK_EnableNewConn (unsigned char p)
 		default:
 			hlk_config_state = ENA_INIT;
 			break;
+	}
+	return resp;
+}
+
+//con CMD_RESET hace reset de la maquina
+//con CMD_PROC busca primero ir a AT Mode y luego va a transparente
+//con CMD_ONLY_CHECK revisa si esta en AT y pasa a transparente o constesta que ya esta en transparente
+unsigned char HLK_GoTransparent (unsigned char p)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	if (p == CMD_RESET)
+	{
+		hlk_config_state = TRANSP_INIT;
+		return resp;
+	}
+
+	if (p == CMD_PROC)
+	{
+		switch (hlk_config_state)
+		{
+			case TRANSP_INIT:
+				hlk_config_state++;
+				resp = HLKToATMode(CMD_RESET);
+				break;
+
+			case TRANSP_INIT1:
+				resp = HLKToATMode(CMD_PROC);
+
+				if (resp == RESP_OK)
+				{
+					resp = RESP_CONTINUE;
+					hlk_config_state = TRANSP_GOTRANSP;
+				}
+				break;
+
+			case TRANSP_GOTRANSP:
+				USARTSend((char *) (const char *) "at+out_trans=0\r\n");
+				resp = RESP_CONTINUE;
+				hlk_config_state = TRANSP_GOTRANSP_WAIT;
+				hlk_timeout = 500;
+				hlk_mode = TRANSPARENT_MODE;
+				break;
+
+			case TRANSP_GOTRANSP_WAIT:
+				if (!hlk_timeout)
+					resp = RESP_OK;
+				break;
+
+			default:
+				hlk_config_state = TRANSP_INIT;
+				break;
+		}
+	}
+
+	if (p == CMD_ONLY_CHECK)
+	{
+		if (HLK_Mode() != TRANSPARENT_MODE)
+			USARTSend((char *) (const char *) "at+out_trans=0\r\n");
+		resp = RESP_OK;
 	}
 	return resp;
 }
@@ -226,6 +287,8 @@ unsigned char HLK_SendConfig (unsigned char p)
 	return resp;
 }
 
+//con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
+//contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
 unsigned char HLKToATMode (unsigned char p)
 {
 	unsigned char resp = RESP_CONTINUE;
@@ -420,9 +483,24 @@ void HLK_ATModeRx (unsigned char d)
 	hlk_mini_timeout = TT_HLK_AT_MINI;
 }
 
+//me llaman desde usart rx si estoy en modo TRANSPARENT
 void HLK_TransparentModeRx (unsigned char d)
 {
-
+	if (d == '\n')		//cuando veo final de linea aviso
+	{
+		hlk_transparent_finish = 1;
+	}
+	else
+	{
+		*prx = d;
+		if (prx < &data256[SIZEOF_DATA256])
+			prx++;
+		else
+		{
+			//recibi demasiados bytes juntos sin final de linea
+			prx = (unsigned char *) data256;
+		}
+	}
 }
 
 void HLKPreParser(unsigned char * d)

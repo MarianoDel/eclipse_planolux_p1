@@ -149,7 +149,8 @@ unsigned char sac_aux;
 #ifdef HLK_RM04_PRESENT
 unsigned short hlk_timeout = 0;
 unsigned char hlk_mini_timeout = 0;
-unsigned char hlk_answer;
+unsigned char hlk_answer = 0;
+unsigned char hlk_transparent_finish = 0;
 #endif
 
 
@@ -438,6 +439,10 @@ int main(void)
     			break;
 
 			case MAIN_WAIT_CONNECT_2:
+				//seguro vengo desde AT entonces cambio rapido a transparente
+				resp = HLK_GoTransparent (CMD_ONLY_CHECK);
+				main_state = MAIN_TRANSPARENT;
+
     			break;
 
 			case MAIN_WAIT_CONNECT_3:
@@ -448,6 +453,14 @@ int main(void)
 					LCD_2DO_RENGLON;
 					LCDTransmitStr((const char *) "HLK: in AT Mode ");
 					main_state = MAIN_WAIT_CONNECT_0;
+				}
+    			break;
+
+			case MAIN_TRANSPARENT:
+				if (hlk_transparent_finish)
+				{
+					//tengo un mensage reviso cual es
+
 				}
     			break;
 

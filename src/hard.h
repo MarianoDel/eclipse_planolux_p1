@@ -179,7 +179,7 @@
 #define MAIN_WAIT_CONNECT_1		4
 #define MAIN_WAIT_CONNECT_2		5
 #define MAIN_WAIT_CONNECT_3		6
-#define MAIN_AT_CONFIG_2		7
+#define MAIN_TRANSPARENT		7
 #define MAIN_AT_CONFIG_2B		8
 #define MAIN_ERROR				9
 
