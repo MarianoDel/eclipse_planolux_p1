@@ -486,16 +486,19 @@ void HLK_ATModeRx (unsigned char d)
 //me llaman desde usart rx si estoy en modo TRANSPARENT
 void HLK_TransparentModeRx (unsigned char d)
 {
-	if (d == '\n')		//cuando veo final de linea aviso
-		hlk_transparent_finish = 1;
-
-	*prx = d;
-	if (prx < &data256[SIZEOF_DATA256])
-		prx++;
-	else
+	if (!hlk_transparent_finish)	//si llego un byte cuando todavia estoy analizando, lo pierdo
 	{
-		//recibi demasiados bytes juntos sin final de linea
-		prx = (unsigned char *) data256;
+		if (d == '\n')		//cuando veo final de linea aviso
+			hlk_transparent_finish = 1;
+
+		*prx = d;
+		if (prx < &data256[SIZEOF_DATA256])
+			prx++;
+		else
+		{
+			//recibi demasiados bytes juntos sin final de linea
+			prx = (unsigned char *) data256;
+		}
 	}
 }
 

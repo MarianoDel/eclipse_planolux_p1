@@ -18,9 +18,9 @@ enum TcpMessages
 	LAMP_BRIGHT
 };
 
-
+#define TT_KALIVE	8000	//8 segundos de keep alive para el tcp
 
 //--- Module Functions ----------------------------//
-enum TcpMessages CheckTCPMessage(char *);
+enum TcpMessages CheckTCPMessage(char *, unsigned char *, unsigned char *);
 
 #endif /* TCP_TRANSCEIVER_H_ */

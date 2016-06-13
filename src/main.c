@@ -160,6 +160,7 @@ parameters_typedef param_struct;
 
 // ------- de los timers -------
 volatile unsigned short timer_standby;
+volatile unsigned short tcp_kalive_timer;
 //volatile unsigned char display_timer;
 volatile unsigned char filter_timer;
 
@@ -232,6 +233,8 @@ int main(void)
 	unsigned char main_state = 0;
 	char s_lcd [20];
 	enum TcpMessages tcp_msg = NONE_MSG;
+	unsigned char new_room = 0;
+	unsigned char new_lamp = 0;
 
 
 #ifdef WITH_GRANDMASTER
@@ -462,7 +465,13 @@ int main(void)
 				if (hlk_transparent_finish)
 				{
 					//tengo un mensage reviso cual es
-					tcp_msg = CheckTCPMessage(data);
+					tcp_msg = CheckTCPMessage(data, &new_room, &new_lamp);
+					hlk_transparent_finish = 0;
+
+					if (tcp_msg != NONE_MSG)	//es un mensaje valido
+						tcp_kalive_timer = TT_KALIVE;
+
+
 
 				}
     			break;
@@ -770,6 +779,9 @@ void TimingDelay_Decrement(void)
 
 	if (hlk_mini_timeout)
 		hlk_mini_timeout--;
+
+	if (tcp_kalive_timer)
+		tcp_kalive_timer--;
 #endif
 
 
