@@ -89,6 +89,7 @@ volatile unsigned short standalone_enable_menu_timer;
 volatile unsigned char grouped_master_timeout_timer;
 volatile unsigned short take_temp_sample = 0;
 volatile unsigned short minutes = 0;
+volatile unsigned char timer_wifi_bright = 0;
 
 // ------- Externals de los modos -------
 StandAlone_Typedef const StandAloneStruct_constant =
@@ -235,6 +236,7 @@ int main(void)
 	enum TcpMessages tcp_msg = NONE_MSG;
 	unsigned char new_room = 0;
 	unsigned char new_lamp = 0;
+	unsigned char last_bright = 0;
 
 
 #ifdef WITH_GRANDMASTER
@@ -486,11 +488,16 @@ int main(void)
 						USARTSend((char *) (const char *) "ACK\r\n");
 					}
 
-					if (tcp_msg == LAMP_BRIGHT)
+					if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF))
 					{
 						USARTSend((char *) (const char *) "ACK\r\n");
 					}
+				}
 
+				if (!tcp_kalive_timer)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Connection drop ");
 				}
     			break;
 
@@ -507,6 +514,20 @@ int main(void)
 
     	//Procesos continuos
     	HLK_ATProcess ();
+    	if (!timer_wifi_bright)
+    	{
+    		timer_wifi_bright = 5;	//muevo un punto cada 5ms
+    		if (new_room > last_bright)
+    		{
+    			last_bright++;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+    		else if (new_room < last_bright)
+    		{
+    			last_bright--;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+    	}
     }
     //---------- Fin Prueba AT HLK_RM04 --------//
 
@@ -800,6 +821,9 @@ void TimingDelay_Decrement(void)
 
 	if (tcp_kalive_timer)
 		tcp_kalive_timer--;
+
+	if (timer_wifi_bright)
+		timer_wifi_bright--;
 #endif
 
 

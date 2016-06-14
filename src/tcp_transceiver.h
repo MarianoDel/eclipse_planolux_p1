@@ -16,7 +16,9 @@ enum TcpMessages
 	KEEP_ALIVE,
 	ROOM_BRIGHT,
 	LAMP_BRIGHT,
-	GET_A
+	GET_A,
+	LIGHTS_OFF,
+	LIGHTS_ON
 };
 
 #define TT_KALIVE	8000	//8 segundos de keep alive para el tcp

@@ -47,6 +47,15 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 		return LAMP_BRIGHT;
 	}
 
+	if (strncmp((char *) (const char *) "o0,0;\r", (char *)d, sizeof((char *) (const char *) "o0,0;\r")) == 0)
+	{
+		*new_room_bright = 0;
+		return LIGHTS_OFF;
+	}
+
+	if (strncmp((char *) (const char *) "o0,1;\r", (char *)d, sizeof((char *) (const char *) "o0,1;\r")) == 0)
+		return LIGHTS_ON;
+
 	return NONE_MSG;
 }
 
