@@ -517,7 +517,7 @@ int main(void)
     	if (!timer_wifi_bright)
     	{
     		timer_wifi_bright = 5;	//muevo un punto cada 5ms
-    		if (new_room > last_bright)
+    		if (new_room > last_bright)		//TODO: en vez de new_room deberia utilizar un filtro de los ultimos valores recibidos
     		{
     			last_bright++;
     			Update_TIM3_CH1 (last_bright);
