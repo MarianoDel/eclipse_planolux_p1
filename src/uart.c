@@ -18,7 +18,8 @@
 #include "stm32f0xx.h"
 #include "uart.h"
 #include "dmx_transceiver.h"
-#include "HLK_RM04.h"
+//#include "HLK_RM04.h"
+#include "ESP8266.h"
 
 #include <string.h>
 
@@ -74,7 +75,7 @@ void USART1_IRQHandler(void)
 	{
 		//RX DMX
 		dummy = USART1->RDR & 0x0FF;
-
+#ifdef USE_HLK_WIFI
 		mode = HLK_Mode();
 		if ((mode == AT_MODE) || (mode == GOING_AT_MODE))
 		{
@@ -86,8 +87,22 @@ void USART1_IRQHandler(void)
 		}
 		else
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
-	}
+#endif
+#ifdef USE_ESP_WIFI
+		mode = ESP_Mode();
+		if ((mode == AT_MODE) || (mode == GOING_AT_MODE))
+		{
+			ESP_ATModeRx(dummy);
+		}
+		else if (mode == TRANSPARENT_MODE)
+		{
+			ESP_TransparentModeRx(dummy);
+		}
+		else
+			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
+#endif
 
+	}
 	/* USART in mode Transmitter -------------------------------------------------*/
 	//if (USART_GetITStatus(USARTx, USART_IT_TXE) == SET)
 

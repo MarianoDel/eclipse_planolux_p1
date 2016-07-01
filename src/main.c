@@ -40,7 +40,12 @@
 #include "grouped.h"
 #include "networked.h"
 
+#ifdef USE_RM04_WIFI
 #include "HLK_RM04.h"
+#endif
+#ifdef USE_ESP_WIFI
+#include "ESP8266.h"
+#endif
 #include "gsm_engine.h"
 #include "tcp_transceiver.h"
 
@@ -148,13 +153,20 @@ unsigned short sac;
 unsigned char sac_aux;
 
 // ------- Externals del HLK_RM04 -------
-#ifdef HLK_RM04_PRESENT
+#ifdef USE_HLK_WIFI
 unsigned short hlk_timeout = 0;
 unsigned char hlk_mini_timeout = 0;
 unsigned char hlk_answer = 0;
 unsigned char hlk_transparent_finish = 0;
 #endif
 
+// ------- Externals del ESP8266 -------
+#ifdef USE_ESP_WIFI
+unsigned short esp_timeout = 0;
+unsigned char esp_mini_timeout = 0;
+unsigned char esp_answer = 0;
+unsigned char esp_transparent_finish = 0;
+#endif
 
 //--- VARIABLES GLOBALES ---//
 parameters_typedef param_struct;
@@ -279,7 +291,14 @@ int main(void)
 	}
 
 	//Pin OFF HLK
+
+#ifdef USE_HLK_WIFI
 	HLK_PIN_OFF;
+#endif
+#ifdef USE_ESP_WIFI
+	WRST_OFF;
+#endif
+
 	Wait_ms(6000);	//espero ue bootee la placa wifi
 
 	//ADC Configuration
@@ -360,6 +379,164 @@ int main(void)
 //	Wait_ms(100);
     while( 1 )
     {
+#ifdef USE_ESP_WIFI
+    	switch (main_state)
+    	{
+			case MAIN_INIT:
+				USARTSend("ESP8266 Test...\r\n");
+				timer_standby = 100;
+				main_state++;
+				break;
+
+			case MAIN_INIT_1:
+				if (!timer_standby)
+				{
+					main_state++;
+
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Send to ESP Conf");
+					resp = ESP_SendConfig (CMD_RESET);
+				}
+				break;
+
+			case MAIN_SENDING_CONF:
+				resp = ESP_SendConfig (CMD_PROC);
+
+    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+    			{
+					LCD_2DO_RENGLON;
+					if (resp == RESP_TIMEOUT)
+						LCDTransmitStr((const char *) "ESP: Timeout    ");
+					else
+						LCDTransmitStr((const char *) "ESP: Error      ");
+					main_state = MAIN_ERROR;
+					timer_standby = 20000;	//20 segundos de error
+				}
+
+    			if (resp == RESP_OK)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "ESP: Configured ");
+					timer_standby = 20000;								//TODO: ojo 20000 va bien
+																		//con 10000 tiene que pegar una vuelta por los comandos AT
+					main_state = MAIN_WAIT_CONNECT_0;
+				}
+				break;
+
+			case MAIN_WAIT_CONNECT_0:
+				if (!timer_standby)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Enable connect  ");
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_blank_line);
+					resp = ESP_EnableNewConn (CMD_RESET);
+					main_state = MAIN_WAIT_CONNECT_1;
+				}
+				break;
+
+			case MAIN_WAIT_CONNECT_1:
+				resp = ESP_EnableNewConn (CMD_PROC);
+
+				if (resp == RESP_OK)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Waiting new conn");
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_blank_line);
+					main_state = MAIN_WAIT_CONNECT_2;
+				}
+
+				if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+				{
+					LCD_2DO_RENGLON;
+					if (resp == RESP_TIMEOUT)
+					{
+						LCDTransmitStr((const char *) "ESP: Timeout    ");
+						main_state = MAIN_WAIT_CONNECT_0;
+					}
+					else
+					{
+						LCDTransmitStr((const char *) "ESP: Error go AT");
+						main_state = MAIN_WAIT_CONNECT_3;
+						resp = ESPToATMode (CMD_RESET);
+					}
+					timer_standby = 10000;
+				}
+    			break;
+
+			case MAIN_WAIT_CONNECT_2:
+				//seguro vengo desde AT entonces cambio rapido a transparente
+				resp = ESP_GoTransparent (CMD_ONLY_CHECK);
+				main_state = MAIN_TRANSPARENT;
+
+    			break;
+
+//			case MAIN_WAIT_CONNECT_3:
+//				resp = HLKToATMode (CMD_PROC);
+//
+//				if (resp == RESP_OK)
+//				{
+//					LCD_2DO_RENGLON;
+//					LCDTransmitStr((const char *) "HLK: in AT Mode ");
+//					main_state = MAIN_WAIT_CONNECT_0;
+//				}
+//    			break;
+//
+//			case MAIN_TRANSPARENT:
+//				if (hlk_transparent_finish)
+//				{
+//					//tengo un mensage reviso cual es
+//					tcp_msg = CheckTCPMessage(data, &new_room, &new_lamp);
+//					hlk_transparent_finish = 0;
+//
+//					if (tcp_msg != NONE_MSG)	//es un mensaje valido
+//						tcp_kalive_timer = TT_KALIVE;
+//
+//					if (tcp_msg == KEEP_ALIVE)
+//					{
+//						USARTSend((char *) (const char *) "kAL_ACK\r\n");
+//					}
+//
+//					if (tcp_msg == GET_A)	//tira error en apk de android
+//					{
+////						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
+//					}
+//
+//					if (tcp_msg == ROOM_BRIGHT)
+//					{
+//						USARTSend((char *) (const char *) "ACK\r\n");
+//					}
+//
+//					if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF))
+//					{
+//						USARTSend((char *) (const char *) "ACK\r\n");
+//					}
+//				}
+//
+//				if (!tcp_kalive_timer)
+//				{
+//					LCD_1ER_RENGLON;
+//					LCDTransmitStr((const char *) "Connection drop ");
+//				}
+//    			break;
+
+			case MAIN_ERROR:
+				if (!timer_standby)
+					main_state = MAIN_INIT_1;
+				break;
+
+			default:
+				main_state = MAIN_INIT;
+				break;
+
+    	}
+
+    	//Procesos continuos
+    	ESP_ATProcess ();
+#endif
+
+#ifdef USE_HLK_WIFI
     	switch (main_state)
     	{
 			case MAIN_INIT:
@@ -514,6 +691,8 @@ int main(void)
 
     	//Procesos continuos
     	HLK_ATProcess ();
+#endif
+
     	if (!timer_wifi_bright)
     	{
     		timer_wifi_bright = 5;	//muevo un punto cada 5ms
@@ -812,7 +991,7 @@ void TimingDelay_Decrement(void)
 	if (standalone_enable_menu_timer)
 		standalone_enable_menu_timer--;
 
-#ifdef HLK_RM04_PRESENT
+#ifdef USE_HLK_WIFI
 	if (hlk_timeout)
 		hlk_timeout--;
 
@@ -826,6 +1005,19 @@ void TimingDelay_Decrement(void)
 		timer_wifi_bright--;
 #endif
 
+#ifdef USE_ESP_WIFI
+	if (esp_timeout)
+		esp_timeout--;
+
+	if (esp_mini_timeout)
+		esp_mini_timeout--;
+
+	if (tcp_kalive_timer)
+		tcp_kalive_timer--;
+
+	if (timer_wifi_bright)
+		timer_wifi_bright--;
+#endif
 
 	//cuenta de a 1 minuto
 	if (secs > 59999)	//pasaron 1 min

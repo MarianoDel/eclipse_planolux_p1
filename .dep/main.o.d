@@ -28,7 +28,7 @@ src\main.o: src\main.c cmsis_boot/stm32f0xx.h cmsis_core/core_cm0.h \
  src\stm32f0x_gpio.h src\stm32f0x_tim.h src\uart.h src\hard.h src\lcd.h \
  src\adc.h src\flash_program.h src\main_menu.h src\synchro.h \
  src\dmx_transceiver.h src\standalone.h src\grouped.h src\networked.h \
- src\HLK_RM04.h ..\GSM_Engine\library\include/gsm_engine.h \
+ src\ESP8266.h ..\GSM_Engine\library\include/gsm_engine.h \
  ..\GSM_Engine\library\include/at_config.h \
  c:\program\ files\ (x86)\gnu\ tools\ arm\ embedded\4.7\ 2013q2\bin\../lib/gcc/arm-none-eabi/4.7.4/include/stdbool.h \
  ..\GSM_Engine\library\include/at_parser.h \
@@ -119,7 +119,7 @@ src\grouped.h:
 
 src\networked.h:
 
-src\HLK_RM04.h:
+src\ESP8266.h:
 
 ..\GSM_Engine\library\include/gsm_engine.h:
 

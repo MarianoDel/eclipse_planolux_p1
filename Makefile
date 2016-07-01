@@ -136,7 +136,8 @@ SRC += $(DLIBDIR)\src\gsm_adapter.c
 SRC += $(DLIBDIR)\src\gsm_engine.c
 SRC += $(DLIBDIR)\src\gsm_hal.c
 ## Other Peripherals
-SRC += .\src\HLK_RM04.c
+SRC += .\src\ESP8266.c
+#SRC += .\src\HLK_RM04.c
 
 # List ASM source files here
 ASRC = .\cmsis_boot\startup\startup_stm32f0xx.s

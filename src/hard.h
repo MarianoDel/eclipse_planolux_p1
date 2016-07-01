@@ -13,6 +13,9 @@
 #define VER_1_0
 //#define VER_1_2
 
+//-------- WiFi Configuration -------------
+//#define USE_HLK_WIFI
+#define USE_ESP_WIFI
 
 //-------- End Of Defines For Configuration ------
 
