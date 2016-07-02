@@ -22,6 +22,7 @@ extern unsigned char esp_transparent_finish;
 
 extern volatile unsigned char data1[];
 extern volatile unsigned char data[];
+extern volatile unsigned char bufftcp[];
 
 #define data512		data1
 #define data256		data
@@ -37,6 +38,8 @@ unsigned char esp_mode = UNKNOW_MODE;
 volatile unsigned char * prx;
 volatile unsigned char at_start = 0;
 volatile unsigned char at_finish = 0;
+volatile unsigned char pckt_start = 0;
+volatile unsigned char pckt_finish = 0;
 enum EspConfigState esp_config_state = CONF_INIT;
 
 unsigned char ESP_EnableNewConn (unsigned char p)
@@ -158,12 +161,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_0:
-			resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_RESET);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWMODE_CUR=2\r\n", CMD_RESET);
 			esp_config_state = CONF_AT_CONFIG_0B;
 			break;
 
 		case CONF_AT_CONFIG_0B:
-			resp = SendCommandWaitAnswer((const char *) "at+netmode=3\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWMODE_CUR=2\r\n", CMD_PROC);
 
 			if (resp == RESP_OK)
 			{
@@ -173,12 +176,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_1:
-			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_RESET);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWSAP_CUR=\"KIRNO_WIFI\",\"12345678\",5,3\r\n", CMD_RESET);
 			esp_config_state = CONF_AT_CONFIG_1B;
 			break;
 
 		case CONF_AT_CONFIG_1B:
-			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWSAP_CUR=\"KIRNO_WIFI\",\"12345678\",5,3\r\n", CMD_PROC);
 
 			if (resp == RESP_OK)
 			{
@@ -188,12 +191,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_2:
-			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_RESET);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=0,1\r\n", CMD_RESET);
 			esp_config_state = CONF_AT_CONFIG_2B;
 			break;
 
 		case CONF_AT_CONFIG_2B:
-			resp = SendCommandWaitAnswer((const char *) "at+wifi_conf=KIRNO_WIFI,wpa2_aes,12345678\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=0,1\r\n", CMD_PROC);
 
 			if (resp == RESP_OK)
 			{
@@ -203,12 +206,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_3:
-			resp = SendCommandWaitAnswer((const char *) "at+net_ip=192.168.1.254,255.255.255.0,192.168.1.1\r\n", CMD_RESET);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPAP_CUR=\"192.168.1.250\"\r\n", CMD_RESET);
 			esp_config_state = CONF_AT_CONFIG_3B;
 			break;
 
 		case CONF_AT_CONFIG_3B:
-			resp = SendCommandWaitAnswer((const char *) "at+net_ip=192.168.1.254,255.255.255.0,192.168.1.1\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPAP_CUR=\"192.168.1.254\"\r\n", CMD_PROC);
 
 			if (resp == RESP_OK)
 			{
@@ -218,12 +221,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_4:
-			resp = SendCommandWaitAnswer((const char *) "at+dhcpd_ip=192.168.1.100,192.168.1.200,255.255.255.0,192.168.1.254\r\n", CMD_RESET);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPMUX=1\r\n", CMD_RESET);
 			esp_config_state = CONF_AT_CONFIG_4B;
 			break;
 
 		case CONF_AT_CONFIG_4B:
-			resp = SendCommandWaitAnswer((const char *) "at+dhcpd_ip=192.168.1.100,192.168.1.200,255.255.255.0,192.168.1.254\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPMUX=1\r\n", CMD_PROC);
 
 			if (resp == RESP_OK)
 			{
@@ -233,54 +236,54 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_5:
-			resp = SendCommandWaitAnswer((const char *) "at+dhcpd=1\r\n", CMD_RESET);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPSERVER=1,10002\r\n", CMD_RESET);
 			esp_config_state = CONF_AT_CONFIG_5B;
 			break;
 
 		case CONF_AT_CONFIG_5B:
-			resp = SendCommandWaitAnswer((const char *) "at+dhcpd=1\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPSERVER=1,10002\r\n", CMD_PROC);
 
-			if (resp == RESP_OK)
-			{
-				esp_config_state = CONF_AT_CONFIG_6;
-				resp = RESP_CONTINUE;
-			}
+//			if (resp == RESP_OK)
+//			{
+//				esp_config_state = CONF_AT_CONFIG_6;
+//				resp = RESP_CONTINUE;
+//			}
 			break;
 
-		case CONF_AT_CONFIG_6:
-			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_RESET);
-			esp_config_state = CONF_AT_CONFIG_6B;
-			break;
-
-		case CONF_AT_CONFIG_6B:
-			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_PROC);
-
-			if (resp == RESP_OK)
-			{
-				esp_config_state = CONF_AT_CONFIG_7;
-				resp = RESP_CONTINUE;
-			}
-			break;
-
-		case CONF_AT_CONFIG_7:
-			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_RESET);
-			esp_config_state = CONF_AT_CONFIG_7B;
-			break;
-
-		case CONF_AT_CONFIG_7B:
-			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_PROC);
-
-			if (resp == RESP_OK)
-			{
-				esp_config_state = CONF_AT_CONFIG_8;
-				resp = RESP_CONTINUE;
-			}
-			break;
-
-		case CONF_AT_CONFIG_8:
-			USARTSend((char *) (const char *) "at+net_commit=1\r\n");
-			resp = RESP_OK;
-			break;
+//		case CONF_AT_CONFIG_6:
+//			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_RESET);
+//			esp_config_state = CONF_AT_CONFIG_6B;
+//			break;
+//
+//		case CONF_AT_CONFIG_6B:
+//			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_PROC);
+//
+//			if (resp == RESP_OK)
+//			{
+//				esp_config_state = CONF_AT_CONFIG_7;
+//				resp = RESP_CONTINUE;
+//			}
+//			break;
+//
+//		case CONF_AT_CONFIG_7:
+//			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_RESET);
+//			esp_config_state = CONF_AT_CONFIG_7B;
+//			break;
+//
+//		case CONF_AT_CONFIG_7B:
+//			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_PROC);
+//
+//			if (resp == RESP_OK)
+//			{
+//				esp_config_state = CONF_AT_CONFIG_8;
+//				resp = RESP_CONTINUE;
+//			}
+//			break;
+//
+//		case CONF_AT_CONFIG_8:
+//			USARTSend((char *) (const char *) "at+net_commit=1\r\n");
+//			resp = RESP_OK;
+//			break;
 
 		default:
 			esp_config_state = CONF_INIT;
@@ -317,6 +320,70 @@ unsigned char ESPToATMode (unsigned char p)
 			{
 				esp_command_state = COMM_AT_ANSWER;
 				SendCommandWithAnswer((const char *) "AT+GMR\r\n");	//blanquea esp_answer
+				esp_timeout = 3000;
+			}
+			break;
+
+		case COMM_AT_ANSWER:
+			if ((esp_answer == RESP_TIMEOUT) || (!esp_timeout))
+			{
+				if (esp_timeout_cnt >= 3)
+					resp = RESP_TIMEOUT;
+				else
+				{
+					esp_timeout_cnt++;
+					esp_command_state = COMM_TO_AT;
+				}
+			}
+
+			if (esp_answer == RESP_READY)
+			{
+				//esp_command_state = COMM_WAIT_PARSER;
+				ESPPreParser((unsigned char *)data256);
+
+				resp = ESPVerifyVersion((unsigned char *)data256);
+
+				if (resp == RESP_OK)
+					esp_mode = AT_MODE;
+				else
+					esp_mode = UNKNOW_MODE;
+			}
+			break;
+
+		default:
+			esp_command_state = COMM_INIT;
+			break;
+	}
+
+	return resp;
+}
+
+//con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
+//contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
+unsigned char ESP_SendData (unsigned char p, unsigned char port)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	if (p == CMD_RESET)
+	{
+		esp_command_state = COMM_INIT;
+		return resp;
+	}
+
+	//hago polling hasta que este con modo AT
+	switch (esp_command_state)
+	{
+		case COMM_INIT:
+			esp_timeout = TT_ESP_AT_MODE;
+			esp_command_state = COMM_TO_AT;
+			esp_mode = AT_TRANSMIT;
+			break;
+
+		case COMM_TO_AT:
+			if (!esp_timeout)
+			{
+				esp_command_state = COMM_AT_ANSWER;
+
 				esp_timeout = 3000;
 			}
 			break;
@@ -404,6 +471,9 @@ unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanq
 			{
 				if ((*(data256 + length) == 'O') && (*(data256 + length + 1) == 'K'))
 					resp = RESP_OK;
+
+				if (strncmp((char *) (const char *) "no change OK", (data256 + length), (sizeof ((const char *) "no change OK")) - 1) == 0)
+					resp = RESP_OK;
 			}
 			else
 				resp = RESP_NOK;
@@ -447,13 +517,21 @@ void ESP_ATProcess (void)
 		at_finish = 0;
 		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
 	}
+
+	if ((pckt_start) && (pckt_finish) && (!esp_mini_timeout))
+	{
+		pckt_start = 0;
+		pckt_finish = 0;
+		esp_transparent_finish = RESP_READY;	//aviso que tengo una respuesta para revisar
+	}
 }
 
+//TODO: ver que pasa si llega AT y nada mas como salgo por timeout EN ESTA O LA DE ARRIBA
 //me llaman desde usart rx si estoy en modo AT
 void ESP_ATModeRx (unsigned char d)
 {
 	//tengo que ver en que parte del AT estoy
-	if (!at_start)
+	if ((!at_start) && (!pckt_start))
 	{
 		if ((d == 'A') || (d == 'a'))
 		{
@@ -461,6 +539,13 @@ void ESP_ATModeRx (unsigned char d)
 			*prx = d;
 			prx++;
 			at_start = 1;
+		}
+		else if (((d >= '0') && (d <= '4'))	|| (d == '+'))	//pueden ser nuevas conexiones o paquete TCP
+		{
+			prx = (unsigned char *) bufftcp;
+			*prx = d;
+			prx++;
+			pckt_start = 1;
 		}
 	}
 	else if (at_start)
@@ -476,6 +561,22 @@ void ESP_ATModeRx (unsigned char d)
 			//recibi demasiados bytes juntos
 			//salgo por error
 			prx = (unsigned char *) data256;
+			esp_answer = RESP_NOK;
+		}
+	}
+	else if (pckt_start)
+	{
+		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
+			pckt_finish = 1;
+
+		*prx = d;
+		if (prx < &bufftcp[SIZEOF_BUFFTCP])
+			prx++;
+		else
+		{
+			//recibi demasiados bytes juntos
+			//salgo por error
+			prx = (unsigned char *) bufftcp;
 			esp_answer = RESP_NOK;
 		}
 	}
@@ -543,7 +644,7 @@ unsigned char ESPVerifyVersion(unsigned char * d)
 	if (comp == 0)
 	{
 		//ahora reviso solo algunos valores
-		if ((*(d+8) == 'V') && (*(d+10) == '.') && (*(d+13) == '('))
+		if ((*(d+6) == 'A') && (*(d+9) == 'v') && (*(d+16) == ':'))
 			return RESP_OK;
 	}
 	return RESP_NOK;

@@ -7,6 +7,7 @@
 
 #include "tcp_transceiver.h"
 #include <string.h>
+#include "main_menu.h"
 
 
 
@@ -20,6 +21,7 @@
 
 
 //--- Globals -------------------------------------//
+char bufftcp [5] [SIZEOF_BUFFTCP];
 
 
 
@@ -29,10 +31,10 @@
 enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsigned char * new_lamp_bright)
 {
 	//reviso que tipo de mensaje tengo en data
-	if (strncmp((char *) (const char *) "kAlive;\r", (char *)d, sizeof((char *) (const char *) "kAlive;\r")) == 0)
+	if (strncmp((char *) (const char *) "kAlive;", (char *)d, (sizeof((char *) (const char *) "kAlive;") - 1)) == 0)
 		return KEEP_ALIVE;
 
-	if (strncmp((char *) (const char *) "geta;\r", (char *)d, sizeof((char *) (const char *) "geta;\r")) == 0)
+	if (strncmp((char *) (const char *) "geta;", (char *)d, (sizeof((char *) (const char *) "geta;") - 1)) == 0)
 		return GET_A;
 
 	if ((*d == 'r') && (*(d + 2) == ','))
@@ -57,6 +59,82 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 		return LIGHTS_ON;
 
 	return NONE_MSG;
+}
+
+//me llaman continuamente para avanzar las maquinas de estado
+//mayormente en transmision
+void TCPProcess (void)
+{
+
+}
+
+unsigned char TCPPreProcess(unsigned char * d, unsigned char * output)
+{
+	unsigned char port = 0xFF;
+	unsigned char len = 0;
+	unsigned char i;
+	//reviso que tipo de mensaje tengo en data
+	//primero reviso estados de conexiones
+//	if ((*d >= '0') && (*d <= '4') && (*(d+1) == ','))
+//	{
+//		if (strncmp((char *) (const char *) "CONNECT\r", (char *) (d + 2), sizeof((char *) (const char *) "CONNECT\r")) == 0)
+//			return KEEP_ALIVE;
+//
+//		if (strncmp((char *) (const char *) "CLOSED\r", (char *) (d + 2), sizeof((char *) (const char *) "CLOSED\r")) == 0)
+//			return KEEP_ALIVE;
+//	}
+
+	//llega:
+	//+IPD,0,6:geta;\n
+	if (strncmp((char *) (const char *) "+IPD,", (char *) d, sizeof((char *) (const char *) "+IPD,")) == 0)
+	{
+		if ((*(d+5) >= '0') && (*(d+5) <= '4'))
+		{
+			port = *(d+5) - '0';
+			for (i = 0; i < 4; i++)	//busco length
+			{
+				if (*(d+7+i) == ':')
+					i = 4;
+
+				len++;
+			}
+			strcpy((char *) output, (char *) (d+7+len));
+		}
+	}
+	return port;
+}
+
+//el bufftcp de transmision es port,lenght,data
+unsigned char TCPSendData (unsigned char port, char * data)
+{
+	char * p;
+	unsigned char length = 0;
+	unsigned char i;
+	unsigned char resp = RESP_NOK;
+
+	//aca reviso si el puerto esta conectado
+	if ((port >= 0) && (port <= 4))
+	{
+		length = strlen(data);
+
+		//busco buffer tcp vacio
+		for (i = 0; i < 5; i++)
+		{
+			p = bufftcp[i];
+			if (*(p+1) == 0)
+				i = 10;				//buffer vacio, lo uso
+		}
+
+		if ((i == 10) && (length < (SIZEOF_BUFFTCP - 2)))
+		{
+			*p = port;
+			*(p+1) = length;
+			strcpy ((p+2), data);
+			resp = RESP_OK;
+		}
+	}
+
+	return resp;
 }
 
 void ReadPcktR(unsigned char * p, unsigned short own_addr, unsigned char * new_r)

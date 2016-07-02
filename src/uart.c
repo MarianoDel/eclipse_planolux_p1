@@ -63,7 +63,7 @@ volatile unsigned short rdm_bytes_left = 0;
 //--- Private functions ---//
 
 
-#ifdef HLK_RM04_PRESENT
+#if ((defined USE_HLK_WIFI) || (defined USE_ESP_WIFI))
 void USART1_IRQHandler(void)
 {
 	unsigned short i;
@@ -97,6 +97,10 @@ void USART1_IRQHandler(void)
 		else if (mode == TRANSPARENT_MODE)
 		{
 			ESP_TransparentModeRx(dummy);
+		}
+		else if (mode == AT_TRANSMIT)
+		{
+			ESP_ATModeTx(dummy);
 		}
 		else
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
@@ -331,7 +335,7 @@ void USARTSendUnsigned(unsigned char * send, unsigned char size)
 	}
 }
 
-#ifdef HLK_RM04_PRESENT
+#if ((defined USE_HLK_WIFI) || (defined USE_ESP_WIFI))
 void USART1Config(void)
 {
 	if (!USART1_CLK)
@@ -366,6 +370,7 @@ void USART1Config(void)
 	NVIC_SetPriority(USART1_IRQn, 5);
 }
 #endif
+
 
 void USARTSendSingle(unsigned char value)
 {

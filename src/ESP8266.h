@@ -34,11 +34,12 @@
 #define WRST_OFF	SW_TX
 
 
-//--- Modos del HLK -----------------------------------------//
+//--- Modos del ESP -----------------------------------------//
 #define UNKNOW_MODE				0
 #define AT_MODE					1
 #define TRANSPARENT_MODE		2
 #define GOING_AT_MODE			3
+#define AT_TRANSMIT				4
 
 #define USART_CALLER	0
 #define PROCESS_CALLER	1

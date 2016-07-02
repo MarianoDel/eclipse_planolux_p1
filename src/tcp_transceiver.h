@@ -22,9 +22,11 @@ enum TcpMessages
 };
 
 #define TT_KALIVE	8000	//8 segundos de keep alive para el tcp
+#define SIZEOF_BUFFTCP	128
 
 //--- Module Functions ----------------------------//
 enum TcpMessages CheckTCPMessage(char *, unsigned char *, unsigned char *);
+unsigned char TCPPreProcess(unsigned char *, unsigned char *);
 void ReadPcktR(unsigned char *, unsigned short, unsigned char *);
 void ReadPcktS(unsigned char *);
 unsigned short GetValue (unsigned char *);
