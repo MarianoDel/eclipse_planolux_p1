@@ -501,11 +501,15 @@ void SendCommandWithAnswer(const char * str)
 	USARTSend((char *) str);
 }
 
-unsigned char ESP_Mode(void)
+unsigned char ESP_AskMode(void)
 {
 	return esp_mode;	//TRANSPARENT_MODE, AT_MODE, UNKNOW_MODE
 }
 
+void ESP_SetMode(unsigned char m)
+{
+	esp_mode = m;	//TRANSPARENT_MODE, AT_MODE, UNKNOW_MODE
+}
 
 //me llaman desde el proceso principal para update
 void ESP_ATProcess (void)

@@ -65,7 +65,38 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 //mayormente en transmision
 void TCPProcess (void)
 {
+	//char * ptcp; a global
+	char a [20];
+	unsigned char i;
 
+	switch (tcp_tx_state)
+	{
+		case IDLE:
+			//reviso si tengo algo que enviar
+			for (i = 0; i < 5; i++)
+			{
+				ptcp = bufftcp[i] [0];
+				if (*(ptcp+1) != 0)
+				{
+					tcp_tx_state++;
+					i = 10;
+				}
+			}
+			break;
+
+		case READY_TO_SEND:
+			//tengo el puntero al buffer que quiero enviar
+			tcp_send_timeout = TT_TCP_SEND;
+			Esp_SetMode(AT_TRANSMIT);
+			UsartSend((char *) (const char *) "AT+CIPSEND=");
+			sprintf (a, "%i,%i", *ptcp, *(ptcp+1));
+
+			break;
+
+		default:
+			tcp_tx_state = IDLE;
+			break;
+	}
 }
 
 unsigned char TCPPreProcess(unsigned char * d, unsigned char * output)
@@ -120,7 +151,7 @@ unsigned char TCPSendData (unsigned char port, char * data)
 		//busco buffer tcp vacio
 		for (i = 0; i < 5; i++)
 		{
-			p = bufftcp[i];
+			p = bufftcp[i] [0];
 			if (*(p+1) == 0)
 				i = 10;				//buffer vacio, lo uso
 		}

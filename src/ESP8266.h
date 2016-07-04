@@ -87,7 +87,8 @@ void CheckVersion (char *);
 //void SendCommandWithAnswer(const char *, void (*pCall) (char *));
 void SendCommandWithAnswer(const char *);
 
-unsigned char ESP_Mode(void);
+unsigned char ESP_AskMode(void);
+void ESP_SetMode(unsigned char);
 void ESP_ATModeRx (unsigned char);
 unsigned char SendCommandWaitAnswer (const char *, unsigned char);
 void ESP_TransparentModeRx (unsigned char);
