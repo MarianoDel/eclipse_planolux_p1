@@ -168,6 +168,7 @@ unsigned char esp_answer = 0;
 unsigned char esp_transparent_finish = 0;
 volatile unsigned char bufftcp[SIZEOF_BUFFTCP];
 char bufftcp_transp[SIZEOF_BUFFTCP - 5];
+volatile unsigned short tcp_send_timeout;
 #endif
 
 //--- VARIABLES GLOBALES ---//
@@ -479,7 +480,7 @@ int main(void)
 
 						if (tcp_msg == KEEP_ALIVE)
 						{
-							USARTSend((char *) (const char *) "kAL_ACK\r\n");
+							TCPSendData(0, "kAL_ACK\r\n");
 						}
 
 						if (tcp_msg == GET_A)	//tira error en apk de android
@@ -489,17 +490,18 @@ int main(void)
 
 						if (tcp_msg == ROOM_BRIGHT)
 						{
-//							USARTSend((char *) (const char *) "ACK\r\n");
+							TCPSendData(0, "ACK\r\n");
 						}
 
 						if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF))
 						{
-//							USARTSend((char *) (const char *) "ACK\r\n");
+							TCPSendData(0, "ACK\r\n");
 						}
 
 					}
 					esp_transparent_finish = RESP_CONTINUE;
 				}
+				TCPProcess();
     			break;
 
 //			case MAIN_WAIT_CONNECT_3:
@@ -1047,6 +1049,9 @@ void TimingDelay_Decrement(void)
 
 	if (timer_wifi_bright)
 		timer_wifi_bright--;
+
+	if (tcp_send_timeout)
+		tcp_send_timeout--;
 #endif
 
 	//cuenta de a 1 minuto

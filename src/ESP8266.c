@@ -40,6 +40,8 @@ volatile unsigned char at_start = 0;
 volatile unsigned char at_finish = 0;
 volatile unsigned char pckt_start = 0;
 volatile unsigned char pckt_finish = 0;
+volatile unsigned char pckttx_start = 0;
+volatile unsigned char pckttx_finish = 0;
 enum EspConfigState esp_config_state = CONF_INIT;
 
 unsigned char ESP_EnableNewConn (unsigned char p)
@@ -123,7 +125,7 @@ unsigned char ESP_GoTransparent (unsigned char p)
 
 	if (p == CMD_ONLY_CHECK)
 	{
-		if (ESP_Mode() != TRANSPARENT_MODE)
+		if (ESP_AskMode() != TRANSPARENT_MODE)
 		{
 			USARTSend((char *) (const char *) "at+out_trans=0\r\n");
 			esp_mode = TRANSPARENT_MODE;
@@ -528,6 +530,14 @@ void ESP_ATProcess (void)
 		pckt_finish = 0;
 		esp_transparent_finish = RESP_READY;	//aviso que tengo una respuesta para revisar
 	}
+
+	if ((pckttx_start) && (pckttx_finish) && (!esp_mini_timeout))
+	{
+		pckttx_start = 0;
+		pckttx_finish = 0;
+		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
+	}
+
 }
 
 //TODO: ver que pasa si llega AT y nada mas como salgo por timeout EN ESTA O LA DE ARRIBA
@@ -572,6 +582,47 @@ void ESP_ATModeRx (unsigned char d)
 	{
 		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
 			pckt_finish = 1;
+
+		*prx = d;
+		if (prx < &bufftcp[SIZEOF_BUFFTCP])
+			prx++;
+		else
+		{
+			//recibi demasiados bytes juntos
+			//salgo por error
+			prx = (unsigned char *) bufftcp;
+			esp_answer = RESP_NOK;
+		}
+	}
+
+	//mientras reciba bytes hago update del timer
+	esp_mini_timeout = TT_ESP_AT_MINI;
+}
+
+//me llaman desde usart rx si estoy en modo AT para transmitir
+void ESP_ATModeTx (unsigned char d)
+{
+	//tengo que ver en que parte del AT estoy o si esta listo a enviar
+	if (d == '>')
+	{
+		pckttx_start = 0;
+		pckttx_finish = 0;
+		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
+	}
+	else if (!pckttx_start)
+	{
+		if (d == 'R')				//cantidad de bytes recibidos
+		{
+			prx = (unsigned char *) bufftcp;
+			*prx = d;
+			prx++;
+			pckttx_start = 1;
+		}
+	}
+	else if (pckttx_start)
+	{
+		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
+			pckttx_finish = 1;
 
 		*prx = d;
 		if (prx < &bufftcp[SIZEOF_BUFFTCP])

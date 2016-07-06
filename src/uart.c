@@ -89,7 +89,7 @@ void USART1_IRQHandler(void)
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
 #endif
 #ifdef USE_ESP_WIFI
-		mode = ESP_Mode();
+		mode = ESP_AskMode();
 		if ((mode == AT_MODE) || (mode == GOING_AT_MODE))
 		{
 			ESP_ATModeRx(dummy);
