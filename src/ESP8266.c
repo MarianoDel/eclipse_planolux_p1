@@ -11,6 +11,7 @@
 #include "stm32f0xx.h"
 
 #include <string.h>
+#include <stdio.h>
 
 
 
@@ -297,6 +298,91 @@ unsigned char ESP_SendConfig (unsigned char p)
 
 //con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
 //contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
+//el bufftcpsend de transmision es port,lenght,data
+unsigned char ESP_SendData (unsigned char p, unsigned char port, unsigned char * pbuf)
+{
+	unsigned char resp = RESP_CONTINUE;
+	char a [30];
+	unsigned char i;
+
+	if (p == CMD_RESET)
+	{
+		esp_config_state = SEND_DATA_INIT;
+		return resp;
+	}
+
+	switch (esp_config_state)
+	{
+		case SEND_DATA_INIT:
+			esp_config_state++;
+			ESP_SetMode(AT_MODE);		//TODO: ver si todo no puede ser AT
+			break;
+
+		case SEND_DATA_RST:
+			resp = SendCommandWaitAnswer(a, CMD_RESET);
+			esp_config_state++;
+			break;
+
+		case SEND_DATA_ASK_CHANNEL:
+			sprintf (a, "AT+CIPSEND=%i,%i\r\n", *pbuf, *(pbuf+1));
+			resp = SendCommandWaitAnswer(a, CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				SendCommandWithAnswer((pbuf + 2));		//blanquea esp_answer
+				esp_timeout = TT_AT_3SEG;
+				esp_config_state++;
+			}
+			break;
+
+		case SEND_DATA_WAIT_SEND_OK:
+			//me quedo esperando el ok de envio o timeout
+			if (esp_answer == RESP_READY)
+			{
+				//reviso si tengo SEND OK en el buffer
+				ESPPreParser((unsigned char *)data256);
+				for (i = 0; i < 249; i++)
+				{
+					if (data256[i] != '\0')
+					{
+						if ((data256[i] == 'S') &&
+								(data256[i+1] == 'E') &&
+								(data256[i+2] == 'N') &&
+								(data256[i+3] == 'D') &&
+								(data256[i+4] == ' ') &&
+								(data256[i+5] == 'O') &&
+								(data256[i+6] == 'K'))
+						{
+							i = 250;
+							resp = RESP_OK;
+						}
+					}
+					else
+					{
+						i = 250;
+					}
+				}
+				if (resp != RESP_OK)
+					resp = RESP_NOK;
+			}
+
+			if (!esp_timeout)
+			{
+				//tengo timeout, termino transmision
+				resp = RESP_TIMEOUT;
+			}
+			break;
+
+		default:
+			esp_config_state = SEND_DATA_INIT;
+			break;
+	}
+
+	return resp;
+}
+
+//con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
+//contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
 unsigned char ESPToATMode (unsigned char p)
 {
 	unsigned char resp = RESP_CONTINUE;
@@ -360,69 +446,6 @@ unsigned char ESPToATMode (unsigned char p)
 	return resp;
 }
 
-//con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
-//contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
-unsigned char ESP_SendData (unsigned char p, unsigned char port)
-{
-	unsigned char resp = RESP_CONTINUE;
-
-	if (p == CMD_RESET)
-	{
-		esp_command_state = COMM_INIT;
-		return resp;
-	}
-
-	//hago polling hasta que este con modo AT
-	switch (esp_command_state)
-	{
-		case COMM_INIT:
-			esp_timeout = TT_ESP_AT_MODE;
-			esp_command_state = COMM_TO_AT;
-			esp_mode = AT_TRANSMIT;
-			break;
-
-		case COMM_TO_AT:
-			if (!esp_timeout)
-			{
-				esp_command_state = COMM_AT_ANSWER;
-
-				esp_timeout = 3000;
-			}
-			break;
-
-		case COMM_AT_ANSWER:
-			if ((esp_answer == RESP_TIMEOUT) || (!esp_timeout))
-			{
-				if (esp_timeout_cnt >= 3)
-					resp = RESP_TIMEOUT;
-				else
-				{
-					esp_timeout_cnt++;
-					esp_command_state = COMM_TO_AT;
-				}
-			}
-
-			if (esp_answer == RESP_READY)
-			{
-				//esp_command_state = COMM_WAIT_PARSER;
-				ESPPreParser((unsigned char *)data256);
-
-				resp = ESPVerifyVersion((unsigned char *)data256);
-
-				if (resp == RESP_OK)
-					esp_mode = AT_MODE;
-				else
-					esp_mode = UNKNOW_MODE;
-			}
-			break;
-
-		default:
-			esp_command_state = COMM_INIT;
-			break;
-	}
-
-	return resp;
-}
 
 unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanquea esp_answer
 {
@@ -475,6 +498,9 @@ unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanq
 					resp = RESP_OK;
 
 				if (strncmp((char *) (const char *) "no change OK", (data256 + length), (sizeof ((const char *) "no change OK")) - 1) == 0)
+					resp = RESP_OK;
+
+				if (*(data256 + length) == '>')
 					resp = RESP_OK;
 			}
 			else

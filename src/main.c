@@ -387,6 +387,7 @@ int main(void)
     	{
 			case MAIN_INIT:
 				USARTSend("ESP8266 Test...\r\n");
+				TCPProcessInit ();
 				timer_standby = 100;
 				main_state++;
 				break;
@@ -480,7 +481,17 @@ int main(void)
 
 						if (tcp_msg == KEEP_ALIVE)
 						{
-							TCPSendData(0, "kAL_ACK\r\n");
+							resp = TCPSendData(0, "kAL_ACK\r\n");
+							if (resp == RESP_NOK)
+							{
+								LCD_2DO_RENGLON;
+								LCDTransmitStr((char *) (const char *) "Error on tcp tx ");
+							}
+							if (resp == RESP_OK)
+							{
+								LCD_2DO_RENGLON;
+								LCDTransmitStr((char *) (const char *) "Tcp sended ok   ");
+							}
 						}
 
 						if (tcp_msg == GET_A)	//tira error en apk de android

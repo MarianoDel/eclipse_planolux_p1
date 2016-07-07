@@ -17,6 +17,7 @@
 #define TT_ESP_RESET		6000
 #define TT_ESP_AT_MINI		5		//timeout de esopera de chars luego de una comienzo
 #define TT_AT_1SEG			1000
+#define TT_AT_3SEG			1000
 
 //--- Estados para el HLK -----------------------------------//
 #define COMM_INIT			0
@@ -68,6 +69,14 @@ enum EspConfigState
 	CONF_AT_CONFIG_8B
 };
 
+enum EspSendDataState
+{
+	SEND_DATA_INIT = 0,
+	SEND_DATA_RST,
+	SEND_DATA_ASK_CHANNEL,
+	SEND_DATA_WAIT_SEND_OK
+};
+
 enum EspEnaState
 {
 	ENA_INIT = 0,
@@ -99,6 +108,7 @@ unsigned char ESPVerifyVersion(unsigned char *);
 unsigned char ESP_SendConfig (unsigned char);
 unsigned char ESP_EnableNewConn (unsigned char);
 unsigned char ESP_GoTransparent (unsigned char);
+unsigned char ESP_SendData (unsigned char, unsigned char, unsigned char *);
 
 #endif /* HLK_RM04_H_ */
 

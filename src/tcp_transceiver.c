@@ -11,6 +11,8 @@
 #include "main_menu.h"
 #include "ESP8266.h"
 #include "uart.h"
+#include "lcd.h"
+
 
 
 //--- Externals -----------------------------------//
@@ -25,7 +27,7 @@ extern volatile unsigned short tcp_send_timeout;
 extern unsigned char esp_answer;
 
 //--- Globals -------------------------------------//
-char bufftcpsend [5] [SIZEOF_BUFFTCP];
+char bufftcpsend [5] [SIZEOF_BUFFTCP_SEND];
 char * ptcp;
 unsigned char tcp_tx_state = 0;
 
@@ -65,13 +67,24 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 	return NONE_MSG;
 }
 
+void TCPProcessInit (void)
+{
+	unsigned char i;
+
+	for (i = 0; i < 5; i++)
+	{
+		ptcp = &bufftcpsend[i] [0];
+		*(ptcp+1) = 0;
+	}
+}
+
 //me llaman continuamente para avanzar las maquinas de estado
 //mayormente en transmision
 void TCPProcess (void)
 {
 	//char * ptcp; a global
-	char a [30];
 	unsigned char i;
+	unsigned char resp = RESP_CONTINUE;
 
 	switch (tcp_tx_state)
 	{
@@ -79,7 +92,7 @@ void TCPProcess (void)
 			//reviso si tengo algo que enviar
 			for (i = 0; i < 5; i++)
 			{
-				ptcp = bufftcpsend[i] [0];
+				ptcp = &bufftcpsend[i] [0];
 				if (*(ptcp+1) != 0)
 				{
 					tcp_tx_state++;
@@ -90,76 +103,39 @@ void TCPProcess (void)
 
 		case TCP_TX_READY_TO_SEND:
 			//tengo el puntero al buffer que quiero enviar
-			tcp_send_timeout = TT_TCP_SEND;
-			ESP_SetMode(AT_TRANSMIT);
-			sprintf (a, "AT+CIPSEND=%i,%i", *ptcp, *(ptcp+1));
-			SendCommandWithAnswer(a);		//blanquea esp_answer
+			//pido la transmision al ESP, me contesta RESP_OK, RESP_CONTINUE, RESP_TIMEOUT
+			//veo despues que hago en cada caso
+			ESP_SendData(CMD_RESET, 0, ptcp);
 			tcp_tx_state++;
-			break;
-
-		case TCP_TX_WAIT_THE_SIGN:
-			//me quedo esperando el signo de envio o timeout
-
-			if (esp_answer == RESP_READY)
-			{
-				if (data256[0] == '>')
-				{
-					tcp_tx_state++;
-					tcp_send_timeout++;		//por las dudas
-				}
-				else
-				{
-					tcp_tx_state = TCP_TX_END_TRANSMISSION;
-				}
-			}
-
-			if (!tcp_send_timeout)
-			{
-				//tengo timeout, termino transmision
-				tcp_tx_state = TCP_TX_END_TRANSMISSION;
-			}
 			break;
 
 		case TCP_TX_SENDING:
-			//tengo el puntero al buffer que quiero enviar
-			tcp_send_timeout = TT_TCP_SEND;
-			SendCommandWithAnswer((ptcp + 2));		//blanquea esp_answer
-			tcp_tx_state++;
-			break;
-
-		case TCP_TX_WAIT_SEND_OK:
 			//me quedo esperando el signo de envio o timeout
-			if (esp_answer == RESP_READY)
+			resp = ESP_SendData(CMD_PROC, 0, ptcp);
+
+			if (resp == RESP_OK)
 			{
-				//reviso si tengo SEND OK en el buffer
-				ESPPreParser((unsigned char *)data256);
-				for (i = 0; i < 249; i++)
-				{
-					if ((data256[i] == 'S') &&
-							(data256[i+1] == 'E') &&
-							(data256[i+2] == 'N') &&
-							(data256[i+3] == 'D') &&
-							(data256[i+4] == ' ') &&
-							(data256[i+5] == 'O') &&
-							(data256[i+6] == 'K'))
-					{
-						i = 255;
-					}
-				}
-				tcp_tx_state = TCP_TX_END_TRANSMISSION;
+				//termino de enviar
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((char *) (const char *) "Sended tcp ok   ");
+				tcp_tx_state = TCP_TX_IDLE;
 			}
 
-			if (!tcp_send_timeout)
+			if (resp == RESP_NOK)
 			{
-				//tengo timeout, termino transmision
-				tcp_tx_state = TCP_TX_END_TRANSMISSION;
+				//no encontro el SEND OK
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((char *) (const char *) "Error on tcp tx ");
+				tcp_tx_state = TCP_TX_IDLE;
 			}
-			break;
 
-		case TCP_TX_END_TRANSMISSION:
-			*(ptcp+1) = 0;
-			tcp_tx_state = TCP_TX_IDLE;
-			ESP_SetMode(AT_MODE);
+			if (resp == RESP_TIMEOUT)
+			{
+				//no pudo enviar
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((char *) (const char *) "Timeout tcp tx  ");
+				tcp_tx_state = TCP_TX_IDLE;
+			}
 			break;
 
 		default:
@@ -204,7 +180,7 @@ unsigned char TCPPreProcess(unsigned char * d, unsigned char * output)
 	return port;
 }
 
-//el bufftcp de transmision es port,lenght,data
+//el bufftcpsend de transmision es port,lenght,data
 unsigned char TCPSendData (unsigned char port, char * data)
 {
 	char * p;
@@ -220,12 +196,12 @@ unsigned char TCPSendData (unsigned char port, char * data)
 		//busco buffer tcp vacio
 		for (i = 0; i < 5; i++)
 		{
-			p = bufftcpsend [i] [0];
+			p = &bufftcpsend [i] [0];
 			if (*(p+1) == 0)
 				i = 10;				//buffer vacio, lo uso
 		}
 
-		if ((i == 10) && (length < (SIZEOF_BUFFTCP - 2)))
+		if ((i >= 10) && (length < (SIZEOF_BUFFTCP_SEND - 2)))
 		{
 			*p = port;
 			*(p+1) = length;
