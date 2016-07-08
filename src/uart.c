@@ -89,19 +89,19 @@ void USART1_IRQHandler(void)
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
 #endif
 #ifdef USE_ESP_WIFI
-		mode = ESP_AskMode();
+		mode = ESP_AskMode();	//TODO: despues sacar el modo y tratar de resolver siempre en AT_MODE
 		if ((mode == AT_MODE) || (mode == GOING_AT_MODE))
 		{
 			ESP_ATModeRx(dummy);
 		}
-		else if (mode == TRANSPARENT_MODE)
-		{
-			ESP_TransparentModeRx(dummy);
-		}
-		else if (mode == AT_TRANSMIT)
-		{
-			ESP_ATModeTx(dummy);
-		}
+//		else if (mode == TRANSPARENT_MODE)
+//		{
+//			ESP_TransparentModeRx(dummy);
+//		}
+//		else if (mode == AT_TRANSMIT)
+//		{
+//			ESP_ATModeTx(dummy);
+//		}
 		else
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
 #endif

@@ -165,7 +165,7 @@ unsigned char hlk_transparent_finish = 0;
 unsigned short esp_timeout = 0;
 unsigned char esp_mini_timeout = 0;
 unsigned char esp_answer = 0;
-unsigned char esp_transparent_finish = 0;
+unsigned char esp_unsolicited_pckt = 0;
 volatile unsigned char bufftcp[SIZEOF_BUFFTCP];
 char bufftcp_transp[SIZEOF_BUFFTCP - 5];
 volatile unsigned short tcp_send_timeout;
@@ -469,11 +469,12 @@ int main(void)
     			break;
 
 			case MAIN_WAIT_CONNECT_2:
-				if (esp_transparent_finish == RESP_READY)
+				if (esp_unsolicited_pckt == RESP_READY)
 				{
 					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp) < 5)
 					{
-						//estoy como en modo transparente
+						//estoy como en modo transparente y tengo el buffer guardado
+						esp_unsolicited_pckt = RESP_CONTINUE;
 						tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp);
 
 						if (tcp_msg != NONE_MSG)	//es un mensaje valido
@@ -485,13 +486,13 @@ int main(void)
 							if (resp == RESP_NOK)
 							{
 								LCD_2DO_RENGLON;
-								LCDTransmitStr((char *) (const char *) "Error on tcp tx ");
+								LCDTransmitStr((char *) (const char *) "No free buffer  ");
 							}
-							if (resp == RESP_OK)
-							{
-								LCD_2DO_RENGLON;
-								LCDTransmitStr((char *) (const char *) "Tcp sended ok   ");
-							}
+//							if (resp == RESP_OK)
+//							{
+//								LCD_2DO_RENGLON;
+//								LCDTransmitStr((char *) (const char *) "Tcp sended ok   ");
+//							}
 						}
 
 						if (tcp_msg == GET_A)	//tira error en apk de android
@@ -510,7 +511,8 @@ int main(void)
 						}
 
 					}
-					esp_transparent_finish = RESP_CONTINUE;
+					if (esp_unsolicited_pckt != RESP_CONTINUE)
+						esp_unsolicited_pckt = RESP_CONTINUE;
 				}
 				TCPProcess();
     			break;

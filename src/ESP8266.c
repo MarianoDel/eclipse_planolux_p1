@@ -19,7 +19,7 @@
 extern unsigned short esp_timeout;
 extern unsigned char esp_mini_timeout;
 extern unsigned char esp_answer;
-extern unsigned char esp_transparent_finish;
+extern unsigned char esp_unsolicited_pckt;
 
 extern volatile unsigned char data1[];
 extern volatile unsigned char data[];
@@ -41,10 +41,9 @@ volatile unsigned char at_start = 0;
 volatile unsigned char at_finish = 0;
 volatile unsigned char pckt_start = 0;
 volatile unsigned char pckt_finish = 0;
-volatile unsigned char pckttx_start = 0;
-volatile unsigned char pckttx_finish = 0;
 enum EspConfigState esp_config_state = CONF_INIT;
 
+//OJO OJO OJO no esta terminada y no se si se necesita
 unsigned char ESP_EnableNewConn (unsigned char p)
 {
 	unsigned char resp = RESP_CONTINUE;
@@ -59,11 +58,11 @@ unsigned char ESP_EnableNewConn (unsigned char p)
 	{
 		case ENA_INIT:
 			esp_config_state++;
-			resp = SendCommandWaitAnswer((const char *) "at+reconn=1\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			break;
 
 		case ENA_ASK_AT:
-			resp = SendCommandWaitAnswer((const char *) "at+reconn=1\r\n", CMD_PROC);;
+			resp = SendCommandWaitAnswer((const char *) "at+reconn=1\r\n");
 			break;
 
 		default:
@@ -76,65 +75,6 @@ unsigned char ESP_EnableNewConn (unsigned char p)
 //con CMD_RESET hace reset de la maquina
 //con CMD_PROC busca primero ir a AT Mode y luego va a transparente
 //con CMD_ONLY_CHECK revisa si esta en AT y pasa a transparente o constesta que ya esta en transparente
-unsigned char ESP_GoTransparent (unsigned char p)
-{
-	unsigned char resp = RESP_CONTINUE;
-
-	if (p == CMD_RESET)
-	{
-		esp_config_state = TRANSP_INIT;
-		return resp;
-	}
-
-	if (p == CMD_PROC)
-	{
-		switch (esp_config_state)
-		{
-			case TRANSP_INIT:
-				esp_config_state++;
-				resp = ESPToATMode(CMD_RESET);
-				break;
-
-			case TRANSP_INIT1:
-				resp = ESPToATMode(CMD_PROC);
-
-				if (resp == RESP_OK)
-				{
-					resp = RESP_CONTINUE;
-					esp_config_state = TRANSP_GOTRANSP;
-				}
-				break;
-
-			case TRANSP_GOTRANSP:
-				USARTSend((char *) (const char *) "at+out_trans=0\r\n");
-				resp = RESP_CONTINUE;
-				esp_config_state = TRANSP_GOTRANSP_WAIT;
-				esp_timeout = 500;
-				esp_mode = TRANSPARENT_MODE;
-				break;
-
-			case TRANSP_GOTRANSP_WAIT:
-				if (!esp_timeout)
-					resp = RESP_OK;
-				break;
-
-			default:
-				esp_config_state = TRANSP_INIT;
-				break;
-		}
-	}
-
-	if (p == CMD_ONLY_CHECK)
-	{
-		if (ESP_AskMode() != TRANSPARENT_MODE)
-		{
-			USARTSend((char *) (const char *) "at+out_trans=0\r\n");
-			esp_mode = TRANSPARENT_MODE;
-		}
-		resp = RESP_OK;
-	}
-	return resp;
-}
 
 unsigned char ESP_SendConfig (unsigned char p)
 {
@@ -164,12 +104,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_0:
-			resp = SendCommandWaitAnswer((const char *) "AT+CWMODE_CUR=2\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state = CONF_AT_CONFIG_0B;
 			break;
 
 		case CONF_AT_CONFIG_0B:
-			resp = SendCommandWaitAnswer((const char *) "AT+CWMODE_CUR=2\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWMODE_CUR=2\r\n");
 
 			if (resp == RESP_OK)
 			{
@@ -179,12 +119,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_1:
-			resp = SendCommandWaitAnswer((const char *) "AT+CWSAP_CUR=\"KIRNO_WIFI\",\"12345678\",5,3\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state = CONF_AT_CONFIG_1B;
 			break;
 
 		case CONF_AT_CONFIG_1B:
-			resp = SendCommandWaitAnswer((const char *) "AT+CWSAP_CUR=\"KIRNO_WIFI\",\"12345678\",5,3\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWSAP_CUR=\"KIRNO_WIFI\",\"12345678\",5,3\r\n");
 
 			if (resp == RESP_OK)
 			{
@@ -194,12 +134,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_2:
-			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=0,1\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state = CONF_AT_CONFIG_2B;
 			break;
 
 		case CONF_AT_CONFIG_2B:
-			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=0,1\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=0,1\r\n");
 
 			if (resp == RESP_OK)
 			{
@@ -209,12 +149,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_3:
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPAP_CUR=\"192.168.1.250\"\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state = CONF_AT_CONFIG_3B;
 			break;
 
 		case CONF_AT_CONFIG_3B:
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPAP_CUR=\"192.168.1.254\"\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPAP_CUR=\"192.168.1.254\"\r\n");
 
 			if (resp == RESP_OK)
 			{
@@ -224,12 +164,12 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_4:
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPMUX=1\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state = CONF_AT_CONFIG_4B;
 			break;
 
 		case CONF_AT_CONFIG_4B:
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPMUX=1\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPMUX=1\r\n");
 
 			if (resp == RESP_OK)
 			{
@@ -239,54 +179,15 @@ unsigned char ESP_SendConfig (unsigned char p)
 			break;
 
 		case CONF_AT_CONFIG_5:
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPSERVER=1,10002\r\n", CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state = CONF_AT_CONFIG_5B;
 			break;
 
 		case CONF_AT_CONFIG_5B:
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPSERVER=1,10002\r\n", CMD_PROC);
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPSERVER=1,10002\r\n");
+			//utilizo esta respuesta como salida de la funcion
 
-//			if (resp == RESP_OK)
-//			{
-//				esp_config_state = CONF_AT_CONFIG_6;
-//				resp = RESP_CONTINUE;
-//			}
 			break;
-
-//		case CONF_AT_CONFIG_6:
-//			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_RESET);
-//			esp_config_state = CONF_AT_CONFIG_6B;
-//			break;
-//
-//		case CONF_AT_CONFIG_6B:
-//			resp = SendCommandWaitAnswer((const char *) "at+remotepro=tcp\r\n", CMD_PROC);
-//
-//			if (resp == RESP_OK)
-//			{
-//				esp_config_state = CONF_AT_CONFIG_7;
-//				resp = RESP_CONTINUE;
-//			}
-//			break;
-//
-//		case CONF_AT_CONFIG_7:
-//			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_RESET);
-//			esp_config_state = CONF_AT_CONFIG_7B;
-//			break;
-//
-//		case CONF_AT_CONFIG_7B:
-//			resp = SendCommandWaitAnswer((const char *) "at+remoteport=10002\r\n", CMD_PROC);
-//
-//			if (resp == RESP_OK)
-//			{
-//				esp_config_state = CONF_AT_CONFIG_8;
-//				resp = RESP_CONTINUE;
-//			}
-//			break;
-//
-//		case CONF_AT_CONFIG_8:
-//			USARTSend((char *) (const char *) "at+net_commit=1\r\n");
-//			resp = RESP_OK;
-//			break;
 
 		default:
 			esp_config_state = CONF_INIT;
@@ -296,20 +197,20 @@ unsigned char ESP_SendConfig (unsigned char p)
 	return resp;
 }
 
-//con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
+void ESP_SendDataResetSM (void)
+{
+	esp_config_state = SEND_DATA_INIT;
+}
+
+//resetar primero la maquina de estados con ESP_SendDataResetSM()
 //contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
 //el bufftcpsend de transmision es port,lenght,data
-unsigned char ESP_SendData (unsigned char p, unsigned char port, unsigned char * pbuf)
+unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 {
 	unsigned char resp = RESP_CONTINUE;
 	char a [30];
 	unsigned char i;
-
-	if (p == CMD_RESET)
-	{
-		esp_config_state = SEND_DATA_INIT;
-		return resp;
-	}
+	char dummy = 0;
 
 	switch (esp_config_state)
 	{
@@ -319,16 +220,17 @@ unsigned char ESP_SendData (unsigned char p, unsigned char port, unsigned char *
 			break;
 
 		case SEND_DATA_RST:
-			resp = SendCommandWaitAnswer(a, CMD_RESET);
+			SendCommandWaitAnswerResetSM();
 			esp_config_state++;
 			break;
 
 		case SEND_DATA_ASK_CHANNEL:
 			sprintf (a, "AT+CIPSEND=%i,%i\r\n", *pbuf, *(pbuf+1));
-			resp = SendCommandWaitAnswer(a, CMD_PROC);
+			resp = SendCommandWaitAnswer(a);
 
 			if (resp == RESP_OK)
 			{
+				resp = RESP_CONTINUE;
 				SendCommandWithAnswer((pbuf + 2));		//blanquea esp_answer
 				esp_timeout = TT_AT_3SEG;
 				esp_config_state++;
@@ -341,29 +243,37 @@ unsigned char ESP_SendData (unsigned char p, unsigned char port, unsigned char *
 			{
 				//reviso si tengo SEND OK en el buffer
 				ESPPreParser((unsigned char *)data256);
-				for (i = 0; i < 249; i++)
-				{
-					if (data256[i] != '\0')
-					{
-						if ((data256[i] == 'S') &&
-								(data256[i+1] == 'E') &&
-								(data256[i+2] == 'N') &&
-								(data256[i+3] == 'D') &&
-								(data256[i+4] == ' ') &&
-								(data256[i+5] == 'O') &&
-								(data256[i+6] == 'K'))
-						{
-							i = 250;
-							resp = RESP_OK;
-						}
-					}
-					else
-					{
-						i = 250;
-					}
-				}
-				if (resp != RESP_OK)
+
+				//si me recibe los bytes doy como el paquete enviado
+				if (strncmp((char *) (const char *) "Recv ", (char *)data256, (sizeof ((const char *) "Recv ")) - 1) == 0)
+					resp = RESP_OK;
+				else
 					resp = RESP_NOK;
+
+//				for (i = 0; i < 249; i++)
+//				{
+//					if (data256[i] != '\0')
+//					{
+//						if ((data256[i] == 'S') &&
+//								(data256[i+1] == 'E') &&
+//								(data256[i+2] == 'N') &&
+//								(data256[i+3] == 'D') &&
+//								(data256[i+4] == ' ') &&
+//								(data256[i+5] == 'O') &&
+//								(data256[i+6] == 'K'))
+//
+//						{
+//							i = 250;
+//							resp = RESP_OK;
+//						}
+//					}
+//					else
+//					{
+//						i = 250;
+//					}
+//				}
+//				if (resp != RESP_OK)
+//					resp = RESP_NOK;
 			}
 
 			if (!esp_timeout)
@@ -446,18 +356,16 @@ unsigned char ESPToATMode (unsigned char p)
 	return resp;
 }
 
+void SendCommandWaitAnswerResetSM (void)
+{
+	esp_command_state = COMM_INIT;
+}
 
-unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanquea esp_answer
+unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 {
 	unsigned char i, length = 0;
 	unsigned char resp = RESP_CONTINUE;
 	char s_comm [80];
-
-	if (p == CMD_RESET)
-	{
-		esp_command_state = COMM_INIT;
-		return resp;
-	}
 
 	switch (esp_command_state)
 	{
@@ -515,17 +423,11 @@ unsigned char SendCommandWaitAnswer (const char * comm, unsigned char p)	//blanq
 	return resp;
 }
 
-//Manda un comando al ESP y espera respuesta
-//avisa de la respuesta al callback elegido con *pCall
+//Manda un comando al ESP sin esperar la respuesta
 //blanquea esp_answer
-//
-//void SendCommandWithAnswer(const char * str, void (*pCall) (char * answer))
 void SendCommandWithAnswer(const char * str)
 {
 	esp_answer = RESP_NO_ANSWER;
-
-//	pCallBack = pCall;
-
 	USARTSend((char *) str);
 }
 
@@ -554,16 +456,8 @@ void ESP_ATProcess (void)
 	{
 		pckt_start = 0;
 		pckt_finish = 0;
-		esp_transparent_finish = RESP_READY;	//aviso que tengo una respuesta para revisar
+		esp_unsolicited_pckt = RESP_READY;	//aviso que tengo una respuesta para revisar
 	}
-
-	if ((pckttx_start) && (pckttx_finish) && (!esp_mini_timeout))
-	{
-		pckttx_start = 0;
-		pckttx_finish = 0;
-		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
-	}
-
 }
 
 //TODO: ver que pasa si llega AT y nada mas como salgo por timeout EN ESTA O LA DE ARRIBA
@@ -573,7 +467,7 @@ void ESP_ATModeRx (unsigned char d)
 	//tengo que ver en que parte del AT estoy
 	if ((!at_start) && (!pckt_start))
 	{
-		if ((d == 'A') || (d == 'a'))
+		if ((d == 'A') || (d == 'R') || (d == 'S'))		//AT o Recv o SEND OK
 		{
 			prx = (unsigned char *) data256;
 			*prx = d;
@@ -617,7 +511,7 @@ void ESP_ATModeRx (unsigned char d)
 			//recibi demasiados bytes juntos
 			//salgo por error
 			prx = (unsigned char *) bufftcp;
-			esp_answer = RESP_NOK;
+			esp_unsolicited_pckt = RESP_NOK;
 		}
 	}
 
@@ -625,71 +519,47 @@ void ESP_ATModeRx (unsigned char d)
 	esp_mini_timeout = TT_ESP_AT_MINI;
 }
 
-//me llaman desde usart rx si estoy en modo AT para transmitir
-void ESP_ATModeTx (unsigned char d)
-{
-	//tengo que ver en que parte del AT estoy o si esta listo a enviar
-	if (d == '>')
-	{
-		pckttx_start = 0;
-		pckttx_finish = 0;
-		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
-	}
-	else if (!pckttx_start)
-	{
-		if (d == 'R')				//cantidad de bytes recibidos
-		{
-			prx = (unsigned char *) bufftcp;
-			*prx = d;
-			prx++;
-			pckttx_start = 1;
-		}
-	}
-	else if (pckttx_start)
-	{
-		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
-			pckttx_finish = 1;
+////me llaman desde usart rx si estoy en modo AT para transmitir
+//void ESP_ATModeTx (unsigned char d)
+//{
+//	//tengo que ver en que parte del AT estoy o si esta listo a enviar
+//	if (d == '>')
+//	{
+//		pckttx_start = 0;
+//		pckttx_finish = 0;
+//		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
+//	}
+//	else if (!pckttx_start)
+//	{
+//		if (d == 'R')				//cantidad de bytes recibidos
+//		{
+//			prx = (unsigned char *) bufftcp;
+//			*prx = d;
+//			prx++;
+//			pckttx_start = 1;
+//		}
+//	}
+//	else if (pckttx_start)
+//	{
+//		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
+//			pckttx_finish = 1;
+//
+//		*prx = d;
+//		if (prx < &bufftcp[SIZEOF_BUFFTCP])
+//			prx++;
+//		else
+//		{
+//			//recibi demasiados bytes juntos
+//			//salgo por error
+//			prx = (unsigned char *) bufftcp;
+//			esp_answer = RESP_NOK;
+//		}
+//	}
+//
+//	//mientras reciba bytes hago update del timer
+//	esp_mini_timeout = TT_ESP_AT_MINI;
+//}
 
-		*prx = d;
-		if (prx < &bufftcp[SIZEOF_BUFFTCP])
-			prx++;
-		else
-		{
-			//recibi demasiados bytes juntos
-			//salgo por error
-			prx = (unsigned char *) bufftcp;
-			esp_answer = RESP_NOK;
-		}
-	}
-
-	//mientras reciba bytes hago update del timer
-	esp_mini_timeout = TT_ESP_AT_MINI;
-}
-
-//me llaman desde usart rx si estoy en modo TRANSPARENT
-void ESP_TransparentModeRx (unsigned char d)
-{
-	if (!esp_transparent_finish)	//si llego un byte cuando todavia estoy analizando, lo pierdo
-	{
-		if (d != '\n')
-		{
-			*prx = d;
-			if (prx < &data256[SIZEOF_DATA256])
-				prx++;
-			else
-			{
-				//recibi demasiados bytes juntos sin final de linea
-				prx = (unsigned char *) data256;
-			}
-		}
-		else	//cuando veo final de linea aviso
-		{
-			*prx = '\0';
-			prx = (unsigned char *) data256;
-			esp_transparent_finish = 1;
-		}
-	}
-}
 
 void ESPPreParser(unsigned char * d)
 {

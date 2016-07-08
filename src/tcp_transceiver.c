@@ -105,17 +105,18 @@ void TCPProcess (void)
 			//tengo el puntero al buffer que quiero enviar
 			//pido la transmision al ESP, me contesta RESP_OK, RESP_CONTINUE, RESP_TIMEOUT
 			//veo despues que hago en cada caso
-			ESP_SendData(CMD_RESET, 0, ptcp);
+			ESP_SendDataResetSM();
 			tcp_tx_state++;
 			break;
 
 		case TCP_TX_SENDING:
 			//me quedo esperando el signo de envio o timeout
-			resp = ESP_SendData(CMD_PROC, 0, ptcp);
+			resp = ESP_SendData(0, ptcp);
 
 			if (resp == RESP_OK)
 			{
-				//termino de enviar
+				//termino de enviar limpio buffer
+				*(ptcp+1) = 0;
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((char *) (const char *) "Sended tcp ok   ");
 				tcp_tx_state = TCP_TX_IDLE;
@@ -123,7 +124,9 @@ void TCPProcess (void)
 
 			if (resp == RESP_NOK)
 			{
-				//no encontro el SEND OK
+				//no encontro el SEND OK  limpio buffer
+				//TODO: ver despues si no debo intentar un par de veces mas antes de descartar
+				*(ptcp+1) = 0;
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((char *) (const char *) "Error on tcp tx ");
 				tcp_tx_state = TCP_TX_IDLE;
@@ -131,7 +134,9 @@ void TCPProcess (void)
 
 			if (resp == RESP_TIMEOUT)
 			{
-				//no pudo enviar
+				//no pudo enviar  limpio buffer
+				//TODO: ver despues si no debo intentar un par de veces mas antes de descartar
+				*(ptcp+1) = 0;
 				LCD_2DO_RENGLON;
 				LCDTransmitStr((char *) (const char *) "Timeout tcp tx  ");
 				tcp_tx_state = TCP_TX_IDLE;

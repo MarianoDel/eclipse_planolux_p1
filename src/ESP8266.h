@@ -15,7 +15,8 @@
 //--- Timeouts para el HLK -----------------------------------//
 #define TT_ESP_AT_MODE		300
 #define TT_ESP_RESET		6000
-#define TT_ESP_AT_MINI		5		//timeout de esopera de chars luego de una comienzo
+#define TT_ESP_AT_MINI		10		//timeout de esopera de chars luego de una comienzo
+									//con 5 esta OK para AT pero puerde SEND OK en tx
 #define TT_AT_1SEG			1000
 #define TT_AT_3SEG			1000
 
@@ -99,16 +100,16 @@ void SendCommandWithAnswer(const char *);
 unsigned char ESP_AskMode(void);
 void ESP_SetMode(unsigned char);
 void ESP_ATModeRx (unsigned char);
-unsigned char SendCommandWaitAnswer (const char *, unsigned char);
-void ESP_TransparentModeRx (unsigned char);
+unsigned char SendCommandWaitAnswer (const char *);
+void SendCommandWaitAnswerResetSM (void);
 void ESP_ATProcess (void);
 unsigned char ESPToATMode (unsigned char);
 void ESPPreParser(unsigned char *);
 unsigned char ESPVerifyVersion(unsigned char *);
 unsigned char ESP_SendConfig (unsigned char);
 unsigned char ESP_EnableNewConn (unsigned char);
-unsigned char ESP_GoTransparent (unsigned char);
-unsigned char ESP_SendData (unsigned char, unsigned char, unsigned char *);
+unsigned char ESP_SendData (unsigned char, unsigned char *);
+void ESP_SendDataResetSM (void);
 
 #endif /* HLK_RM04_H_ */
 
