@@ -247,6 +247,8 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 				//si me recibe los bytes doy como el paquete enviado
 				if (strncmp((char *) (const char *) "Recv ", (char *)data256, (sizeof ((const char *) "Recv ")) - 1) == 0)
 					resp = RESP_OK;
+				else if (strncmp((char *) (const char *) "SEND OK", (char *)data256, (sizeof ((const char *) "SEND OK")) - 1) == 0)
+					resp = RESP_OK;
 				else
 					resp = RESP_NOK;
 

@@ -15,7 +15,7 @@
 //--- Timeouts para el HLK -----------------------------------//
 #define TT_ESP_AT_MODE		300
 #define TT_ESP_RESET		6000
-#define TT_ESP_AT_MINI		10		//timeout de esopera de chars luego de una comienzo
+#define TT_ESP_AT_MINI		5		//timeout de esopera de chars luego de una comienzo
 									//con 5 esta OK para AT pero puerde SEND OK en tx
 #define TT_AT_1SEG			1000
 #define TT_AT_3SEG			1000
