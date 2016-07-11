@@ -433,48 +433,23 @@ int main(void)
 					LCDTransmitStr((const char *) "Enable connect  ");
 					LCD_2DO_RENGLON;
 					LCDTransmitStr(s_blank_line);
-//					resp = ESP_EnableNewConn (CMD_RESET);
+
 					main_state = MAIN_WAIT_CONNECT_1;
 				}
 				break;
 
 			case MAIN_WAIT_CONNECT_1:
-//				resp = ESP_EnableNewConn (CMD_PROC);
-//
-//				if (resp == RESP_OK)
-//				{
-//					LCD_1ER_RENGLON;
-//					LCDTransmitStr((const char *) "Waiting new conn");
-//					LCD_2DO_RENGLON;
-//					LCDTransmitStr(s_blank_line);
 					main_state = MAIN_WAIT_CONNECT_2;
-//				}
-//
-//				if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
-//				{
-//					LCD_2DO_RENGLON;
-//					if (resp == RESP_TIMEOUT)
-//					{
-//						LCDTransmitStr((const char *) "ESP: Timeout    ");
-//						main_state = MAIN_WAIT_CONNECT_0;
-//					}
-//					else
-//					{
-//						LCDTransmitStr((const char *) "ESP: Error go AT");
-//						main_state = MAIN_WAIT_CONNECT_3;
-//						resp = ESPToATMode (CMD_RESET);
-//					}
-//					timer_standby = 10000;
-//				}
     			break;
 
 			case MAIN_WAIT_CONNECT_2:
 				if (esp_unsolicited_pckt == RESP_READY)
 				{
+					esp_unsolicited_pckt = RESP_CONTINUE;
+					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
 					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp) < 5)
 					{
 						//estoy como en modo transparente y tengo el buffer guardado
-						esp_unsolicited_pckt = RESP_CONTINUE;
 						tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp);
 
 						if (tcp_msg != NONE_MSG)	//es un mensaje valido
@@ -511,8 +486,6 @@ int main(void)
 						}
 
 					}
-					if (esp_unsolicited_pckt != RESP_CONTINUE)
-						esp_unsolicited_pckt = RESP_CONTINUE;
 				}
 				TCPProcess();
     			break;

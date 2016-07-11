@@ -55,13 +55,13 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 		return LAMP_BRIGHT;
 	}
 
-	if (strncmp((char *) (const char *) "o0,0;\r", (char *)d, sizeof((char *) (const char *) "o0,0;\r")) == 0)
+	if (strncmp((char *) (const char *) "o0,0;", (char *)d, sizeof((char *) (const char *) "o0,0;")) == 0)
 	{
 		*new_room_bright = 0;
 		return LIGHTS_OFF;
 	}
 
-	if (strncmp((char *) (const char *) "o0,1;\r", (char *)d, sizeof((char *) (const char *) "o0,1;\r")) == 0)
+	if (strncmp((char *) (const char *) "o0,1;", (char *)d, sizeof((char *) (const char *) "o0,1;")) == 0)
 		return LIGHTS_ON;
 
 	return NONE_MSG;
@@ -154,6 +154,7 @@ unsigned char TCPPreProcess(unsigned char * d, unsigned char * output)
 	unsigned char port = 0xFF;
 	unsigned char len = 0;
 	unsigned char i;
+
 	//reviso que tipo de mensaje tengo en data
 	//primero reviso estados de conexiones
 //	if ((*d >= '0') && (*d <= '4') && (*(d+1) == ','))
