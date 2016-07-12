@@ -34,35 +34,47 @@ unsigned char tcp_tx_state = 0;
 
 //--- Module Functions ----------------------------//
 
-enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsigned char * new_lamp_bright)
+enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsigned char * new_lamp_bright, unsigned char * bytes)
 {
 	//reviso que tipo de mensaje tengo en data
 	if (strncmp((char *) (const char *) "kAlive;", (char *)d, (sizeof((char *) (const char *) "kAlive;") - 1)) == 0)
+	{
+		*bytes = 7;
 		return KEEP_ALIVE;
+	}
 
 	if (strncmp((char *) (const char *) "geta;", (char *)d, (sizeof((char *) (const char *) "geta;") - 1)) == 0)
+	{
+		*bytes = 5;
 		return GET_A;
+	}
 
 	if ((*d == 'r') && (*(d + 2) == ','))
 	{
+		*bytes = 7;
 		ReadPcktR(d, 1, new_room_bright);
 		return ROOM_BRIGHT;
 	}
 
 	if ((*d == 's') && (*(d + 2) == ','))
 	{
+		*bytes = 7;
 		*new_room_bright = 20;
 		return LAMP_BRIGHT;
 	}
 
 	if (strncmp((char *) (const char *) "o0,0;", (char *)d, sizeof((char *) (const char *) "o0,0;")) == 0)
 	{
+		*bytes = 5;
 		*new_room_bright = 0;
 		return LIGHTS_OFF;
 	}
 
 	if (strncmp((char *) (const char *) "o0,1;", (char *)d, sizeof((char *) (const char *) "o0,1;")) == 0)
+	{
+		*bytes = 5;
 		return LIGHTS_ON;
+	}
 
 	return NONE_MSG;
 }
@@ -149,7 +161,7 @@ void TCPProcess (void)
 	}
 }
 
-unsigned char TCPPreProcess(unsigned char * d, unsigned char * output)
+unsigned char TCPPreProcess(unsigned char * d, unsigned char * output, unsigned char * length)
 {
 	unsigned char port = 0xFF;
 	unsigned char len = 0;
@@ -183,6 +195,7 @@ unsigned char TCPPreProcess(unsigned char * d, unsigned char * output)
 			strcpy((char *) output, (char *) (d+7+len));
 		}
 	}
+	*length = len;
 	return port;
 }
 

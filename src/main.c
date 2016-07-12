@@ -243,7 +243,7 @@ unsigned short vpote [LARGO_FILTRO + 1];
 int main(void)
 {
 	unsigned char i;
-	unsigned short ii;
+	unsigned char bytes_remain, new_bytes, need_ack = 0;
 	unsigned char resp = RESP_CONTINUE;
 	unsigned short local_meas, local_meas_last;
 	unsigned char main_state = 0;
@@ -447,59 +447,64 @@ int main(void)
 				{
 					esp_unsolicited_pckt = RESP_CONTINUE;
 					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
-					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp) < 5)
+					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
 					{
-						//estoy como en modo transparente y tengo el buffer guardado
-						tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp);
-
-						if (tcp_msg != NONE_MSG)	//es un mensaje valido
-							tcp_kalive_timer = TT_KALIVE;
-
-						if (tcp_msg == KEEP_ALIVE)
-						{
-							resp = TCPSendData(0, "kAL_ACK\r\n");
-							if (resp == RESP_NOK)
-							{
-								LCD_2DO_RENGLON;
-								LCDTransmitStr((char *) (const char *) "No free buffer  ");
-							}
-//							if (resp == RESP_OK)
-//							{
-//								LCD_2DO_RENGLON;
-//								LCDTransmitStr((char *) (const char *) "Tcp sended ok   ");
-//							}
-						}
-
-						if (tcp_msg == GET_A)	//tira error en apk de android
-						{
-//						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
-						}
-
-						if (tcp_msg == ROOM_BRIGHT)
-						{
-							TCPSendData(0, "ACK\r\n");
-						}
-
-						if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF))
-						{
-							TCPSendData(0, "ACK\r\n");
-						}
-
+						if (bytes_remain > 0)
+							main_state = MAIN_READING_TCP;
 					}
 				}
 				TCPProcess();
     			break;
 
-//			case MAIN_WAIT_CONNECT_3:
-//				resp = HLKToATMode (CMD_PROC);
-//
-//				if (resp == RESP_OK)
-//				{
-//					LCD_2DO_RENGLON;
-//					LCDTransmitStr((const char *) "HLK: in AT Mode ");
-//					main_state = MAIN_WAIT_CONNECT_0;
-//				}
-//    			break;
+			case MAIN_READING_TCP:
+				//estoy como en modo transparente y tengo el buffer guardado
+				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &new_bytes);
+
+				if (new_bytes < bytes_remain)
+					bytes_remain -= new_bytes;
+				else
+				{
+					bytes_remain = 0;
+					main_state = MAIN_WAIT_CONNECT_2;
+
+					//mando ACK de luces solo al final del ultimo mensaje de paquete
+					if (need_ack)
+					{
+						need_ack = 0;
+						TCPSendData(0, "ACK\r\n");
+					}
+				}
+
+				if (tcp_msg != NONE_MSG)	//es un mensaje valido
+					tcp_kalive_timer = TT_KALIVE;
+				else
+					bytes_remain = 0;
+
+				if (tcp_msg == KEEP_ALIVE)
+				{
+					resp = TCPSendData(0, "kAL_ACK\r\n");
+					if (resp == RESP_NOK)
+					{
+						LCD_2DO_RENGLON;
+						LCDTransmitStr((char *) (const char *) "No free buffer  ");
+					}
+//							if (resp == RESP_OK)
+//							{
+//								LCD_2DO_RENGLON;
+//								LCDTransmitStr((char *) (const char *) "Tcp sended ok   ");
+//							}
+				}
+
+				if (tcp_msg == GET_A)	//tira error en apk de android
+				{
+//						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
+				}
+
+				if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF) || (tcp_msg == ROOM_BRIGHT))
+				{
+					need_ack = 1;
+				}
+    			break;
 //
 //			case MAIN_TRANSPARENT:
 //				if (hlk_transparent_finish)

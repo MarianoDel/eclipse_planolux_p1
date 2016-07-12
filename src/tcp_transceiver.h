@@ -31,8 +31,8 @@ enum TcpMessages
 #define TCP_TX_SENDING				2
 
 //--- Module Functions ----------------------------//
-enum TcpMessages CheckTCPMessage(char *, unsigned char *, unsigned char *);
-unsigned char TCPPreProcess(unsigned char *, unsigned char *);
+enum TcpMessages CheckTCPMessage(char *, unsigned char *, unsigned char *, unsigned char *);
+unsigned char TCPPreProcess(unsigned char *, unsigned char *, unsigned char *);
 void ReadPcktR(unsigned char *, unsigned short, unsigned char *);
 void ReadPcktS(unsigned char *);
 unsigned short GetValue (unsigned char *);
