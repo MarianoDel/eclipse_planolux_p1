@@ -8,6 +8,7 @@
 #include "tcp_transceiver.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "main_menu.h"
 #include "ESP8266.h"
 #include "uart.h"
@@ -39,25 +40,33 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 	//reviso que tipo de mensaje tengo en data
 	if (strncmp((char *) (const char *) "kAlive;", (char *)d, (sizeof((char *) (const char *) "kAlive;") - 1)) == 0)
 	{
+		strcpy ((char *) d, (char *) (d + 7));
 		*bytes = 7;
 		return KEEP_ALIVE;
 	}
 
 	if (strncmp((char *) (const char *) "geta;", (char *)d, (sizeof((char *) (const char *) "geta;") - 1)) == 0)
 	{
+		strcpy ((char *) d, (char *) (d + 5));
 		*bytes = 5;
 		return GET_A;
 	}
 
 	if ((*d == 'r') && (*(d + 2) == ','))
 	{
-		*bytes = 7;
-		ReadPcktR(d, 1, new_room_bright);
-		return ROOM_BRIGHT;
+		if (ReadPcktR(d, 1, new_room_bright, bytes) == RESP_OK)
+		{
+			strcpy ((char *) d, (char *) (d + *bytes));
+			return ROOM_BRIGHT;
+		}
+		else
+			return NONE_MSG;
+
 	}
 
 	if ((*d == 's') && (*(d + 2) == ','))
 	{
+		strcpy ((char *) d, (char *) (d + 7));
 		*bytes = 7;
 		*new_room_bright = 20;
 		return LAMP_BRIGHT;
@@ -65,6 +74,7 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 
 	if (strncmp((char *) (const char *) "o0,0;", (char *)d, sizeof((char *) (const char *) "o0,0;")) == 0)
 	{
+		strcpy ((char *) d, (char *) (d + 5));
 		*bytes = 5;
 		*new_room_bright = 0;
 		return LIGHTS_OFF;
@@ -72,6 +82,7 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 
 	if (strncmp((char *) (const char *) "o0,1;", (char *)d, sizeof((char *) (const char *) "o0,1;")) == 0)
 	{
+		strcpy ((char *) d, (char *) (d + 5));
 		*bytes = 5;
 		return LIGHTS_ON;
 	}
@@ -164,8 +175,11 @@ void TCPProcess (void)
 unsigned char TCPPreProcess(unsigned char * d, unsigned char * output, unsigned char * length)
 {
 	unsigned char port = 0xFF;
-	unsigned char len = 0;
+	unsigned char len_index = 0;
 	unsigned char i;
+	unsigned char max_len = 0;
+	unsigned char * d_offset;
+	unsigned char bytes_cnt = 0;
 
 	//reviso que tipo de mensaje tengo en data
 	//primero reviso estados de conexiones
@@ -190,12 +204,39 @@ unsigned char TCPPreProcess(unsigned char * d, unsigned char * output, unsigned 
 				if (*(d+7+i) == ':')
 					i = 4;
 
-				len++;
+				len_index++;
 			}
-			strcpy((char *) output, (char *) (d+7+len));
+
+			max_len = (unsigned char) atoi ((char *) (d+7));
+
+			if (max_len > 0)
+			{
+				d_offset = (d+7+len_index);
+
+				for (i = 0; i < max_len; i++)	//copio todos los codigos numeros y letras
+				{
+					if (*d_offset != '\0')
+					{
+						if ((*d_offset > 31) && (*d_offset < 127))		//todos los codigos numeros y letras
+						{
+							*output = *d_offset;
+							output++;
+							bytes_cnt++;
+						}
+						d_offset++;
+					}
+					else
+					{
+						*output = '\0';
+						break;
+					}
+				}
+				*length = bytes_cnt;
+			}
+			else
+				port = 0xFF;
 		}
 	}
-	*length = len;
 	return port;
 }
 
@@ -232,15 +273,15 @@ unsigned char TCPSendData (unsigned char port, char * data)
 	return resp;
 }
 
-void ReadPcktR(unsigned char * p, unsigned short own_addr, unsigned char * new_r)
+unsigned char ReadPcktR(unsigned char * p, unsigned short own_addr, unsigned char * new_r, unsigned char * len)
 {
 	unsigned char new_shine;
 
 	if (*(p+2) != ',')
-		return;
+		return RESP_NOK;
 
 	if (GetValue(p + 3) == 0xffff)
-		return;
+		return RESP_NOK;
 
 	new_shine = GetValue(p + 3);
 
@@ -277,6 +318,15 @@ void ReadPcktR(unsigned char * p, unsigned short own_addr, unsigned char * new_r
 		default:
 			break;
 	}
+
+	if (new_shine < 10)
+		*len = 5;
+	else if (new_shine < 100)
+		*len = 6;
+	else
+		*len = 7;
+
+	return RESP_OK;
 }
 
 //en S me llega un parametro particular

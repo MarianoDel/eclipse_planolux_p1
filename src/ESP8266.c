@@ -209,8 +209,6 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 {
 	unsigned char resp = RESP_CONTINUE;
 	char a [30];
-	unsigned char i;
-	char dummy = 0;
 
 	switch (esp_config_state)
 	{
@@ -222,6 +220,7 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 		case SEND_DATA_RST:
 			SendCommandWaitAnswerResetSM();
 			esp_config_state++;
+			esp_timeout = TT_AT_3SEG;
 			break;
 
 		case SEND_DATA_ASK_CHANNEL:
@@ -234,6 +233,12 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 				SendCommandWithAnswer((pbuf + 2));		//blanquea esp_answer
 				esp_timeout = TT_AT_3SEG;
 				esp_config_state++;
+			}
+
+			if (!esp_timeout)
+			{
+				//tengo timeout, termino transmision
+				resp = RESP_TIMEOUT;
 			}
 			break;
 
@@ -251,31 +256,6 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 					resp = RESP_OK;
 				else
 					resp = RESP_NOK;
-
-//				for (i = 0; i < 249; i++)
-//				{
-//					if (data256[i] != '\0')
-//					{
-//						if ((data256[i] == 'S') &&
-//								(data256[i+1] == 'E') &&
-//								(data256[i+2] == 'N') &&
-//								(data256[i+3] == 'D') &&
-//								(data256[i+4] == ' ') &&
-//								(data256[i+5] == 'O') &&
-//								(data256[i+6] == 'K'))
-//
-//						{
-//							i = 250;
-//							resp = RESP_OK;
-//						}
-//					}
-//					else
-//					{
-//						i = 250;
-//					}
-//				}
-//				if (resp != RESP_OK)
-//					resp = RESP_NOK;
 			}
 
 			if (!esp_timeout)

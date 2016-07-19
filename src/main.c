@@ -243,7 +243,7 @@ unsigned short vpote [LARGO_FILTRO + 1];
 int main(void)
 {
 	unsigned char i;
-	unsigned char bytes_remain, new_bytes, need_ack = 0;
+	unsigned char bytes_remain, bytes_read, need_ack = 0;
 	unsigned char resp = RESP_CONTINUE;
 	unsigned short local_meas, local_meas_last;
 	unsigned char main_state = 0;
@@ -453,27 +453,12 @@ int main(void)
 							main_state = MAIN_READING_TCP;
 					}
 				}
-				TCPProcess();
     			break;
 
 			case MAIN_READING_TCP:
 				//estoy como en modo transparente y tengo el buffer guardado
-				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &new_bytes);
-
-				if (new_bytes < bytes_remain)
-					bytes_remain -= new_bytes;
-				else
-				{
-					bytes_remain = 0;
-					main_state = MAIN_WAIT_CONNECT_2;
-
-					//mando ACK de luces solo al final del ultimo mensaje de paquete
-					if (need_ack)
-					{
-						need_ack = 0;
-						TCPSendData(0, "ACK\r\n");
-					}
-				}
+				bytes_read = 0;
+				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
 
 				if (tcp_msg != NONE_MSG)	//es un mensaje valido
 					tcp_kalive_timer = TT_KALIVE;
@@ -488,11 +473,6 @@ int main(void)
 						LCD_2DO_RENGLON;
 						LCDTransmitStr((char *) (const char *) "No free buffer  ");
 					}
-//							if (resp == RESP_OK)
-//							{
-//								LCD_2DO_RENGLON;
-//								LCDTransmitStr((char *) (const char *) "Tcp sended ok   ");
-//							}
 				}
 
 				if (tcp_msg == GET_A)	//tira error en apk de android
@@ -504,45 +484,22 @@ int main(void)
 				{
 					need_ack = 1;
 				}
+
+				if (bytes_read < bytes_remain)
+					bytes_remain -= bytes_read;
+				else
+				{
+					bytes_remain = 0;
+					main_state = MAIN_WAIT_CONNECT_2;
+
+					//mando ACK de luces solo al final del ultimo mensaje de paquete
+					if (need_ack)
+					{
+						need_ack = 0;
+						TCPSendData(0, "ACK\r\n");
+					}
+				}
     			break;
-//
-//			case MAIN_TRANSPARENT:
-//				if (hlk_transparent_finish)
-//				{
-//					//tengo un mensage reviso cual es
-//					tcp_msg = CheckTCPMessage(data, &new_room, &new_lamp);
-//					hlk_transparent_finish = 0;
-//
-//					if (tcp_msg != NONE_MSG)	//es un mensaje valido
-//						tcp_kalive_timer = TT_KALIVE;
-//
-//					if (tcp_msg == KEEP_ALIVE)
-//					{
-//						USARTSend((char *) (const char *) "kAL_ACK\r\n");
-//					}
-//
-//					if (tcp_msg == GET_A)	//tira error en apk de android
-//					{
-////						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
-//					}
-//
-//					if (tcp_msg == ROOM_BRIGHT)
-//					{
-//						USARTSend((char *) (const char *) "ACK\r\n");
-//					}
-//
-//					if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF))
-//					{
-//						USARTSend((char *) (const char *) "ACK\r\n");
-//					}
-//				}
-//
-//				if (!tcp_kalive_timer)
-//				{
-//					LCD_1ER_RENGLON;
-//					LCDTransmitStr((const char *) "Connection drop ");
-//				}
-//    			break;
 
 			case MAIN_ERROR:
 				if (!timer_standby)
@@ -552,11 +509,10 @@ int main(void)
 			default:
 				main_state = MAIN_INIT;
 				break;
-
     	}
-
     	//Procesos continuos
     	ESP_ATProcess ();
+    	TCPProcess();
 #endif
 
 #ifdef USE_HLK_WIFI
