@@ -5,6 +5,7 @@
 *.o
 *.o.d
 *.lst
+.dep/*
 dimmer_model.*
 rdm_responder.*
 transceiver.*
