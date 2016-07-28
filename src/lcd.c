@@ -46,7 +46,6 @@ void   LCDPrintNext(void); /* Function that print the next character and     */
                         /*      decrement the counter "howmany"              */
 
 /*+++++++++++++++++++++++++++++++ LCD Driver ++++++++++++++++++++++++++++++++*/
-#ifdef lcdExists
 
 //TRANSMITIR PRIMERO LOS MSB Y LUEGO LOS LSB EN 4BITS
 //float frecuencia = 0.0;
@@ -101,7 +100,7 @@ void LCDInit(void)
       
   //lcdPortDD |= 0x0F;   //PTB0 - 3 salidas
 
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x00000003;
   Lcd_WritePort (0x03);
   LCDSend();
@@ -119,7 +118,7 @@ void LCDInit(void)
   Wait_ms(20);
 
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x02;    //4 bits
   Lcd_WritePort (0x02);
   LCDSend();
@@ -130,7 +129,7 @@ void LCDInit(void)
   LCDSend();
   Lcd_Delay(60);
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x08;
   Lcd_WritePort (0x08);
   LCDSend();
@@ -138,13 +137,13 @@ void LCDInit(void)
 
 
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x00;    //Display OFF Cursor OFF Parpadeo OFF
   Lcd_WritePort (0x00);
   LCDSend();
   Lcd_Delay(60);
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x08;
   Lcd_WritePort (0x08);
   LCDSend();
@@ -152,13 +151,13 @@ void LCDInit(void)
 
 
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x00;    //Reseteo Cursor y DDRAM
   Lcd_WritePort (0x00);
   LCDSend();
   Lcd_Delay(60);
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x01;
   Lcd_WritePort (0x01);
   LCDSend();
@@ -167,13 +166,13 @@ void LCDInit(void)
 
 
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x00;    //Movimiento del cursor y desplazamiento
   Lcd_WritePort (0x00);
   LCDSend();
   Lcd_Delay(60);
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= 0x06;
   Lcd_WritePort (0x06);
   LCDSend();
@@ -233,7 +232,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x01;
       Lcd_WritePort (0x01);
       LCDSend();    
@@ -246,7 +245,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x02;
       Lcd_WritePort (0x02);
       LCDSend();    
@@ -259,7 +258,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x0c;
       Lcd_WritePort (0x0c);
       LCDSend();
@@ -272,7 +271,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x08;
       Lcd_WritePort (0x08);
       LCDSend();
@@ -285,7 +284,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x0e;
       Lcd_WritePort (0x0e);
       LCDSend();
@@ -298,7 +297,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x0c;                     //siempre con display on
       Lcd_WritePort (0x0c);
       LCDSend();
@@ -311,7 +310,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x0f;                     //siempre con display on cursor on
       Lcd_WritePort (0x0f);
       LCDSend();
@@ -324,7 +323,7 @@ void Lcd_Command (unsigned char cmd)
       LCDSend();
       Lcd_Delay(30);
       //lcdPort &= PMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= 0x0c;                     //siempre con display on cursor on
       Lcd_WritePort (0x0c);
       LCDSend();
@@ -405,7 +404,7 @@ void Lcd_SetDDRAM (unsigned char addr)   //datos validos 100ns despues de que E 
   b = addr;
   b >>= 4;
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= b;
   Lcd_WritePort (b);
   LCDSend();
@@ -413,7 +412,7 @@ void Lcd_SetDDRAM (unsigned char addr)   //datos validos 100ns despues de que E 
   b = addr;
   b &= 0x0F;
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= b;
   Lcd_WritePort (b);
   LCDSend();
@@ -451,7 +450,7 @@ void LCDStartTransmit(UINT8 cData)
   b = cData;
   b >>= 4;
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= b;
   Lcd_WritePort (b);
   LCDSend();
@@ -459,7 +458,7 @@ void LCDStartTransmit(UINT8 cData)
   b = cData;
   b &= 0x0F;  
   //lcdPort &= PMASK;
-  LCDClearData;
+  //LCDClearData;
   //lcdPort |= b;
   Lcd_WritePort (b);
   LCDSend();
@@ -497,14 +496,14 @@ void LCDTransmitStr(const char * pStr)
 	  LCD_RS_OFF;
     #ifdef lcd4bit
       //lcdPort &= PORTMASK;
-	  LCDClearData;
+	  //LCDClearData;
       //lcdPort |= OUTNUMBER(0x00);
-	  Lcd_WritePort (OUTNUMBER(0x00));
+	  Lcd_WritePort (0x00);
       LCDSend();
       //lcdPort &= PORTMASK;
-      LCDClearData;
+      //LCDClearData;
       //lcdPort |= OUTNUMBER(0x01);
-      Lcd_WritePort (OUTNUMBER(0x01));
+      Lcd_WritePort (0x01);
       LCDSend();
     #else
       //lcdPort |= 0x01;
@@ -532,14 +531,14 @@ void LCDTransmitStr(const char * pStr)
     	LCD_RS_ON;
       #ifdef lcd4bit
         //lcdPort &= PORTMASK;
-    	LCDClearData;
+    	//LCDClearData;
         //lcdPort |= OUTNUMBER(((*nextchr)>>0x04));
-    	Lcd_WritePort (OUTNUMBER(((*nextchr)>>0x04)));
+    	Lcd_WritePort (((*nextchr)>>0x04));
         LCDSend();
         //lcdPort &= PORTMASK;
-        LCDClearData;
+        //LCDClearData;
         //lcdPort |= OUTNUMBER(((*nextchr) & 0x0F));
-        Lcd_WritePort (OUTNUMBER(((*nextchr) & 0x0F)));
+        Lcd_WritePort (((*nextchr) & 0x0F));
         LCDSend();          
       #else
         //lcdPort |= (*nextchr);
@@ -603,14 +602,14 @@ void LCDTransmitStr(const char * pStr)
       ddramAddress |= 0x80;
       #ifdef lcd4bit        
         //lcdPort &= PORTMASK;
-      	LCDClearData;
+      	//LCDClearData;
         //lcdPort |= OUTNUMBER(ddramAddress>>4);
-      	Lcd_WritePort (OUTNUMBER(ddramAddress>>4));
+      	Lcd_WritePort (ddramAddress>>4);
         LCDSend();
         //lcdPort &= PORTMASK;
-        LCDClearData;
+        //LCDClearData;
         //lcdPort |= OUTNUMBER(ddramAddress & 0x0F);
-        Lcd_WritePort (OUTNUMBER(ddramAddress & 0x0F));
+        Lcd_WritePort (ddramAddress & 0x0F);
         LCDSend();
       #else
         //lcdPort |= ddramAddress;
@@ -644,33 +643,13 @@ void Lcd_Delay (unsigned short i)        //con 30 67us; con 10 29us
 
 void Lcd_WritePort (unsigned char data_w)
 {
-/*
-	if (data & 0x01)
-		lcdPort2->BSRR = 0x08;
-	else
-		lcdPort2->BRR = 0x08;
-
-	if (data & 0x02)
-		lcdPort2->BSRR = 0x04;
-	else
-		lcdPort2->BRR = 0x04;
-
-	if (data & 0x04)
-		lcdPort2->BSRR = 0x02;
-	else
-		lcdPort2->BRR = 0x02;
-
-	if (data & 0x08)
-		lcdPort2->BSRR = 0x01;
-	else
-		lcdPort2->BRR = 0x01;
-*/
 #ifdef PORT_INVERTED
-	lcdPort2->BRR = 0x0f;
-	lcdPort2->BSRR |= SwapNibble(data_w);
+	lcdPort2->BRR = PMASK;
+	lcdPort2->BSRR |= (SwapNibble(data_w) << lcdDataPinOffset);
 #else
-	lcdPort2->BRR = 0x0f;
-	lcdPort2->BSRR |= data_w;
+	//lcdPort2->BRR = PMASK;
+	LCDClearData;
+	lcdPort2->BSRR |= (data_w << lcdDataPinOffset);
 #endif
 }
 
@@ -1113,6 +1092,5 @@ void LCDTransmitSM(void)
 }
 #endif	//WITH_STATE_MACHINE
 
-#endif	//LcdExist
 
 /*++++++++++++++++++++++++++++++ END LCD Driver +++++++++++++++++++++++++++++*/

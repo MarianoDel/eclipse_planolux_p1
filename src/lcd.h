@@ -3,50 +3,59 @@
 #include "stm32f0x_tim.h"	//para Wait_ms
 
 //--- LCD Configurations ---//
-
+#ifdef VER_1_3
 #define PINS_DEFINED_IN_HARD
-#define WITH_STATE_MACHINE		//rutinas SM hay que ir llamando a un callback
+//#define WITH_STATE_MACHINE		//rutinas SM hay que ir llamando a un callback
 									//y se envia desde un buffer con interrupcion
-#define PORT_INVERTED				//bit bajo con alto PA0->LCD_D7
+
+
+//#define PORT_INVERTED				//bit bajo con alto PA0->LCD_D7
+#define PORT_DIRECT					//bit bajo con pin bajo PA8->LCD_D4
 
 
 typedef unsigned char UINT8;
 
-#define PMASK       0xFFF0
+#define PMASK       0x0F00
 
-#define LCDClearData GPIOA->BSRR = 0x000F0000	//reset PA3..PA0
+//#define LCDClearData GPIOA->BSRR = 0x000F0000	//reset PA3..PA0
+//#define LCDClearData GPIOA->BSRR = 0x0F000000	//reset PA8..PA11
+#define LCDClearData	GPIOA->BRR = PMASK;
 
 /***  Declarations of ports of a specified MCU  ***/
 /* Choose the output control pins accord your MCU */
-#define lcdExists      1           /* If LCD does not exist, do not declare  */
-                                   /*        this #define                    */
-#ifdef lcdExists
-	#define lcd4bit		1		/* 4 bit interface; comment this line if  */
-								/*        is 8 bit interface              */
-	#define lcdPort2	GPIOA	/* Port of 4 data bits to lcd connection  */
-  
-	#ifdef lcd4bit
-    	#define  lcdDataPins  0    /* Number of pin of the port where begin  */
-                                   /*        the data pins (4 pins). These   */
-                                   /*        pins must be consecutive. Only  */
-                                   /*        in case of 4 bit interface      */
-	#endif
+#define lcd4bit		1		/* 4 bit interface; comment this line if  */
+							/*        is 8 bit interface              */
+#define lcdPort2	GPIOA	/* Port of 4 data bits to lcd connection  */
+#define lcdDataPinOffset	8	//offset al primer pin de los datos
+								//PA0 = 0; PA4 = 4; PA8 = 8
 
-//  #define lcd4bit      1           /* 4 bit interface; comment this line if  */
-                                   /*        is 8 bit interface              */
-//  #define lcdE        PTD_PTD6     /* Enabled pin of LCD                     */
-//  #define lcdEDD      DDRD_DDRD6   /* Data Direction of Enabled Pin          */
-//  #define lcdRS       PTD_PTD7     /* RS pin of LCD (Data/Instruction Select)*/
-//  #define lcdRSDD     DDRD_DDRD7   /* Data Direction of RS Pin               */
-//  #define lcdPort     PTA          /* Port of 4 data bits to lcd connection  */
-//  #define lcdPortDD   DDRA         /* Data direction for 4 data pins         */
-//  #ifdef lcd4bit
-//    #define  lcdDataPins  0        /* Number of pin of the port where begin  */
-                                   /*        the data pins (4 pins). These   */
-                                   /*        pins must be consecutive. Only  */
-                                   /*        in case of 4 bit interface      */
-//  #endif
-  
+#endif
+
+#ifdef VER_1_2
+#define PINS_DEFINED_IN_HARD
+//#define WITH_STATE_MACHINE		//rutinas SM hay que ir llamando a un callback
+									//y se envia desde un buffer con interrupcion
+
+
+#define PORT_INVERTED				//bit bajo con alto PA0->LCD_D7
+//#define PORT_DIRECT					//bit bajo con pin bajo PA8->LCD_D4
+
+
+typedef unsigned char UINT8;
+
+#define PMASK       0x000F
+
+#define LCDClearData GPIOA->BSRR = 0x000F0000	//reset PA3..PA0
+//#define LCDClearData GPIOA->BSRR = 0x0F000000	//reset PA8..PA11
+
+/***  Declarations of ports of a specified MCU  ***/
+/* Choose the output control pins accord your MCU */
+#define lcd4bit		1		/* 4 bit interface; comment this line if  */
+							/*        is 8 bit interface              */
+#define lcdPort2	GPIOA	/* Port of 4 data bits to lcd connection  */
+#define lcdDataPinOffset	0	//offset al primer pin de los datos
+								//PA0 = 0; PA4 = 4; PA8 = 8
+
 #endif
 
 #define CLEAR         0
