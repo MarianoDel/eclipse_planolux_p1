@@ -253,16 +253,6 @@ int main(void)
 	unsigned char new_lamp = 0;
 	unsigned char last_bright = 0;
 
-
-#ifdef WITH_GRANDMASTER
-	unsigned short acc = 0;
-	unsigned char dummy = 0;
-#endif
-#ifdef RGB_FOR_CAT
-	unsigned char show_channels_state = 0;
-	unsigned char fixed_data[2];		//la eleccion del usaario en los canales de 0 a 100
-	unsigned char need_to_save = 0;
-#endif
 	parameters_typedef * p_mem_init;
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -292,6 +282,8 @@ int main(void)
 			}
 		}
 	}
+
+
 
 	//Pin OFF HLK
 
