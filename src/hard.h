@@ -10,8 +10,9 @@
 
 
 //-------- Defines For Configuration -------------
-#define VER_1_0
+//#define VER_1_0
 //#define VER_1_2
+#define VER_1_3
 
 //-------- WiFi Configuration -------------
 //#define USE_HLK_WIFI
@@ -165,6 +166,104 @@
 #define LED ((GPIOB->ODR & 0x0080) != 0)
 #define LED_ON	GPIOB->BSRR = 0x00000080
 #define LED_OFF GPIOB->BSRR = 0x00800000
+
+#define CH_IN_TEMP ADC_Channel_0
+
+#endif	//
+
+#ifdef VER_1_3
+//GPIOC pin13
+#define SW_AC ((GPIOC->IDR & 0x2000) == 0)	//activo por 0
+
+//GPIOA pin0	analog input	I_Sense
+//GPIOA pin1	analog input	V_Sense
+
+//GPIOA pin2
+//GPIOA pin3	USART2
+
+//GPIOA pin4
+#define RELAY ((GPIOA->ODR & 0x0010) != 0)
+#define RELAY_ON	GPIOA->BSRR = 0x00000010
+#define RELAY_OFF GPIOA->BSRR = 0x00100000
+
+//GPIOA pin5	analog input LDR
+
+//GPIOA pin6	TIM3_CH1 para PWM_CH1
+
+//GPIOA pin7
+#define LED ((GPIOA->ODR & 0x0080) != 0)
+#define LED_ON	GPIOA->BSRR = 0x00000080
+#define LED_OFF GPIOA->BSRR = 0x00800000
+
+//GPIOB pin0
+#define WRST ((GPIOB->ODR & 0x0001) != 0)
+#define WRST_ON	GPIOB->BSRR = 0x00000001
+#define WRST_OFF GPIOB->BSRR = 0x00010000
+
+//GPIOB pin1
+
+//GPIOB pin2	input
+#define MOV_SENSE ((GPIOB->IDR & 0x0004) == 0)
+
+//GPIOB pin10	input
+#define S2_PIN ((GPIOB->IDR & 0x0400) == 0)
+
+//GPIOB pin11	input
+#define S1_PIN ((GPIOB->IDR & 0x0800) == 0)
+
+//GPIOB pin12
+#define CTRL_BKL ((GPIOB->ODR & 0x1000) != 0)
+#define CTRL_BKL_ON	GPIOB->BSRR = 0x00001000
+#define CTRL_BKL_OFF GPIOB->BSRR = 0x10000000
+
+//GPIOB pin13
+#define DMX_TX_PIN ((GPIOB->ODR & 0x2000) == 0)
+#define DMX_TX_PIN_OFF	GPIOB->BSRR = 0x00002000
+#define DMX_TX_PIN_ON GPIOB->BSRR = 0x20000000
+
+//GPIOB pin14
+#define LCD_RS ((GPIOB->ODR & 0x4000) != 0)
+#define LCD_RS_ON	GPIOB->BSRR = 0x00004000
+#define LCD_RS_OFF GPIOB->BSRR = 0x40000000
+
+//GPIOB pin15
+#define LCD_E ((GPIOB->ODR & 0x8000) != 0)
+#define LCD_E_ON	GPIOB->BSRR = 0x00008000
+#define LCD_E_OFF GPIOB->BSRR = 0x80000000
+
+//GPIOA pin8
+//GPIOA pin9
+//GPIOA pin10
+//GPIOA pin11	interface LCD
+
+//GPIOA pin12
+//GPIOA pin13
+
+//GPIOF pin6
+//GPIOF pin7
+
+//GPIOA pin14
+//GPIOA pin15
+
+//GPIOB pin3
+
+//GPIOB pin4
+#define SW ((GPIOB->ODR & 0x0010) != 0)
+#define SW_TX	GPIOB->BSRR = 0x00000010
+#define SW_RX GPIOB->BSRR = 0x00100000
+
+//GPIOB pin5
+
+//GPIOB pin6
+//GPIOB pin7	USART1
+
+//GPIOB pin8
+#define EXTI_Input ((GPIOB->IDR & 0x0100) != 0)
+#define DMX_INPUT EXTI_Input
+
+
+
+//GPIOB pin7
 
 #define CH_IN_TEMP ADC_Channel_0
 
