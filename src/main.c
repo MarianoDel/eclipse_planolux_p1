@@ -252,6 +252,7 @@ int main(void)
 	unsigned char new_room = 0;
 	unsigned char new_lamp = 0;
 	unsigned char last_bright = 0;
+	unsigned char show_ldr = 0;
 
 	parameters_typedef * p_mem_init;
 	//!< At this stage the microcontroller clock setting is already configured,
@@ -363,7 +364,9 @@ int main(void)
 	//DMX_channel_selected = 1;
 	//DMX_channel_quantity = 4;
 	USART1Config();
+#ifdef VER_1_3
 	USART2Config();
+#endif
 	EXTIOff();
 
 #ifdef VER_1_2
@@ -426,6 +429,54 @@ int main(void)
 //	}
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
+    //---------- Prueba Enviar DMX Pckts --------//
+	EXTIOn ();
+	DMX_channel_quantity = 1;
+	DMX_channel_selected = 1;
+	DMX_Ena();
+	i = 0;
+
+	while (1)
+	{
+		if (!timer_standby)
+		{
+			timer_standby = 100;
+			data1[1] = i;
+			data1[2] = i;
+			data1[3] = i;
+			data1[4] = i;
+			data1[5] = i;
+			data1[6] = i;
+			if (i < 255)
+				i++;
+			else
+				i = 0;
+
+			SendDMXPacket (PCKT_INIT);
+			show_ldr++;
+		}
+
+		if (DMX_packet_flag)
+		{
+			//llego un paquete DMX
+			DMX_packet_flag = 0;
+
+			//en data tengo la info
+			Update_TIM3_CH1 (data[1]);
+		}
+
+		if (show_ldr > 3)
+		{
+			show_ldr = 0;
+			LCD_1ER_RENGLON;
+			LCDTransmitStr(s_blank_line);
+			sprintf (s_lcd, "LDR: %04i", GetLDR());
+			LCD_1ER_RENGLON;
+			LCDTransmitStr(s_lcd);
+		}
+		UpdatePackets();
+	}
+	//---------- Fin Prueba Recibir DMX Pckts --------//
 
 
 
@@ -566,6 +617,21 @@ int main(void)
     	//Procesos continuos
     	ESP_ATProcess ();
     	TCPProcess();
+
+    	if (!timer_wifi_bright)
+    	{
+    		timer_wifi_bright = 5;	//muevo un punto cada 5ms
+    		if (new_room > last_bright)		//TODO: en vez de new_room deberia utilizar un filtro de los ultimos valores recibidos
+    		{
+    			last_bright++;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+    		else if (new_room < last_bright)
+    		{
+    			last_bright--;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+    	}
 #endif
 
 #ifdef USE_HLK_WIFI
@@ -723,7 +789,6 @@ int main(void)
 
     	//Procesos continuos
     	HLK_ATProcess ();
-#endif
 
     	if (!timer_wifi_bright)
     	{
@@ -739,6 +804,8 @@ int main(void)
     			Update_TIM3_CH1 (last_bright);
     		}
     	}
+#endif
+
     }
     //---------- Fin Prueba AT HLK_RM04 --------//
 

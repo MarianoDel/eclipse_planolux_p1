@@ -51,8 +51,8 @@ extern volatile unsigned char data1[];
 extern volatile unsigned char data[];
 
 
-#define data512		data1
-#define data256		data
+#define data512		data1		//en rx es la trama recibida; en tx es la trama a enviar
+#define data256		data		//en rx son los valores del channel elegido
 volatile unsigned char * pdmx;
 
 extern volatile unsigned char tx2buff[];

@@ -6,6 +6,7 @@
  */
 #include "adc.h"
 #include "stm32f0xx.h"
+#include "hard.h"
 
 #include "stm32f0xx_adc.h"
 //la incluyo por constates como ADC_SampleTime_239_5Cycles
@@ -63,11 +64,17 @@ void AdcConfig (void)
 													//las dos int (usar DMA?) y pierde el valor intermedio
 	//ADC1->SMPR |= ADC_SampleTime_1_5Cycles;			//20.7 de salida son SP 420 (regula mal)
 
+#ifdef VER_1_2
 	//set channel selection
 	ADC1->CHSELR |= ADC_Channel_0 | ADC_Channel_1 | ADC_Channel_2 | ADC_Channel_3 | ADC_Channel_4;
 	//ADC1->CHSELR |= ADC_Channel_0 | ADC_Channel_1 | ADC_Channel_2;
 	//ADC1->CHSELR |= ADC_Channel_0 | ADC_Channel_1;
 	//ADC1->CHSELR |= ADC_Channel_2;	//individuales andan todos
+#endif
+#ifdef VER_1_3
+	//set channel selection
+	ADC1->CHSELR |= ADC_Channel_0 | ADC_Channel_1 | ADC_Channel_5;
+#endif
 
 	//habilito sensado de temperatura
 	ADC->CCR |= ADC_CCR_TSEN;
@@ -259,6 +266,11 @@ unsigned short ReadADC1Check (unsigned char channel)
 	ADC1->CHSELR = 0x00000001;	//solo convierto CH0
 
 	return 1;
+}
+
+unsigned short GetLDR (void)
+{
+	return ReadADC1_SameSampleTime(ADC_Channel_5);
 }
 
 void UpdateTemp(void)

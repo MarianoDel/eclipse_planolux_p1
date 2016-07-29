@@ -107,8 +107,8 @@ void GPIO_Config (void)
 	GPIOB->OTYPER = temp;
 
 	temp = GPIOB->OSPEEDR;	//2 bits por pin
-	temp &= 0x00FFFCFC;
-	temp |= 0x00000000;		//PB0 PB4 PB12-PB15 low speed
+	temp &= 0x00FFFCFC;		//PB13 high speed
+	temp |= 0x0C000000;		//PB0 PB4 PB12-PB15 low speed
 	GPIOB->OSPEEDR = temp;
 
 	temp = GPIOB->PUPDR;	//2 bits por pin

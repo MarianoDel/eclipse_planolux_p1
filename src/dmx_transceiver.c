@@ -61,6 +61,9 @@ void UpdateRDMResponder(void)
 	}
 }
 
+//funcion para enviar el buffer data1[512] al DMX
+//recibe PCKT_INIT por el usuario
+//recibe PCKT_UPDATE desde su propia maquina de estados
 void SendDMXPacket (unsigned char new_func)
 {
 	if ((new_func == PCKT_INIT) &&
