@@ -24,6 +24,10 @@
 #define USART1_CLK_ON RCC->APB2ENR |= 0x00004000
 #define USART1_CLK_OFF RCC->APB2ENR &= ~0x00004000
 
+#define USART2_CLK (RCC->APB1ENR & 0x00020000)
+#define USART2_CLK_ON RCC->APB1ENR |= 0x00020000
+#define USART2_CLK_OFF RCC->APB1ENR &= ~0x00020000
+
 #define USART_9600		5000
 #define USART_115200		416
 #define USART_250000		192
@@ -46,6 +50,9 @@ void UsartSendDMX (void);
 void USARTSend(char *);
 void USARTSendUnsigned(unsigned char *, unsigned char);
 
+void USART2Config(void);
+void USART2_IRQHandler(void);
+void Usart2Send (char *);
 
 #endif //--- End ---//
 

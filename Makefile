@@ -32,11 +32,14 @@ MCU  = cortex-m0
 DADEFS =
  
 # List all default directories to look for include files here
-DINCDIR = 	.\src \
-			..\GSM_Engine\library\include
- 
+#DINCDIR = 	.\src \
+#			..\GSM_Engine\library\include
+
+DINCDIR = 	.\src
+
 # List the default directory to look for the libraries here
-DLIBDIR = ..\GSM_Engine\library
+#DLIBDIR = ..\GSM_Engine\library
+DLIBDIR = 
  
 # List all default libraries here
 DLIBS =
@@ -130,11 +133,11 @@ SRC += .\src\rdm_util.c
 SRC += $(CORELIBDIR)\core_cm0.c
 ## used parts of the STM-Library
 ## used part of GSM_Library
-SRC += $(DLIBDIR)\src\at_parser.c
-SRC += $(DLIBDIR)\src\at_timer.c
-SRC += $(DLIBDIR)\src\gsm_adapter.c
-SRC += $(DLIBDIR)\src\gsm_engine.c
-SRC += $(DLIBDIR)\src\gsm_hal.c
+#SRC += $(DLIBDIR)\src\at_parser.c
+#SRC += $(DLIBDIR)\src\at_timer.c
+#SRC += $(DLIBDIR)\src\gsm_adapter.c
+#SRC += $(DLIBDIR)\src\gsm_engine.c
+#SRC += $(DLIBDIR)\src\gsm_hal.c
 ## Other Peripherals
 SRC += .\src\ESP8266.c
 #SRC += .\src\HLK_RM04.c

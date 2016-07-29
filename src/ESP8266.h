@@ -1,5 +1,5 @@
 /*
- * HLK_RM04.h
+ * ESP8266.h
  *
  *  Created on: 26/04/2016
  *      Author: Mariano
@@ -12,7 +12,10 @@
 
 #define ESP8266_PRESENT
 
-//--- Timeouts para el HLK -----------------------------------//
+//--- Configuracion puerto serie -----------------------------//
+#define SerialSend(X)		Usart2Send(X)
+
+//--- Timeouts para el ESP -----------------------------------//
 #define TT_ESP_AT_MODE		300
 #define TT_ESP_RESET		6000
 #define TT_ESP_AT_MINI		5		//timeout de esopera de chars luego de una comienzo
@@ -20,7 +23,7 @@
 #define TT_AT_1SEG			1000
 #define TT_AT_3SEG			1000
 
-//--- Estados para el HLK -----------------------------------//
+//--- Estados para el ESP -----------------------------------//
 #define COMM_INIT			0
 #define COMM_TO_AT			1
 #define COMM_AT_ANSWER		2
@@ -31,10 +34,6 @@
 #define CMD_RESET	0
 #define CMD_PROC	1
 #define CMD_ONLY_CHECK	2
-
-#define WRST_ON		SW_RX
-#define WRST_OFF	SW_TX
-
 
 //--- Modos del ESP -----------------------------------------//
 #define UNKNOW_MODE				0

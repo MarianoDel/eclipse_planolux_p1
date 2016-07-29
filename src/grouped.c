@@ -344,8 +344,8 @@ unsigned char FuncGrouped (void)
 				Packet_Detected_Flag = 0;
 
 				//en data tengo la info
-				Update_TIM3_CH1 (data[0]);
-				grouped_ii = data[0];
+				Update_TIM3_CH1 (data[1]);
+				grouped_ii = data[1];
 			}
 
 

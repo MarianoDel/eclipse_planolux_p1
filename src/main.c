@@ -46,7 +46,6 @@
 #ifdef USE_ESP_WIFI
 #include "ESP8266.h"
 #endif
-#include "gsm_engine.h"
 #include "tcp_transceiver.h"
 
 //--- VARIABLES EXTERNAS ---//
@@ -55,9 +54,12 @@ volatile unsigned char timer_1seg = 0;
 volatile unsigned short timer_led_comm = 0;
 volatile unsigned short timer_for_cat_switch = 0;
 volatile unsigned short timer_for_cat_display = 0;
-volatile unsigned char buffrx_ready = 0;
-volatile unsigned char *pbuffrx;
+
 volatile unsigned short wait_ms_var = 0;
+
+// ------- Externals del Puerto serie  -------
+volatile unsigned char tx2buff[SIZEOF_DATA];
+volatile unsigned char rx2buff[SIZEOF_DATA];
 
 //volatile unsigned char TxBuffer_SPI [TXBUFFERSIZE];
 //volatile unsigned char RxBuffer_SPI [RXBUFFERSIZE];
@@ -214,15 +216,13 @@ unsigned char vd4 [LARGO_F + 1];
 void TimingDelay_Decrement(void);
 void Update_PWM (unsigned short);
 void UpdatePackets (void);
+
 // ------- del display -------
 
-// ------- del GSM Engine -------
-void dbg_cb( char *response );
 
 // ------- del DMX -------
 extern void EXTI4_15_IRQHandler(void);
 #define DMX_TIMEOUT	20
-unsigned char MAFilter (unsigned char, unsigned char *);
 
 //--- FILTROS DE SENSORES ---//
 #define LARGO_FILTRO 16
@@ -242,7 +242,7 @@ unsigned short vpote [LARGO_FILTRO + 1];
 //------------------------------------------//
 int main(void)
 {
-	unsigned char i;
+	unsigned char i,ii;
 	unsigned char bytes_remain, bytes_read, need_ack = 0;
 	unsigned char resp = RESP_CONTINUE;
 	unsigned short local_meas, local_meas_last;
@@ -292,6 +292,8 @@ int main(void)
 #endif
 #ifdef USE_ESP_WIFI
 	WRST_OFF;
+	Wait_ms(2);
+	WRST_ON;
 #endif
 
 	Wait_ms(6000);	//espero ue bootee la placa wifi
@@ -319,8 +321,41 @@ int main(void)
 	Wait_ms(100);
 	CTRL_BKL_ON;
 
-	while (FuncShowBlink ((const char *) "Kirno Technology", (const char *) " WiFi Test V1.0 ", 2, BLINK_NO) != RESP_FINISH);
+	//while (FuncShowBlink ((const char *) "Kirno Technology", (const char *) " WiFi Test V1.0 ", 2, BLINK_NO) != RESP_FINISH);
+	while (FuncShowBlink ((const char *) "  PLANOLUX LLC  ", (const char *) "  Smart Driver  ", 2, BLINK_NO) != RESP_FINISH);
 	LED_OFF;
+
+	//----- Prueba switches ---------//
+//	while (1)
+//	{
+//		if (CheckS1())
+//		{
+//			LCD_1ER_RENGLON;
+//			LCDTransmitStr((const char *) "S1 -> ON        ");
+//			i = 1;
+//		}
+//		else if (i == 1)
+//		{
+//			i = 0;
+//			LCD_1ER_RENGLON;
+//			LCDTransmitStr((const char *) "S1 -> OFF       ");
+//		}
+//
+//		if (CheckS2())
+//		{
+//			LCD_2DO_RENGLON;
+//			LCDTransmitStr((const char *) "S2 -> ON        ");
+//			ii = 1;
+//		}
+//		else if (ii == 1)
+//		{
+//			ii = 0;
+//			LCD_2DO_RENGLON;
+//			LCDTransmitStr((const char *) "S2 -> OFF       ");
+//		}
+//
+//		UpdateSwitches();
+//	}
 
 	//DE PRODUCCION Y PARA PRUEBAS EN DMX
 
@@ -328,11 +363,25 @@ int main(void)
 	//DMX_channel_selected = 1;
 	//DMX_channel_quantity = 4;
 	USART1Config();
+	USART2Config();
 	EXTIOff();
 
-
+#ifdef VER_1_2
 	Update_TIM3_CH2 (255);
+#endif
 	DMX_TX_PIN_OFF;
+
+	//---------- Prueba DMX_INPUT con y sin INT --------//
+//	EXTIOn();
+//	while (1)
+//	{
+////		if (DMX_INPUT)
+////			LED_ON;
+////		else
+////			LED_OFF;
+//	}
+	//---------- Fin Prueba DMX_INPUT con y sin INT ----//
+
 
 	//---------- Prueba USART --------//
 
@@ -357,17 +406,28 @@ int main(void)
 
     //---------- Fin Prueba USART --------//
 
-	//---------- Prueba GSM_Engine --------//
-    //system_init();
-//    gsm_engine_init( dbg_cb );
+    //---------- Prueba Recibir DMX Pckts --------//
+//	EXTIOn ();
+//	DMX_channel_quantity = 1;
+//	DMX_channel_selected = 6;
+//	DMX_Ena();
 //
-//    at_cmd( "AT" );
+//	while (1)
+//	{
+//		if (DMX_packet_flag)
+//		{
+//			//llego un paquete DMX
+//			DMX_packet_flag = 0;
 //
-//    while( 1 )
-//    {
-//        gsm_process();
-//    }
-    //---------- Fin Prueba GSM_Engine --------//
+//			//en data tengo la info
+//			Update_TIM3_CH1 (data[1]);
+//		}
+//		UpdatePackets();
+//	}
+	//---------- Fin Prueba Recibir DMX Pckts --------//
+
+
+
 
 	//---------- Prueba AT HLK_RM04 --------//
 //	USARTSendSingle('M');
@@ -378,7 +438,8 @@ int main(void)
     	switch (main_state)
     	{
 			case MAIN_INIT:
-				USARTSend("ESP8266 Test...\r\n");
+				//USARTSend("ESP8266 Test...\r\n");
+				Usart2Send("ESP8266 Test...\r\n");
 				TCPProcessInit ();
 				timer_standby = 100;
 				main_state++;
@@ -747,6 +808,9 @@ int main(void)
 	return 0;
 }
 
+//--- End of Main ---//
+
+
 void UpdatePackets (void)
 {
 	if (Packet_Detected_Flag)
@@ -760,12 +824,8 @@ void UpdatePackets (void)
 		Packet_Detected_Flag = 0;
 	}
 }
-//--- End of Main ---//
-void Update_PWM (unsigned short pwm)
-{
-	Update_TIM3_CH1 (pwm);
-	Update_TIM3_CH2 (4095 - pwm);
-}
+
+
 
 
 unsigned short Get_Temp (void)
@@ -786,43 +846,7 @@ unsigned short Get_Temp (void)
     return total_ma >> DIVISOR;
 }
 
-unsigned char MAFilter (unsigned char new_sample, unsigned char * vsample)
-{
-	unsigned short total_ma;
-	unsigned char j;
 
-	//Kernel mejorado ver 2
-	//si el vector es de 0 a 7 (+1) sumo todas las posiciones entre 1 y 8, acomodo el nuevo vector entre 0 y 7
-	total_ma = 0;
-	*(vsample + LARGO_F) = new_sample;
-
-    for (j = 0; j < (LARGO_F); j++)
-    {
-    	total_ma += *(vsample + j + 1);
-    	*(vsample + j) = *(vsample + j + 1);
-    }
-
-    return total_ma >> DIVISOR_F;
-}
-
-unsigned short MAFilter16 (unsigned char new_sample, unsigned char * vsample)
-{
-	unsigned short total_ma;
-	unsigned char j;
-
-	//Kernel mejorado ver 2
-	//si el vector es de 0 a 7 (+1) sumo todas las posiciones entre 1 y 8, acomodo el nuevo vector entre 0 y 7
-	total_ma = 0;
-	*(vsample + LARGO_F) = new_sample;
-
-    for (j = 0; j < (LARGO_F); j++)
-    {
-    	total_ma += *(vsample + j + 1);
-    	*(vsample + j) = *(vsample + j + 1);
-    }
-
-    return total_ma >> DIVISOR_F;
-}
 
 
 
@@ -832,6 +856,13 @@ void EXTI4_15_IRQHandler(void)
 {
 	unsigned short aux;
 
+//--- SOLO PRUEBA DE INTERRUPCIONES ---//
+//	if (DMX_INPUT)
+//		LED_ON;
+//	else
+//		LED_OFF;
+//
+//	EXTI->PR |= 0x0100;
 
 	if(EXTI->PR & 0x0100)	//Line8
 	{
@@ -1003,17 +1034,4 @@ void TimingDelay_Decrement(void)
 		secs++;
 }
 
-
-
-void dbg_cb( char *response )
-{
-	unsigned char dummy = 0;
-
-    //UART1_Write_Text( " < CALLBACK >\r\n" );
-    //UART1_Write_Text( response );
-
-    //dummys
-    dummy = strlen (response);
-
-}
-
+//------ EOF -------//

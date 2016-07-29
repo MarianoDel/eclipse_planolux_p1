@@ -21,13 +21,10 @@ extern unsigned char esp_mini_timeout;
 extern unsigned char esp_answer;
 extern unsigned char esp_unsolicited_pckt;
 
-extern volatile unsigned char data1[];
-extern volatile unsigned char data[];
 extern volatile unsigned char bufftcp[];
 
-#define data512		data1
-#define data256		data
-
+extern volatile unsigned char tx2buff[];
+extern volatile unsigned char rx2buff[];
 
 //--- Globals -------------------------------------//
 
@@ -230,7 +227,7 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 			if (resp == RESP_OK)
 			{
 				resp = RESP_CONTINUE;
-				SendCommandWithAnswer((pbuf + 2));		//blanquea esp_answer
+				SendCommandWithAnswer((char *)(pbuf + 2));		//blanquea esp_answer
 				esp_timeout = TT_AT_3SEG;
 				esp_config_state++;
 			}
@@ -247,12 +244,12 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 			if (esp_answer == RESP_READY)
 			{
 				//reviso si tengo SEND OK en el buffer
-				ESPPreParser((unsigned char *)data256);
+				ESPPreParser((unsigned char *)rx2buff);
 
 				//si me recibe los bytes doy como el paquete enviado
-				if (strncmp((char *) (const char *) "Recv ", (char *)data256, (sizeof ((const char *) "Recv ")) - 1) == 0)
+				if (strncmp((char *) (const char *) "Recv ", (char *)rx2buff, (sizeof ((const char *) "Recv ")) - 1) == 0)
 					resp = RESP_OK;
-				else if (strncmp((char *) (const char *) "SEND OK", (char *)data256, (sizeof ((const char *) "SEND OK")) - 1) == 0)
+				else if (strncmp((char *) (const char *) "SEND OK", (char *)rx2buff, (sizeof ((const char *) "SEND OK")) - 1) == 0)
 					resp = RESP_OK;
 				else
 					resp = RESP_NOK;
@@ -319,9 +316,9 @@ unsigned char ESPToATMode (unsigned char p)
 			if (esp_answer == RESP_READY)
 			{
 				//esp_command_state = COMM_WAIT_PARSER;
-				ESPPreParser((unsigned char *)data256);
+				ESPPreParser((unsigned char *)rx2buff);
 
-				resp = ESPVerifyVersion((unsigned char *)data256);
+				resp = ESPVerifyVersion((unsigned char *)rx2buff);
 
 				if (resp == RESP_OK)
 					esp_mode = AT_MODE;
@@ -381,16 +378,16 @@ unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 				}
 			}
 
-			ESPPreParser((unsigned char *)data256);
-			if (strncmp(s_comm, (char *)data256, length) == 0)
+			ESPPreParser((unsigned char *)rx2buff);
+			if (strncmp(s_comm, (char *)rx2buff, length) == 0)
 			{
-				if ((*(data256 + length) == 'O') && (*(data256 + length + 1) == 'K'))
+				if ((*(rx2buff + length) == 'O') && (*(rx2buff + length + 1) == 'K'))
 					resp = RESP_OK;
 
-				if (strncmp((char *) (const char *) "no change OK", (data256 + length), (sizeof ((const char *) "no change OK")) - 1) == 0)
+				if (strncmp((char *) (const char *) "no change OK", (char *)(rx2buff + length), (sizeof ((const char *) "no change OK")) - 1) == 0)
 					resp = RESP_OK;
 
-				if (*(data256 + length) == '>')
+				if (*(rx2buff + length) == '>')
 					resp = RESP_OK;
 			}
 			else
@@ -410,7 +407,7 @@ unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 void SendCommandWithAnswer(const char * str)
 {
 	esp_answer = RESP_NO_ANSWER;
-	USARTSend((char *) str);
+	SerialSend((char *) str);
 }
 
 unsigned char ESP_AskMode(void)
@@ -451,7 +448,7 @@ void ESP_ATModeRx (unsigned char d)
 	{
 		if ((d == 'A') || (d == 'R') || (d == 'S'))		//AT o Recv o SEND OK
 		{
-			prx = (unsigned char *) data256;
+			prx = rx2buff;
 			*prx = d;
 			prx++;
 			at_start = 1;
@@ -470,13 +467,13 @@ void ESP_ATModeRx (unsigned char d)
 			at_finish = 1;
 
 		*prx = d;
-		if (prx < &data256[SIZEOF_DATA256])
+		if (prx < &rx2buff[SIZEOF_DATA])
 			prx++;
 		else
 		{
 			//recibi demasiados bytes juntos
 			//salgo por error
-			prx = (unsigned char *) data256;
+			prx = rx2buff;
 			esp_answer = RESP_NOK;
 		}
 	}
@@ -501,46 +498,6 @@ void ESP_ATModeRx (unsigned char d)
 	esp_mini_timeout = TT_ESP_AT_MINI;
 }
 
-////me llaman desde usart rx si estoy en modo AT para transmitir
-//void ESP_ATModeTx (unsigned char d)
-//{
-//	//tengo que ver en que parte del AT estoy o si esta listo a enviar
-//	if (d == '>')
-//	{
-//		pckttx_start = 0;
-//		pckttx_finish = 0;
-//		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
-//	}
-//	else if (!pckttx_start)
-//	{
-//		if (d == 'R')				//cantidad de bytes recibidos
-//		{
-//			prx = (unsigned char *) bufftcp;
-//			*prx = d;
-//			prx++;
-//			pckttx_start = 1;
-//		}
-//	}
-//	else if (pckttx_start)
-//	{
-//		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
-//			pckttx_finish = 1;
-//
-//		*prx = d;
-//		if (prx < &bufftcp[SIZEOF_BUFFTCP])
-//			prx++;
-//		else
-//		{
-//			//recibi demasiados bytes juntos
-//			//salgo por error
-//			prx = (unsigned char *) bufftcp;
-//			esp_answer = RESP_NOK;
-//		}
-//	}
-//
-//	//mientras reciba bytes hago update del timer
-//	esp_mini_timeout = TT_ESP_AT_MINI;
-//}
 
 
 void ESPPreParser(unsigned char * d)
