@@ -144,6 +144,7 @@ unsigned char saved_mode;
 
 // ------- para determinar igrid -------
 volatile unsigned char igrid_timer = 0;
+volatile unsigned char vgrid_timer = 0;
 
 // ------- del display LCD -------
 const char s_blank_line [] = {"                "};
@@ -285,13 +286,7 @@ int main(void)
 	}
 
 
-
-	//Pin OFF HLK
-
-#ifdef USE_HLK_WIFI
-	HLK_PIN_OFF;
-#endif
-#ifdef USE_ESP_WIFI
+#if ((defined USE_ESP_WIFI) || (defined USE_HLK_WIFI))
 	WRST_OFF;
 	Wait_ms(2);
 	WRST_ON;
@@ -430,59 +425,58 @@ int main(void)
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
     //---------- Prueba Enviar DMX Pckts --------//
-	EXTIOn ();
-	DMX_channel_quantity = 1;
-	DMX_channel_selected = 1;
-	DMX_Ena();
-	i = 0;
-
-	while (1)
-	{
-		if (!timer_standby)
-		{
-			timer_standby = 100;
-			data1[1] = i;
-			data1[2] = i;
-			data1[3] = i;
-			data1[4] = i;
-			data1[5] = i;
-			data1[6] = i;
-			if (i < 255)
-				i++;
-			else
-				i = 0;
-
-			SendDMXPacket (PCKT_INIT);
-			show_ldr++;
-		}
-
-		if (DMX_packet_flag)
-		{
-			//llego un paquete DMX
-			DMX_packet_flag = 0;
-
-			//en data tengo la info
-			Update_TIM3_CH1 (data[1]);
-		}
-
-		if (show_ldr > 3)
-		{
-			show_ldr = 0;
-			LCD_1ER_RENGLON;
-			LCDTransmitStr(s_blank_line);
-			sprintf (s_lcd, "LDR: %04i", GetLDR());
-			LCD_1ER_RENGLON;
-			LCDTransmitStr(s_lcd);
-		}
-		UpdatePackets();
-	}
+//	EXTIOn ();
+//	DMX_channel_quantity = 1;
+//	DMX_channel_selected = 1;
+//	DMX_Ena();
+//	i = 0;
+//
+//	while (1)
+//	{
+//		if (!timer_standby)
+//		{
+//			timer_standby = 100;
+//			data1[1] = i;
+//			data1[2] = i;
+//			data1[3] = i;
+//			data1[4] = i;
+//			data1[5] = i;
+//			data1[6] = i;
+//			if (i < 255)
+//				i++;
+//			else
+//				i = 0;
+//
+//			SendDMXPacket (PCKT_INIT);
+//			show_ldr++;
+//		}
+//
+//		if (DMX_packet_flag)
+//		{
+//			//llego un paquete DMX
+//			DMX_packet_flag = 0;
+//
+//			//en data tengo la info
+//			Update_TIM3_CH1 (data[1]);
+//		}
+//
+//		if (show_ldr > 3)
+//		{
+//			show_ldr = 0;
+//			LCD_1ER_RENGLON;
+//			LCDTransmitStr(s_blank_line);
+//			sprintf (s_lcd, "LDR: %04i", GetLDR());
+//			LCD_1ER_RENGLON;
+//			LCDTransmitStr(s_lcd);
+//		}
+//		UpdatePackets();
+//	}
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
 
 
-	//---------- Prueba AT HLK_RM04 --------//
-//	USARTSendSingle('M');
-//	Wait_ms(100);
+	//---------- Prueba Conexiones ESP8266 & HLK_RM04  --------//
+#if ((defined USE_ESP_WIFI) || (defined USE_HLK_WIFI))
     while( 1 )
     {
 #ifdef USE_ESP_WIFI
@@ -807,7 +801,8 @@ int main(void)
 #endif
 
     }
-    //---------- Fin Prueba AT HLK_RM04 --------//
+    //---------- Fin Prueba AT ESP8266 & HLK_RM04 --------//
+#endif
 
 	//---------- Prueba temp --------//
 	/*
@@ -859,6 +854,7 @@ int main(void)
 	*/
 	//---------- Fin prueba 1 to 10V --------//
 
+    //---------- Programa de Certificacion S.E. --------//
 	while (1)
 	{
 		resp = FuncStandAloneCert();
@@ -868,9 +864,11 @@ int main(void)
 		UpdateACSwitch();
 		UpdatePackets();
 		UpdateTemp();
-		UpdateIGrid();		//OJO que LCD lleva algo de tiempo y quita determinacion
+		UpdateIGrid();
+		UpdateVGrid();
 
 	}	//termina while(1)
+	//---------- Fin Programa de Certificacion S.E. --------//
 
 	return 0;
 }
@@ -891,33 +889,6 @@ void UpdatePackets (void)
 		Packet_Detected_Flag = 0;
 	}
 }
-
-
-
-
-unsigned short Get_Temp (void)
-{
-	unsigned short total_ma;
-	unsigned char j;
-
-	//Kernel mejorado ver 2
-	//si el vector es de 0 a 7 (+1) sumo todas las posiciones entre 1 y 8, acomodo el nuevo vector entre 0 y 7
-	total_ma = 0;
-	vtemp[LARGO_FILTRO] = ReadADC1 (CH_IN_TEMP);
-    for (j = 0; j < (LARGO_FILTRO); j++)
-    {
-    	total_ma += vtemp[j + 1];
-    	vtemp[j] = vtemp[j + 1];
-    }
-
-    return total_ma >> DIVISOR;
-}
-
-
-
-
-
-
 
 void EXTI4_15_IRQHandler(void)
 {

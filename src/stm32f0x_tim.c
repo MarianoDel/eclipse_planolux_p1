@@ -29,6 +29,7 @@ extern volatile unsigned short wait_ms_var;
 
 // ------- para determinar igrid -------
 extern volatile unsigned char igrid_timer;
+extern volatile unsigned char vgrid_timer;
 
 //--- VARIABLES GLOBALES ---//
 
@@ -255,6 +256,7 @@ void OneShootTIM16 (unsigned short a)
 void TIM17_IRQHandler (void)	//200uS
 {
 	igrid_timer = 1;
+	vgrid_timer = 1;
 
 	if (TIM17->SR & 0x01)
 		TIM17->SR = 0x00;		//bajar flag
@@ -267,7 +269,7 @@ void TIM_17_Init (void)
 		RCC_TIM17_CLK_ON;
 
 	//Configuracion del timer.
-	TIM17->ARR = 400;		//200us
+	TIM17->ARR = 400;		//400us
 	TIM17->CNT = 0;
 	TIM17->PSC = 47;
 
@@ -280,5 +282,6 @@ void TIM_17_Init (void)
 }
 
 //--- end of file ---//
+
 
 

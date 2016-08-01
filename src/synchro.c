@@ -20,17 +20,15 @@ extern volatile unsigned char freq_ready;
 extern volatile unsigned short lastC0V;
 extern volatile unsigned char zero_cross;
 extern volatile unsigned char slips_state;
-
-// ------- para determinar vgrid -------
-extern unsigned short max_vgrid_last;
-extern unsigned short max_vgrid;
-extern unsigned short min_vgrid_last;
-extern unsigned short min_vgrid;
-extern unsigned short v_vgrid [4];
-extern unsigned short vgrid_update_samples;
 */
-// ------- para determinar igrid -------
+// ------- para determinar VGrid() -------
+unsigned short max_vgrid_last = 0;
+unsigned short max_vgrid = 0;
+unsigned short vgrid_update_samples = 0;
+
+// ------- para determinar timer vgrid & igrid -------
 extern volatile unsigned char igrid_timer;
+extern volatile unsigned char vgrid_timer;
 
 // ------- Globales para determinar IGrid() -------
 unsigned short max_igrid_last = 0;
@@ -207,12 +205,12 @@ void UpdateIGrid (void)
 {
 	unsigned short medida = 0;
 
-	if (igrid_timer)	//cada 200us
+	if (igrid_timer)	//cada 400us
 	{
 		igrid_timer = 0;
 		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//50 es toda la senoidal 60 es un ciclo y un octavo
 		{
-			medida = ReadADC1(ADC_Channel_8);
+			medida = ReadADC1_SameSampleTime(ADC_Channel_0);
 			//reviso si es un maximo
 			if (medida > max_igrid)
 				max_igrid = medida;
@@ -253,3 +251,38 @@ unsigned short GetIGrid (void)
 
 	return medida;
 }
+
+void UpdateVGrid (void)		//es una senial rectificada solo positiva
+{
+	unsigned short medida;
+
+	if (vgrid_timer)	//cada 400us
+	{
+		vgrid_timer = 0;
+
+		medida = ReadADC1_SameSampleTime(ADC_Channel_1);
+		//medida = MAFilterFast(V_GRID_SENSE, v_vgrid);
+
+		if (vgrid_update_samples < VGRID_SAMPLES_RESET)	//512 es toda la senoidal 576 es un ciclo y un octavo
+		{
+			//reviso si es un maximo
+			if (medida > max_vgrid)
+				max_vgrid = medida;
+
+			vgrid_update_samples++;
+		}
+		else
+		{
+		//paso un ciclo y un octavo completo, seguro tengo maximo y minimos cargados
+			max_vgrid_last = max_vgrid;
+			max_vgrid = 0;
+			vgrid_update_samples = 0;
+		}
+	}
+}
+
+unsigned short GetVGrid (void)
+{
+	return max_vgrid_last;
+}
+

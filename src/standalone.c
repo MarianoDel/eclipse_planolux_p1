@@ -16,6 +16,7 @@
 
 #include "stm32f0x_gpio.h"
 #include "adc.h"
+#include "synchro.h"
 
 
 /* Externals variables ---------------------------------------------------------*/
@@ -48,8 +49,9 @@ unsigned short standalone_last_1to10 = 0;
 const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
 
 float fcalc = 0.0;
-#define K_1TO10	0.0392
+#define K_1TO10	0.0393
 #define K_CURR	0.000127
+#define K_VOLT	0.0743
 
 
 StandAlone_Typedef StandAloneStruct_local;
@@ -1277,7 +1279,7 @@ void MenuStandAloneCert(void)
 					fcalc = fcalc * 1000;
 					one_dec = (short) fcalc;
 
-					sprintf(s_lcd, "%01d.%03d A", one_int, one_dec);
+					sprintf(s_lcd, "%01d.%03dA", one_int, one_dec);
 					Lcd_SetDDRAM(0x40 + 10);
 					LCDTransmitStr(s_lcd);
 				}
@@ -1287,7 +1289,7 @@ void MenuStandAloneCert(void)
 
 		case STAND_ALONE_MENU_CERT_CURRENT_UP:
 			if (CheckS2() == S_NO)
-				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_0;
+				standalone_menu_state = STAND_ALONE_MENU_CERT_VOLTAGE_0;
 
 			break;
 
@@ -1296,6 +1298,66 @@ void MenuStandAloneCert(void)
 				standalone_menu_state = STAND_ALONE_MENU_CERT_TEMP_0;
 
 			break;
+
+//#################################
+		case STAND_ALONE_MENU_CERT_VOLTAGE_0:
+			standalone_last_current = 0;
+			standalone_menu_state++;
+			break;
+
+		case STAND_ALONE_MENU_CERT_VOLTAGE_1:
+			if (CheckS2() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu up     ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_VOLTAGE_UP;
+			}
+
+			if (CheckS1() > S_NO)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "    menu down   ");
+				standalone_menu_state = STAND_ALONE_MENU_CERT_VOLTAGE_DOWN;
+			}
+
+			//refresco dos veces por segundo
+			if (!scroll1_timer)
+			{
+				scroll1_timer = 500;
+				local_meas = GetVGrid();
+				if (standalone_last_current != local_meas)
+				{
+					standalone_last_current = local_meas;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "Drvr Vlt:       ");
+					fcalc = local_meas;
+					fcalc = fcalc * K_VOLT;
+					one_int = (short) fcalc;
+					fcalc = fcalc - one_int;
+					fcalc = fcalc * 10;
+					one_dec = (short) fcalc;
+
+					sprintf(s_lcd, "%03d.%01dV", one_int, one_dec);
+					Lcd_SetDDRAM(0x40 + 10);
+					LCDTransmitStr(s_lcd);
+				}
+			}
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_VOLTAGE_UP:
+			if (CheckS2() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_0;
+
+			break;
+
+		case STAND_ALONE_MENU_CERT_VOLTAGE_DOWN:
+			if (CheckS1() == S_NO)
+				standalone_menu_state = STAND_ALONE_MENU_CERT_CURRENT_0;
+
+			break;
+
+//#################################
 
 		case STAND_ALONE_MENU_CERT_UPTIME_0:
 			if (!minutes)						//para forzar arranque
@@ -1400,6 +1462,7 @@ void MenuStandAloneCert(void)
 				standalone_menu_state = STAND_ALONE_MENU_CERT_UPTIME_0;
 
 			break;
+
 
 		default:
 			standalone_menu_state = STAND_ALONE_MENU_CERT_INIT_0;

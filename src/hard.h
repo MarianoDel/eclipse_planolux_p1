@@ -16,7 +16,7 @@
 
 //-------- WiFi Configuration -------------
 //#define USE_HLK_WIFI
-#define USE_ESP_WIFI
+//#define USE_ESP_WIFI
 
 //-------- End Of Defines For Configuration ------
 
@@ -351,10 +351,6 @@ unsigned char CheckS2 (void);
 void UpdateACSwitch (void);
 unsigned char CheckACSw (void);
 
-void UpdateIGrid (void);
-unsigned short GetIGrid (void);
-unsigned char CheckIGrid (void);
-unsigned short MAFilterFast (unsigned short, unsigned short *);
 
 #endif /* HARD_H_ */
 

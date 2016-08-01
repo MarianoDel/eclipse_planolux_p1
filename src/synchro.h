@@ -22,7 +22,7 @@
 //#define VGRID_MIN			550	//equivale a 440mVpp	34,2Vrms
 //#define VGRID_MIN			2700	//equivale a 2160mVpp	180Vrms
 #define VGRID_MIN			3046	//equivale a 200Vrms
-#define VGRID_SAMPLES_RESET		576
+#define VGRID_SAMPLES_RESET		60
 
 // ------- para determinar IGrid -------
 #define IGRID_SAMPLES_RESET		60		//tengo muestras cada 400us 50 son 1 ciclo completo
@@ -62,6 +62,7 @@ unsigned char CheckFGridFast (unsigned short);
 unsigned char CheckGridNoise (void);
 unsigned char CheckVin (void);
 unsigned short GetIGrid (void);
+unsigned short GetVGrid (void);
 
 void UpdateVGrid (void);
 void UpdateFGrid (void);
