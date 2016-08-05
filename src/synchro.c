@@ -210,7 +210,13 @@ void UpdateIGrid (void)
 		igrid_timer = 0;
 		if (igrid_update_samples < IGRID_SAMPLES_RESET)	//50 es toda la senoidal 60 es un ciclo y un octavo
 		{
+#ifdef VER_1_3
 			medida = ReadADC1_SameSampleTime(ADC_Channel_0);
+#endif
+#ifdef VER_1_2
+			medida = ReadADC1_SameSampleTime(ADC_Channel_8);
+#endif
+
 			//reviso si es un maximo
 			if (medida > max_igrid)
 				max_igrid = medida;

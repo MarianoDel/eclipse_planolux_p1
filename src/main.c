@@ -419,8 +419,22 @@ int main(void)
 //
 //			//en data tengo la info
 //			Update_TIM3_CH1 (data[1]);
+//
+//			//prendo relay
+//			if (data[1] > 20)
+//			{
+//				if (!RELAY)
+//					RELAY_ON;
+//			}
+//			else if (data[1] < 10)
+//			{
+//				if (RELAY)
+//					RELAY_OFF;
+//			}
+//
 //		}
 //		UpdatePackets();
+//
 //	}
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
@@ -624,6 +638,18 @@ int main(void)
     		{
     			last_bright--;
     			Update_TIM3_CH1 (last_bright);
+    		}
+
+    		//prendo relay
+    		if (last_bright > 20)
+    		{
+    			if (!RELAY)
+    				RELAY_ON;
+    		}
+    		else if (last_bright < 10)
+    		{
+    			if (RELAY)
+    				RELAY_OFF;
     		}
     	}
 #endif

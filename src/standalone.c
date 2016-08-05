@@ -49,10 +49,15 @@ unsigned short standalone_last_1to10 = 0;
 const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
 
 float fcalc = 0.0;
+#ifdef VER_1_3
 #define K_1TO10	0.0393
 #define K_CURR	0.000127
 #define K_VOLT	0.0743
-
+#endif
+#ifdef VER_1_2
+#define K_1TO10	0.0393
+#define K_CURR	0.000135
+#endif
 
 StandAlone_Typedef StandAloneStruct_local;
 #define standalone_dimming_top StandAloneStruct_local.max_dimmer_value_dmx
@@ -1324,6 +1329,16 @@ void MenuStandAloneCert(void)
 			if (!scroll1_timer)
 			{
 				scroll1_timer = 500;
+#ifdef VER_1_2
+				local_meas = GetVGrid();
+				if (standalone_last_current != local_meas)
+				{
+					standalone_last_current = local_meas;
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "D Vlt: No sensor");
+				}
+#endif
+#ifdef VER_1_3
 				local_meas = GetVGrid();
 				if (standalone_last_current != local_meas)
 				{
@@ -1341,6 +1356,7 @@ void MenuStandAloneCert(void)
 					Lcd_SetDDRAM(0x40 + 10);
 					LCDTransmitStr(s_lcd);
 				}
+#endif
 			}
 
 			break;

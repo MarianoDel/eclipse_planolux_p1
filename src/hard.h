@@ -16,7 +16,7 @@
 
 //-------- WiFi Configuration -------------
 //#define USE_HLK_WIFI
-//#define USE_ESP_WIFI
+#define USE_ESP_WIFI
 
 //-------- End Of Defines For Configuration ------
 
