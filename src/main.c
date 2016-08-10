@@ -255,6 +255,9 @@ int main(void)
 	unsigned char last_bright = 0;
 	unsigned char show_ldr = 0;
 
+#ifdef USE_PROD_PROGRAM
+	unsigned char jump_the_menu = 0;
+#endif
 	parameters_typedef * p_mem_init;
 	//!< At this stage the microcontroller clock setting is already configured,
     //   this is done through SystemInit() function which is called from startup
@@ -881,6 +884,7 @@ int main(void)
 	//---------- Fin prueba 1 to 10V --------//
 
     //---------- Programa de Certificacion S.E. --------//
+#ifdef USE_CE_PROGRAM
 	while (1)
 	{
 		resp = FuncStandAloneCert();
@@ -894,7 +898,92 @@ int main(void)
 		UpdateVGrid();
 
 	}	//termina while(1)
+#endif
 	//---------- Fin Programa de Certificacion S.E. --------//
+
+    //---------- Programa de Produccion --------//
+#ifdef USE_PROD_PROGRAM
+	//--- PRUEBA FUNCION MAIN_MENU
+	//leo la memoria, si tengo configuracion de modo
+	//entro directo, sino a Main Menu
+	if (saved_mode == 0xFF)	//memoria borrada
+		main_state = MAIN_INIT;
+	else
+		jump_the_menu = RESP_YES;
+
+#ifdef VER_1_2
+	Update_TIM3_CH2 (255);
+#endif
+	//Wait_ms(2000);
+	while (1)
+	{
+		switch (main_state)
+		{
+			case MAIN_INIT:
+				resp = FuncMainMenu();
+
+				if (resp == MAINMENU_SHOW_STANDALONE_SELECTED)	//TODO deberia forzar init
+					main_state = MAIN_STAND_ALONE;
+
+				if (resp == MAINMENU_SHOW_GROUPED_SELECTED)
+					main_state = MAIN_GROUPED;
+
+				if (resp == MAINMENU_SHOW_NETWORK_SELECTED)
+					main_state = MAIN_NETWORKED;
+
+				jump_the_menu = RESP_NO;
+				break;
+
+			case MAIN_STAND_ALONE:
+				resp = FuncStandAlone();
+
+				if (resp == RESP_CHANGE_ALL_UP)
+				{
+					FuncStandAloneReset();
+					main_state = MAIN_INIT;
+				}
+
+				break;
+
+			case MAIN_GROUPED:
+				resp = FuncGrouped();
+
+				if (resp == RESP_CHANGE_ALL_UP)
+				{
+					FuncGroupedReset();
+					main_state = MAIN_INIT;
+				}
+
+				break;
+
+			case MAIN_NETWORKED:
+				resp = FuncNetworked(jump_the_menu);
+				jump_the_menu = RESP_NO_CHANGE;
+				main_state++;
+				break;
+
+			case MAIN_NETWORKED_1:
+				resp = FuncNetworked(jump_the_menu);
+
+				if (resp == RESP_CHANGE_ALL_UP)
+					main_state = MAIN_INIT;
+
+				break;
+
+			default:
+				main_state = MAIN_INIT;
+				break;
+
+		}
+
+		UpdateSwitches();
+		UpdateACSwitch();
+		UpdatePackets();
+	}
+
+	//--- FIN PRUEBA FUNCION MAIN_MENU
+#endif
+	//---------- Fin Programa de Procduccion --------//
 
 	return 0;
 }

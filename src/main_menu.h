@@ -106,6 +106,7 @@
 //wrapers de la funcion FuncChange
 #define FuncChangePercent(X)	FuncChange(X, CHANGE_PERCENT, 0, 100)
 #define FuncChangeSecs(X)		FuncChange(X, CHANGE_SECS, 0, 10)
+#define FuncChangeSecsMove(X)		FuncChange(X, CHANGE_SECS, 30, 120)
 #define FuncChangeChannels(X)	FuncChange(X, CHANGE_CHANNELS, 1, 255)
 #define FuncChangePercentReset()	FuncChangeReset()
 #define FuncChangeSecsReset()	FuncChangeReset()

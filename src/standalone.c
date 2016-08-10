@@ -38,7 +38,7 @@ unsigned short standalone_ii = 0;
 unsigned char standalone_dimming_last_value = 0;
 unsigned char standalone_dimming_last_slope = 0;
 
-unsigned char standalone_menu_state = 0;
+enum StandAloneMenu standalone_menu_state = STAND_ALONE_MENU_INIT;
 unsigned char standalone_show_conf = 0;
 
 unsigned short standalone_last_temp = 0;
@@ -56,7 +56,8 @@ float fcalc = 0.0;
 #endif
 #ifdef VER_1_2
 #define K_1TO10	0.0393
-#define K_CURR	0.000135
+//#define K_CURR	0.000135	//placa P1 numero 1
+#define K_CURR	0.000129	//placa P1 numero 2
 #endif
 
 StandAlone_Typedef StandAloneStruct_local;
@@ -193,6 +194,22 @@ unsigned char FuncStandAlone (void)
 				standalone_timer = 1500;
 				standalone_state = STAND_ALONE_ON_1;
 			}
+
+#ifdef SA_WITH_LDR
+			if (!standalone_timer)
+			{
+				unsigned short ldr = 0;
+				standalone_timer = 100;
+				ldr = GetLDR ();
+				ldr >>= 4;
+				if (ldr > standalone_ii)	//TODO: salir por iguales
+					standalone_ii++;
+				else
+					standalone_ii--;
+
+				Update_TIM3_CH1 (standalone_ii);
+			}
+#endif
 			break;
 
 		case STAND_ALONE_ON_1:
@@ -336,10 +353,11 @@ unsigned char FuncStandAlone (void)
 
 			if (!standalone_enable_menu_timer)	//ya mostre el menu mucho tiempo, lo apago
 			{
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *)s_blank_line);
-				LCD_2DO_RENGLON;
-				LCDTransmitStr((const char *)s_blank_line);
+//				LCD_1ER_RENGLON;
+//				LCDTransmitStr((const char *)s_blank_line);
+//				LCD_2DO_RENGLON;
+//				LCDTransmitStr((const char *)s_blank_line);
+				CTRL_BKL_OFF;
 				standalone_selections = MENU_OFF;
 			}
 			break;
@@ -365,8 +383,9 @@ unsigned char FuncStandAlone (void)
 
 				standalone_selections++;
 
-				if (standalone_state == STAND_ALONE_SHOW_CONF)
-					ShowConfStandAloneResetEnd();
+				CTRL_BKL_ON;
+//				if (standalone_state == STAND_ALONE_SHOW_CONF)
+//					ShowConfStandAloneResetEnd();
 			}
 			break;
 
@@ -549,29 +568,50 @@ unsigned char MenuStandAlone(void)
 				if (resp_down == 0)
 				{
 					StandAloneStruct_local.move_sensor_enable = 1;
+					standalone_menu_state++;
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "wait to free    ");
+					resp = RESP_WORKING;
 				}
 
 				if (resp_down == 1)
 				{
 					StandAloneStruct_local.move_sensor_enable = 0;
+					resp = RESP_SELECTED;
+					standalone_menu_state = STAND_ALONE_MENU_MOV_SENS;
 				}
 
 				if (resp_down == 2)
 				{
 					resp = RESP_WORKING;
-					standalone_menu_state++;
+					standalone_menu_state = STAND_ALONE_MENU_MOV_SENS_SELECTED_4;
 					LCD_1ER_RENGLON;
 					LCDTransmitStr((const char *) "wait to free    ");
-				}
-				else
-				{
-					resp = RESP_SELECTED;
-					standalone_menu_state = STAND_ALONE_MENU_MOV_SENS;
 				}
 			}
 			break;
 
 		case STAND_ALONE_MENU_MOV_SENS_SELECTED_2:
+			if (CheckS2() == S_NO)
+				standalone_menu_state++;
+
+			resp = RESP_WORKING;
+			break;
+
+		case STAND_ALONE_MENU_MOV_SENS_SELECTED_3:
+			resp_down = FuncChangeSecsMove (&StandAloneStruct_local.move_sensor_secs);
+
+			if (resp_down == RESP_FINISH)
+			{
+				standalone_menu_state++;
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "wait to free    ");
+			}
+
+			resp = RESP_WORKING;
+			break;
+
+		case STAND_ALONE_MENU_MOV_SENS_SELECTED_4:
 			if (CheckS2() == S_NO)
 				standalone_menu_state = STAND_ALONE_MENU_MOV_SENS;
 
