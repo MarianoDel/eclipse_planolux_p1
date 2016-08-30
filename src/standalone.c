@@ -196,7 +196,7 @@ unsigned char FuncStandAlone (void)
 			}
 
 #ifdef SA_WITH_LDR
-			if (!standalone_timer)
+			if ((!standalone_timer) && (StandAloneStruct_local.ldr_enable))
 			{
 				unsigned short ldr = 0;
 				standalone_timer = 100;

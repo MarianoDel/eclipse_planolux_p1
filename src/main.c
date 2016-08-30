@@ -308,6 +308,7 @@ int main(void)
 
 	//--- PRUEBA DISPLAY LCD ---
 	EXTIOff ();
+	    				RELAY_ON;	//TODO: sacar esto despues
 	LCDInit();
 	LED_ON;
 
@@ -644,16 +645,16 @@ int main(void)
     		}
 
     		//prendo relay
-    		if (last_bright > 20)
-    		{
-    			if (!RELAY)
-    				RELAY_ON;
-    		}
-    		else if (last_bright < 10)
-    		{
-    			if (RELAY)
-    				RELAY_OFF;
-    		}
+//    		if (last_bright > 20)
+//    		{
+//    			if (!RELAY)
+//    				RELAY_ON;
+//    		}
+//    		else if (last_bright < 10)
+//    		{
+//    			if (RELAY)
+//    				RELAY_OFF;
+//    		}
     	}
 #endif
 
