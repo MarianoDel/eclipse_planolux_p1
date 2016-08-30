@@ -9,7 +9,8 @@
 #define HARD_H_
 
 
-//-------- Defines For Configuration -------------
+//----------- Defines For Configuration -------------
+//----------- Hardware Board Version -------------
 //#define VER_1_0
 //#define VER_1_2
 #define VER_1_3
@@ -17,6 +18,10 @@
 //-------- WiFi Configuration -------------
 //#define USE_HLK_WIFI
 #define USE_ESP_WIFI
+
+//-------- Type of Program ----------------
+//#define WIFI_TO_CEL_PHONE_PROGRAM
+#define WIFI_TO_MQTT_BROKER
 //#define USE_CERT_PROGRAM
 //#define USE_PROD_PROGRAM
 

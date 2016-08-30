@@ -491,12 +491,177 @@ int main(void)
 //	}
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
+	//---------- Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
+#ifdef WIFI_TO_MQTT_BROKER
+    while( 1 )
+    {
+    	switch (main_state)
+    	{
+			case MAIN_INIT:
+				//USARTSend("ESP8266 Test...\r\n");
+				Usart2Send("ESP8266 Test...\r\n");
+				TCPProcessInit ();
+				timer_standby = 100;
+				main_state++;
+				break;
+
+			case MAIN_INIT_1:
+				if (!timer_standby)
+				{
+					main_state++;
+
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Send to ESP Conf");
+					resp = ESP_SendConfig (CMD_RESET);
+				}
+				break;
+
+			case MAIN_SENDING_CONF:
+				resp = ESP_SendConfig (CMD_PROC);
+
+    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+    			{
+					LCD_2DO_RENGLON;
+					if (resp == RESP_TIMEOUT)
+						LCDTransmitStr((const char *) "ESP: Timeout    ");
+					else
+						LCDTransmitStr((const char *) "ESP: Error      ");
+					main_state = MAIN_ERROR;
+					timer_standby = 20000;	//20 segundos de error
+				}
+
+    			if (resp == RESP_OK)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr((const char *) "ESP: Configured ");
+					timer_standby = 1000;
+					main_state = MAIN_WAIT_CONNECT_0;
+				}
+				break;
+
+			case MAIN_WAIT_CONNECT_0:
+				if (!timer_standby)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Enable connect  ");
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_blank_line);
+
+					main_state = MAIN_WAIT_CONNECT_1;
+				}
+				break;
+
+			case MAIN_WAIT_CONNECT_1:
+					main_state = MAIN_WAIT_CONNECT_2;
+    			break;
+
+			case MAIN_WAIT_CONNECT_2:
+				if (esp_unsolicited_pckt == RESP_READY)
+				{
+					esp_unsolicited_pckt = RESP_CONTINUE;
+					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
+					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
+					{
+						if (bytes_remain > 0)
+							main_state = MAIN_READING_TCP;
+					}
+				}
+    			break;
+
+			case MAIN_READING_TCP:
+				//estoy como en modo transparente y tengo el buffer guardado
+				bytes_read = 0;
+				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
+
+				if (tcp_msg != NONE_MSG)	//es un mensaje valido
+					tcp_kalive_timer = TT_KALIVE;
+				else
+					bytes_remain = 0;
+
+				if (tcp_msg == KEEP_ALIVE)
+				{
+					resp = TCPSendData(0, "kAL_ACK\r\n");
+					if (resp == RESP_NOK)
+					{
+						LCD_2DO_RENGLON;
+						LCDTransmitStr((char *) (const char *) "No free buffer  ");
+					}
+				}
+
+				if (tcp_msg == GET_A)	//tira error en apk de android
+				{
+//						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
+				}
+
+				if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF) || (tcp_msg == ROOM_BRIGHT))
+				{
+					need_ack = 1;
+				}
+
+				if (bytes_read < bytes_remain)
+					bytes_remain -= bytes_read;
+				else
+				{
+					bytes_remain = 0;
+					main_state = MAIN_WAIT_CONNECT_2;
+
+					//mando ACK de luces solo al final del ultimo mensaje de paquete
+					if (need_ack)
+					{
+						need_ack = 0;
+						TCPSendData(0, "ACK\r\n");
+					}
+				}
+    			break;
+
+			case MAIN_ERROR:
+				if (!timer_standby)
+					main_state = MAIN_INIT_1;
+				break;
+
+			default:
+				main_state = MAIN_INIT;
+				break;
+    	}
+    	//Procesos continuos
+    	ESP_ATProcess ();
+    	TCPProcess();
+
+    	if (!timer_wifi_bright)
+    	{
+    		timer_wifi_bright = 5;	//muevo un punto cada 5ms
+    		if (new_room > last_bright)		//TODO: en vez de new_room deberia utilizar un filtro de los ultimos valores recibidos
+    		{
+    			last_bright++;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+    		else if (new_room < last_bright)
+    		{
+    			last_bright--;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+
+    		//prendo relay
+//    		if (last_bright > 20)
+//    		{
+//    			if (!RELAY)
+//    				RELAY_ON;
+//    		}
+//    		else if (last_bright < 10)
+//    		{
+//    			if (RELAY)
+//    				RELAY_OFF;
+//    		}
+    	}
+    }
+#endif
 
 
 	//---------- Prueba Conexiones ESP8266 & HLK_RM04  --------//
-#if ((defined USE_ESP_WIFI) || (defined USE_HLK_WIFI))
+#ifdef WIFI_TO_CEL_PHONE_PROGRAM
     while( 1 )
     {
+
 #ifdef USE_ESP_WIFI
     	switch (main_state)
     	{

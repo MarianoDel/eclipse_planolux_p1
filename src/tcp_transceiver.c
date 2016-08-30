@@ -172,6 +172,9 @@ void TCPProcess (void)
 	}
 }
 
+//Revisa tipo de mensaje y puerto (0 a 4)
+//procesa el buffer en crudo y lo copia en un buffer de salida con solo numeros y letras
+//devuelve length
 unsigned char TCPPreProcess(unsigned char * d, unsigned char * output, unsigned char * length)
 {
 	unsigned char port = 0xFF;
