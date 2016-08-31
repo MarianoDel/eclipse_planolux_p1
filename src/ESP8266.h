@@ -77,6 +77,14 @@ enum EspSendDataState
 	SEND_DATA_WAIT_SEND_OK
 };
 
+enum EspGetIPState
+{
+	GET_IP_INIT = 0,
+	GET_IP_RST,
+	GET_IP_WAIT_ANS,
+	GET_IP_CHECK
+};
+
 enum EspEnaState
 {
 	ENA_INIT = 0,
@@ -105,10 +113,13 @@ void ESP_ATProcess (void);
 unsigned char ESPToATMode (unsigned char);
 void ESPPreParser(unsigned char *);
 unsigned char ESPVerifyVersion(unsigned char *);
-unsigned char ESP_SendConfig (unsigned char);
+unsigned char ESP_SendConfigAP (void);
+unsigned char ESP_SendConfigClient (void);
+void ESP_SendConfigResetSM (void);
 unsigned char ESP_EnableNewConn (unsigned char);
 unsigned char ESP_SendData (unsigned char, unsigned char *);
 void ESP_SendDataResetSM (void);
+unsigned char ESP_GetIP (char *);
 
 #endif /* HLK_RM04_H_ */
 

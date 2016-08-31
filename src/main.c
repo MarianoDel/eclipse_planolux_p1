@@ -295,8 +295,6 @@ int main(void)
 	WRST_ON;
 #endif
 
-	Wait_ms(6000);	//espero ue bootee la placa wifi
-
 	//ADC Configuration
 	AdcConfig();
 
@@ -493,31 +491,39 @@ int main(void)
 
 	//---------- Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
 #ifdef WIFI_TO_MQTT_BROKER
+	main_state = wifi_state_reset;
     while( 1 )
     {
     	switch (main_state)
     	{
-			case MAIN_INIT:
+			case wifi_state_reset:
 				//USARTSend("ESP8266 Test...\r\n");
 				Usart2Send("ESP8266 Test...\r\n");
+				WRST_OFF;
+				Wait_ms(2);
+				WRST_ON;
+
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Reseting WiFi...");
+
 				TCPProcessInit ();
-				timer_standby = 100;
+				timer_standby = 5000;	//espero 5 seg despues del reset
 				main_state++;
 				break;
 
-			case MAIN_INIT_1:
+			case wifi_state_ready:
 				if (!timer_standby)
 				{
 					main_state++;
 
 					LCD_1ER_RENGLON;
 					LCDTransmitStr((const char *) "Send to ESP Conf");
-					resp = ESP_SendConfig (CMD_RESET);
+					ESP_SendConfigResetSM ();
 				}
 				break;
 
-			case MAIN_SENDING_CONF:
-				resp = ESP_SendConfig (CMD_PROC);
+			case wifi_state_sending_conf:
+				resp = ESP_SendConfigClient ();
 
     			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
     			{
@@ -526,7 +532,7 @@ int main(void)
 						LCDTransmitStr((const char *) "ESP: Timeout    ");
 					else
 						LCDTransmitStr((const char *) "ESP: Error      ");
-					main_state = MAIN_ERROR;
+					main_state = wifi_state_error;
 					timer_standby = 20000;	//20 segundos de error
 				}
 
@@ -535,92 +541,120 @@ int main(void)
 					LCD_2DO_RENGLON;
 					LCDTransmitStr((const char *) "ESP: Configured ");
 					timer_standby = 1000;
-					main_state = MAIN_WAIT_CONNECT_0;
+					main_state = wifi_state_wait_ip;
 				}
 				break;
 
-			case MAIN_WAIT_CONNECT_0:
+			case wifi_state_wait_ip:
 				if (!timer_standby)
 				{
 					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "Enable connect  ");
+					LCDTransmitStr((const char *) "Getting DHCP IP ");
 					LCD_2DO_RENGLON;
 					LCDTransmitStr(s_blank_line);
+					timer_standby = 5000;
 
-					main_state = MAIN_WAIT_CONNECT_1;
+					main_state = wifi_state_wait_ip1;
 				}
 				break;
 
-			case MAIN_WAIT_CONNECT_1:
-					main_state = MAIN_WAIT_CONNECT_2;
-    			break;
+			case wifi_state_wait_ip1:
+				resp = ESP_GetIP (s_lcd);
 
-			case MAIN_WAIT_CONNECT_2:
-				if (esp_unsolicited_pckt == RESP_READY)
-				{
-					esp_unsolicited_pckt = RESP_CONTINUE;
-					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
-					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
-					{
-						if (bytes_remain > 0)
-							main_state = MAIN_READING_TCP;
-					}
-				}
-    			break;
-
-			case MAIN_READING_TCP:
-				//estoy como en modo transparente y tengo el buffer guardado
-				bytes_read = 0;
-				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
-
-				if (tcp_msg != NONE_MSG)	//es un mensaje valido
-					tcp_kalive_timer = TT_KALIVE;
-				else
-					bytes_remain = 0;
-
-				if (tcp_msg == KEEP_ALIVE)
-				{
-					resp = TCPSendData(0, "kAL_ACK\r\n");
-					if (resp == RESP_NOK)
-					{
-						LCD_2DO_RENGLON;
-						LCDTransmitStr((char *) (const char *) "No free buffer  ");
-					}
+    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+    			{
+					LCD_2DO_RENGLON;
+					if (resp == RESP_TIMEOUT)
+						LCDTransmitStr((const char *) "ESP: Timeout    ");
+					else
+						LCDTransmitStr((const char *) "ESP: Err no IP  ");
+					main_state = wifi_state_error;
+					timer_standby = 20000;	//20 segundos de error
 				}
 
-				if (tcp_msg == GET_A)	//tira error en apk de android
-				{
-//						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
+    			if (resp == RESP_OK)
+    			{
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_lcd);
+					timer_standby = 1000;
+					main_state = wifi_state_idle;
 				}
 
-				if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF) || (tcp_msg == ROOM_BRIGHT))
-				{
-					need_ack = 1;
-				}
+				break;
 
-				if (bytes_read < bytes_remain)
-					bytes_remain -= bytes_read;
-				else
-				{
-					bytes_remain = 0;
-					main_state = MAIN_WAIT_CONNECT_2;
+			case wifi_state_idle:
+				break;
 
-					//mando ACK de luces solo al final del ultimo mensaje de paquete
-					if (need_ack)
-					{
-						need_ack = 0;
-						TCPSendData(0, "ACK\r\n");
-					}
-				}
-    			break;
+//			case MAIN_WAIT_CONNECT_1:
+//					main_state = MAIN_WAIT_CONNECT_2;
+//    			break;
+//
+//			case MAIN_WAIT_CONNECT_2:
+//				if (esp_unsolicited_pckt == RESP_READY)
+//				{
+//					esp_unsolicited_pckt = RESP_CONTINUE;
+//					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
+//					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
+//					{
+//						if (bytes_remain > 0)
+//							main_state = MAIN_READING_TCP;
+//					}
+//				}
+//    			break;
+//
+//			case MAIN_READING_TCP:
+//				//estoy como en modo transparente y tengo el buffer guardado
+//				bytes_read = 0;
+//				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
+//
+//				if (tcp_msg != NONE_MSG)	//es un mensaje valido
+//					tcp_kalive_timer = TT_KALIVE;
+//				else
+//					bytes_remain = 0;
+//
+//				if (tcp_msg == KEEP_ALIVE)
+//				{
+//					resp = TCPSendData(0, "kAL_ACK\r\n");
+//					if (resp == RESP_NOK)
+//					{
+//						LCD_2DO_RENGLON;
+//						LCDTransmitStr((char *) (const char *) "No free buffer  ");
+//					}
+//				}
+//
+//				if (tcp_msg == GET_A)	//tira error en apk de android
+//				{
+////						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
+//				}
+//
+//				if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF) || (tcp_msg == ROOM_BRIGHT))
+//				{
+//					need_ack = 1;
+//				}
+//
+//				if (bytes_read < bytes_remain)
+//					bytes_remain -= bytes_read;
+//				else
+//				{
+//					bytes_remain = 0;
+//					main_state = MAIN_WAIT_CONNECT_2;
+//
+//					//mando ACK de luces solo al final del ultimo mensaje de paquete
+//					if (need_ack)
+//					{
+//						need_ack = 0;
+//						TCPSendData(0, "ACK\r\n");
+//					}
+//				}
+//    			break;
 
-			case MAIN_ERROR:
+			case wifi_state_error:
 				if (!timer_standby)
 					main_state = MAIN_INIT_1;
 				break;
 
 			default:
-				main_state = MAIN_INIT;
+				main_state = wifi_state_reset;
 				break;
     	}
     	//Procesos continuos
@@ -655,7 +689,7 @@ int main(void)
     	}
     }
 #endif
-
+    //---------- Fin Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
 
 	//---------- Prueba Conexiones ESP8266 & HLK_RM04  --------//
 #ifdef WIFI_TO_CEL_PHONE_PROGRAM
@@ -680,12 +714,12 @@ int main(void)
 
 					LCD_1ER_RENGLON;
 					LCDTransmitStr((const char *) "Send to ESP Conf");
-					resp = ESP_SendConfig (CMD_RESET);
+					ESP_SendConfigResetSM ();
 				}
 				break;
 
 			case MAIN_SENDING_CONF:
-				resp = ESP_SendConfig (CMD_PROC);
+				resp = ESP_SendConfigAP ();
 
     			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
     			{
@@ -996,8 +1030,8 @@ int main(void)
 #endif
 
     }
-    //---------- Fin Prueba AT ESP8266 & HLK_RM04 --------//
 #endif
+    //---------- Fin Prueba AT ESP8266 & HLK_RM04 --------//
 
 	//---------- Prueba temp --------//
 	/*

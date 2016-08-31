@@ -69,19 +69,86 @@ unsigned char ESP_EnableNewConn (unsigned char p)
 	return resp;
 }
 
-//con CMD_RESET hace reset de la maquina
-//con CMD_PROC busca primero ir a AT Mode y luego va a transparente
-//con CMD_ONLY_CHECK revisa si esta en AT y pasa a transparente o constesta que ya esta en transparente
+//Resetea la maquina de estados de SendConfig
+void ESP_SendConfigResetSM (void)
+{
+	esp_config_state = CONF_INIT;
+}
 
-unsigned char ESP_SendConfig (unsigned char p)
+//Configura como cliente WiFi
+unsigned char ESP_SendConfigClient (void)
 {
 	unsigned char resp = RESP_CONTINUE;
 
-	if (p == CMD_RESET)
+	switch (esp_config_state)
 	{
-		esp_config_state = CONF_INIT;
-		return resp;
+		case CONF_INIT:
+			esp_config_state++;
+			ESPToATMode(CMD_RESET);
+			break;
+
+		case CONF_ASK_AT:
+			resp = ESPToATMode(CMD_PROC);
+
+			if (resp == RESP_OK)
+			{
+				esp_config_state = CONF_AT_CONFIG_0;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_0:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = CONF_AT_CONFIG_0B;
+			break;
+
+		case CONF_AT_CONFIG_0B:
+			resp = SendCommandWaitAnswer((const char *) "AT+CWMODE_CUR=1\r\n");
+
+			if (resp == RESP_OK)
+			{
+				esp_config_state = CONF_AT_CONFIG_1;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_1:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = CONF_AT_CONFIG_1B;
+			break;
+
+		case CONF_AT_CONFIG_1B:
+			resp = SendCommandWaitAnswer((const char *) "AT+CWJAP_CUR=\"TP-LINK_962DFC\",\"telefonica123\"\r\n");
+
+			if (resp == RESP_OK)
+			{
+				esp_config_state = CONF_AT_CONFIG_2;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_2:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = CONF_AT_CONFIG_2B;
+			break;
+
+		case CONF_AT_CONFIG_2B:
+			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=1,1\r\n");
+			//utilizo esta respuesta como salida de la funcion
+
+			break;
+
+		default:
+			esp_config_state = CONF_INIT;
+			break;
 	}
+
+	return resp;
+}
+
+unsigned char ESP_SendConfigAP (void)
+{
+	unsigned char resp = RESP_CONTINUE;
 
 	switch (esp_config_state)
 	{
@@ -270,6 +337,51 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 	return resp;
 }
 
+unsigned char ESP_GetIP (char * s_ip)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	switch (esp_config_state)
+	{
+		case GET_IP_INIT:
+			esp_config_state++;
+			ESP_SetMode(AT_MODE);		//TODO: ver si todo no puede ser AT
+			break;
+
+		case GET_IP_RST:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state++;
+			esp_timeout = TT_AT_3SEG;
+			break;
+
+		case GET_IP_WAIT_ANS:
+			resp = SendCommandWaitAnswer((const char *) "AT+CIFSR\r\n");
+
+			if (resp == RESP_OK)
+			{
+				esp_config_state = GET_IP_CHECK;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+
+		case GET_IP_CHECK:
+			ESPPreParser((unsigned char *)rx2buff);
+
+			//si me recibe los bytes doy como el paquete enviado
+			strncpy(s_ip, (char *) (rx2buff + 8), 15);
+			esp_config_state = GET_IP_INIT;
+			resp = RESP_OK;
+			break;
+
+		default:
+			esp_config_state = GET_IP_INIT;
+			break;
+	}
+
+	return resp;
+}
+
 //con CMD_RESET hace reset de la maquina, con CMD_PROC recorre la rutina
 //contesta RESP_CONTINUE, RESP_TIMEOUT, RESP_NOK o RESP_OK
 unsigned char ESPToATMode (unsigned char p)
@@ -340,6 +452,8 @@ void SendCommandWaitAnswerResetSM (void)
 	esp_command_state = COMM_INIT;
 }
 
+//Envia un comando al ESP y espera revisar la respuesta
+//Contesta RESP_TIMEOUT, RESP_CONTINUE, RESP_NOK, RESP_OK
 unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 {
 	unsigned char i, length = 0;
@@ -389,6 +503,9 @@ unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 
 				if (*(rx2buff + length) == '>')
 					resp = RESP_OK;
+
+				if (*(rx2buff + length) == '+')		//es una respuesta con informacion adicional
+					resp = RESP_OK;					//que queda cargada en rx2buff
 			}
 			else
 				resp = RESP_NOK;
@@ -499,7 +616,7 @@ void ESP_ATModeRx (unsigned char d)
 }
 
 
-
+//achica el buffer recibido a solo numeros letras y espacios
 void ESPPreParser(unsigned char * d)
 {
 	unsigned char i;
