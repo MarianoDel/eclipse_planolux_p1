@@ -306,7 +306,7 @@ int main(void)
 
 	//--- PRUEBA DISPLAY LCD ---
 	EXTIOff ();
-	    				RELAY_ON;	//TODO: sacar esto despues
+
 	LCDInit();
 	LED_ON;
 

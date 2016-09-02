@@ -112,6 +112,7 @@ void SendCommandWaitAnswerResetSM (void);
 void ESP_ATProcess (void);
 unsigned char ESPToATMode (unsigned char);
 void ESPPreParser(unsigned char *);
+void ESPPreParser2 (unsigned char *, unsigned char *);
 unsigned char ESPVerifyVersion(unsigned char *);
 unsigned char ESP_SendConfigAP (void);
 unsigned char ESP_SendConfigClient (void);
