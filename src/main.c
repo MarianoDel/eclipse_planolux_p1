@@ -295,6 +295,10 @@ int main(void)
 	WRST_ON;
 #endif
 
+#ifdef WIFI_TO_CEL_PHONE_PROGRAM
+	RELAY_ON;
+#endif
+
 	//ADC Configuration
 	AdcConfig();
 
@@ -579,10 +583,12 @@ int main(void)
 					timer_standby = 1000;
 					main_state = wifi_state_idle;
 				}
-
 				break;
 
 			case wifi_state_idle:
+				//estoy conectado al wifi
+				//me intento conectar al broker
+
 				break;
 
 //			case MAIN_WAIT_CONNECT_1:
@@ -828,6 +834,12 @@ int main(void)
     	//Procesos continuos
     	ESP_ATProcess ();
     	TCPProcess();
+
+//    	///PRUEBA RAPIDA 28-09
+//		resp = FuncStandAloneCert();
+////		UpdateSwitches();
+//		UpdateACSwitch();
+//		///
 
     	if (!timer_wifi_bright)
     	{
