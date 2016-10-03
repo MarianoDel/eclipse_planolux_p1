@@ -124,6 +124,11 @@ SRC += .\src\networked.c
 SRC += .\src\tcp_transceiver.c
 ## RDM libraries
 SRC += .\src\rdm_util.c
+## MQTT libraries
+SRC += .\src\mqtt_wifi_interface.c
+SRC += .\MQTT-Paho\MQTTClient-C\src\MQTTClient.c
+SRC += .\MQTT-Paho\Porting\MQTT_SPWF_interface.c
+SRC += .\MQTT-Paho\Utils\TLocalBuffer.c
 ## System Support
 #SRC += .\cmsis_boot\system_stm32f0xx.c
 #SRC += $(DISCOVERY)\stm32f0_discovery.c
@@ -151,7 +156,12 @@ UINCDIR = $(DEVDIR) \
           $(STMSPINCDDIR) \
           $(DISCOVERY)    \
           .\inc  \
-          .\cmsis_boot
+          .\cmsis_boot \
+          .\MQTT-Paho\Porting \
+          .\MQTT-Paho\MQTTClient-C\src \
+          .\MQTT-Paho\MQTTPacket\src \
+          .\MQTT-Paho\Utils    
+          
 # List the user directory to look for the libraries here
 ULIBDIR =
  

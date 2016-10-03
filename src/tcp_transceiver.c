@@ -422,3 +422,127 @@ unsigned short GetValue (unsigned char * pn)
 	}
 	return new_val;
 }
+
+unsigned char IpIsValid (char * ip)
+{
+	unsigned char i;
+	unsigned char dot1 = 0;
+	unsigned char dot2 = 0;
+	unsigned char dot3 = 0;
+	unsigned char dot4 = 0;
+	unsigned char size1 = 0;
+	unsigned char size2 = 0;
+	unsigned char size3 = 0;
+	unsigned char size4 = 0;
+
+	unsigned char new_val = 0;
+	char s_octet [4];
+
+	//me fijo las posiciones del .
+	for (i = 0; i < 15; i++)
+	{
+		if (*(ip + i) == '\0')
+		{
+			dot4 = i;
+			i = 15;
+		}
+		else
+		{
+			if (*(ip + i) == '.')
+			{
+				if (!dot1)
+					dot1 = i;
+				else if (!dot2)
+					dot2 = i;
+				else if (!dot3)
+					dot3 = i;
+				else
+					return RESP_NOK;
+			}
+		}
+	}
+
+	if (!dot4)
+		dot4 = 15;
+
+	//me fijo si tiene los tres .
+	if ((dot1 == 0) || (dot2 == 0) || (dot3 == 0))
+		return RESP_NOK;
+
+	size1 = dot1;
+	size2 = dot2 - dot1;
+	size3 = dot3 - dot2;
+	size4 = dot4 - dot3;
+
+	//me fijo que no tengan mucho espacio
+	if ((size1 > 3) || (size2 > 3) || (size3 > 3) || (size4 > 3))
+		return RESP_NOK;
+
+	//los puntos son validos, ahora reviso los numeros
+	strncpy (s_octet, ip, size1);
+	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
+		return RESP_NOK;
+
+	strncpy (s_octet, ip + size1, size2);
+	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
+		return RESP_NOK;
+
+	strncpy (s_octet, ip + size1 + size2, size3);
+	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
+		return RESP_NOK;
+
+	strncpy (s_octet, ip + size1 + size2 + size3, size4);
+	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
+		return RESP_NOK;
+
+	return RESP_OK;
+}
+
+unsigned char OctetIsValid (char * ip, unsigned char * octet_val)
+{
+	unsigned char i;
+	unsigned char dot = 0;
+	short new_val = 0;
+
+	//me fijo la posiciones del . o null
+	for (i = 0; i < 4; i++)
+	{
+		if ((*(ip + i) == '.') || (*(ip + i) == '\0'))
+		{
+			dot = i;
+			i = 10;
+		}
+	}
+
+	//si tiene . me fijo el numero
+	if (dot == 0)
+	{
+		*octet_val = 0;
+		return RESP_NOK;
+	}
+
+
+	switch (dot)
+	{
+		case 1:
+			new_val = *ip - '0';
+			break;
+
+		case 2:
+			new_val = (*ip - '0') * 10 + (*(ip + 1) - '0');
+			break;
+
+		case 3:
+			new_val = (*ip - '0') * 100 + (*(ip + 1) - '0') * 10 + (*(ip + 2) - '0');
+			break;
+	}
+
+	if ((new_val < 0) || (new_val > 255))
+	{
+		*octet_val = 0;
+		return RESP_NOK;
+	}
+
+	*octet_val = new_val;
+	return RESP_OK;
+}

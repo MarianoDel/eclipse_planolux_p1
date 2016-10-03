@@ -39,6 +39,9 @@
 #include "MQTTClient.h"
 #include "TLocalBuffer.h"
 
+#include "mqtt_wifi_interface.h"
+
+
 /** @addtogroup MIDDLEWARES
 * @{
 */ 
@@ -70,7 +73,7 @@ static TLocalBuffer localBufferReading;
 
 unsigned long MilliTimer;
 uint32_t intcounter=0;
-WiFi_Status_t status = WiFi_MODULE_SUCCESS;  
+WiFi_Status_t status = WiFi_MODULE_SUCCESS;
 /**
   * @}
   */

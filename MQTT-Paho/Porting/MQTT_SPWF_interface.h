@@ -42,8 +42,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "wifi_interface.h"
-#include "stm32_spwf_wifi.h"
+#include <stdint.h>
+//#include "wifi_interface.h"
+//#include "stm32_spwf_wifi.h"
 
 /** @addtogroup MIDDLEWARES
 * @{

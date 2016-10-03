@@ -40,4 +40,7 @@ unsigned char TCPSendData (unsigned char , char *);
 void TCPProcess (void);
 void TCPProcessInit (void);
 
+unsigned char IpIsValid (char *);
+unsigned char OctetIsValid (char *, unsigned char *);
+
 #endif /* TCP_TRANSCEIVER_H_ */

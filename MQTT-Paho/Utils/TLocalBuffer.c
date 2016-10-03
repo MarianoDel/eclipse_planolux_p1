@@ -37,7 +37,7 @@
 
 #include <string.h>
 #include "TLocalBuffer.h"
-#include "stm32f4xx_hal.h"
+//#include "stm32f4xx_hal.h"
 
 
 uint32_t LocalBufferGetSizeBuffer(TLocalBuffer* localBuffer)

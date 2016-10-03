@@ -48,6 +48,11 @@
 #endif
 #include "tcp_transceiver.h"
 
+//para MQTT
+#include "MQTT_SPWF_interface.h"
+#include "MQTTClient.h"
+#include "IBM_Bluemix_Config.h"
+
 //--- VARIABLES EXTERNAS ---//
 volatile unsigned char timer_1seg = 0;
 
@@ -212,6 +217,18 @@ unsigned char vd4 [LARGO_F + 1];
 #define LOOK_FOR_BREAK	1
 #define LOOK_FOR_MARK	2
 #define LOOK_FOR_START	3
+
+/* MQTT. Private variables ---------------------------------------------------------*/
+unsigned char MQTT_read_buf[512];
+unsigned char MQTT_write_buf[512];
+Network  n;
+Client  c;
+MQTTMessage  MQTT_msg;
+uint8_t url_ibm[80];
+MQTT_vars mqtt_ibm_setup;
+ibm_mode_t ibm_mode;  // EQ. Move this to IBM struct.
+MQTTPacket_connectData options = MQTTPacket_connectData_initializer;
+
 
 //--- FUNCIONES DEL MODULO ---//
 void TimingDelay_Decrement(void);
@@ -578,10 +595,22 @@ int main(void)
 
     			if (resp == RESP_OK)
     			{
+    				if (IpIsValid(s_lcd) == RESP_OK)
+    				{
+    					LCD_1ER_RENGLON;
+    					LCDTransmitStr((const char *) "IP valid on:    ");
+    					timer_standby = 1000;
+    					main_state = wifi_state_idle;
+    				}
+    				else
+    				{
+    					LCD_1ER_RENGLON;
+    					LCDTransmitStr((const char *) "IP is not valid!!");
+    					main_state = wifi_state_error;
+    					timer_standby = 20000;	//20 segundos de error
+    				}
 					LCD_2DO_RENGLON;
 					LCDTransmitStr(s_lcd);
-					timer_standby = 1000;
-					main_state = wifi_state_idle;
 				}
 				break;
 
@@ -589,6 +618,16 @@ int main(void)
 				//estoy conectado al wifi
 				//me intento conectar al broker
 
+				/* Initialize network interface for MQTT  */
+				/* Initialize MQTT client structure */
+				MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
+
+
+				main_state = wifi_state_connected;
+
+				break;
+
+			case wifi_state_connected:
 				break;
 
 //			case MAIN_WAIT_CONNECT_1:
