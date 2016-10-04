@@ -77,6 +77,14 @@ enum EspSendDataState
 	SEND_DATA_WAIT_SEND_OK
 };
 
+enum EspOpenSocketState
+{
+	OPEN_SOCKET_INIT = 0,
+	OPEN_SOCKET_RST,
+	OPEN_SOCKET_ASK_SOCKET,
+	OPEN_SOCKET_WAIT_OK
+};
+
 enum EspGetIPState
 {
 	GET_IP_INIT = 0,

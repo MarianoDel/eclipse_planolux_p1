@@ -277,10 +277,9 @@ unsigned char TCPSendData (unsigned char port, char * data)
 }
 
 //el bufftcpsend de transmision es port,lenght,data
-unsigned char TCPSendDataSocket (unsigned char lenght, unsigned char * data)
+unsigned char TCPSendDataSocket (unsigned char length, unsigned char * data)
 {
 	char * p;
-	unsigned char length = 0;
 	unsigned char i;
 	unsigned char resp = RESP_NOK;
 
@@ -302,7 +301,9 @@ unsigned char TCPSendDataSocket (unsigned char lenght, unsigned char * data)
 		{
 			*p = port;
 			*(p+1) = length;
-			strcpy ((p+2), (char *) data);
+			//strcpy ((p+2), (char *) data);
+			for (i = 0; i < length; i++)
+				*(p + 2 + i) = *(data + i);
 			resp = RESP_OK;
 		}
 	}

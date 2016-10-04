@@ -308,7 +308,7 @@ unsigned char ESP_SendConfigAP (void)
 
 void ESP_OpenSocketResetSM (void)
 {
-	esp_config_state = CONF_INIT;
+	esp_config_state = OPEN_SOCKET_INIT;
 }
 
 //Configura como cliente WiFi
@@ -318,22 +318,76 @@ unsigned char ESP_OpenSocket (void)
 
 	switch (esp_config_state)
 	{
-		case CONF_INIT:
-			SendCommandWaitAnswerResetSM();
-			esp_config_state = CONF_AT_CONFIG_0;
+		case OPEN_SOCKET_INIT:
+			esp_config_state++;
 			break;
 
-		case CONF_AT_CONFIG_0:
-			//protocol server IP & port
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.100\",1883\r\n");
+		case OPEN_SOCKET_RST:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = OPEN_SOCKET_ASK_SOCKET;
+			break;
 
-			if (resp == RESP_TIMEOUT)
+		case OPEN_SOCKET_ASK_SOCKET:
+			//protocol server IP & port
+
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883\r\n");
+
+			if ((resp == RESP_OK) || (resp == RESP_READY))
+			{
+				//ajusto buffer
+				//unsigned char len = sizeof ((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883");	//me da 4 que loco??
+				unsigned char len = 38;
+				strcpy ((char *) rx2buff, (char *) (rx2buff + len));
+
+				//reviso respuestas
+				if (strncmp((char *) rx2buff, (char *) (const char *) "CONNECTOK", sizeof ((const char *) "CONNECTOK") - 1) == 0)
+					resp = RESP_OK;
+				else if (strncmp((char *)rx2buff, (char *) (const char *) "ALREADY CONNECTED", sizeof ((const char *) "ALREADY CONNECTED") - 1) == 0)
+					resp = RESP_OK;
+				else
+				{
+					resp = RESP_CONTINUE;
+					esp_timeout = TT_AT_3SEG;
+					esp_config_state++;
+				}
+			}
+
+			if ((resp == RESP_NOK) || (resp == RESP_TIMEOUT))
+			{
 				resp = RESP_NOK;
-			//utilizo esta respuesta como salida de la funcion
+				esp_config_state = OPEN_SOCKET_INIT;
+			}
+
+//			SendCommandWithAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883\r\n");
+			break;
+
+		case OPEN_SOCKET_WAIT_OK:
+			//me quedo esperando el ok de envio o timeout
+			if (esp_answer == RESP_READY)
+			{
+				//reviso si se conecto en el buffer
+				ESPPreParser((unsigned char *)rx2buff);
+
+				//reviso respuestas
+				if (strncmp((char *) (const char *) "CONNECTOK", (char *)rx2buff, (sizeof ((const char *) "CONNECTOK")) - 1) == 0)
+					resp = RESP_OK;
+				else if (strncmp((char *) (const char *) "ALREADY CONNECTED", (char *)rx2buff, (sizeof ((const char *) "ALREADY CONNECTED")) - 1) == 0)
+					resp = RESP_OK;
+				else
+					resp = RESP_NOK;
+			}
+
+			if (!esp_timeout)
+			{
+				//tengo timeout, no pude abrir socket
+				//resp = RESP_TIMEOUT;
+				resp = RESP_NOK;
+			}
+
 			break;
 
 		default:
-			esp_config_state = CONF_INIT;
+			esp_config_state = OPEN_SOCKET_INIT;
 			break;
 	}
 
@@ -588,6 +642,7 @@ unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 			resp = RESP_NOK;
 			if (strncmp(s_comm, (char *)rx2buff, length) == 0)
 			{
+				resp = RESP_READY;		//si no pega las respuestas comunes igual aviso que el comando era correcto
 				if ((*(rx2buff + length) == 'O') && (*(rx2buff + length + 1) == 'K'))
 					resp = RESP_OK;
 
@@ -656,10 +711,10 @@ void ESP_ATModeRx (unsigned char d)
 	//tengo que ver en que parte del AT estoy
 	if ((!at_start) && (!pckt_start))
 	{
-		if ((d == 'A') || (d == 'R') || (d == 'S') || (d == 'W') || (d == 'O') || (d == 'F'))
+		if ((d == 'A') || (d == 'R') || (d == 'S') || (d == 'W') || (d == 'O') || (d == 'F') || (d == 'C'))
 		{																//AT o Recv o SEND OK
 			prx = rx2buff;												//WIFI... o OK o FAIL
-			*prx = d;
+			*prx = d;													//ALREADY... o CONNECT
 			prx++;
 			at_start = 1;
 		}

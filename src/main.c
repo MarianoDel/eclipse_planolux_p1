@@ -654,8 +654,11 @@ int main(void)
 					}
 					else
 					{
+						LCD_1ER_RENGLON;
+						LCDTransmitStr((const char *) "CONNECT     ");
 						resp = TCPSendDataSocket (dummy_resp, pc->buf);
 						main_state = wifi_state_connected;
+						timer_standby = 3000;
 					}
 				}
 
@@ -668,7 +671,7 @@ int main(void)
 				break;
 
 			case wifi_state_connected:
-				//espero CONNACK
+				//espero CONNACK o  TIMEOUT
 				if (esp_unsolicited_pckt == RESP_READY)
 				{
 					esp_unsolicited_pckt = RESP_CONTINUE;
@@ -683,6 +686,13 @@ int main(void)
 			        else
 			        	main_state = wifi_state_idle;
 
+				}
+
+				if (!timer_standby)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Cant open a socket");
+					main_state = wifi_state_idle;
 				}
 				break;
 
