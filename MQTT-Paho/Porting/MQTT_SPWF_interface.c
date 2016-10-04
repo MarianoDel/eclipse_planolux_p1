@@ -40,7 +40,8 @@
 #include "TLocalBuffer.h"
 
 #include "mqtt_wifi_interface.h"
-
+#include "tcp_transceiver.h"
+#include "main_menu.h"
 
 /** @addtogroup MIDDLEWARES
 * @{
@@ -179,10 +180,15 @@ void spwf_socket_close (Network* n)
   */
 int spwf_socket_write (Network* net, unsigned char* buffer, int lenBuf, int timeout){
    
-   if(wifi_socket_client_write(net->my_socket, lenBuf, (char *)buffer) !=  WiFi_MODULE_SUCCESS){
-           return BROKER_ERR;
-   }    
-   return lenBuf;
+//   if(wifi_socket_client_write(net->my_socket, lenBuf, (char *)buffer) !=  WiFi_MODULE_SUCCESS){
+//           return BROKER_ERR;
+//   }
+//   return lenBuf;
+	//wrapper de TCP para ESP
+	if (TCPSendDataSocket (net->my_socket, lenBuf, buffer) == RESP_NOK)
+		return BROKER_ERR;
+
+	return lenBuf;
  }
 
 /**

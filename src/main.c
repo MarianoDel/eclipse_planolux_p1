@@ -220,7 +220,7 @@ unsigned char vd4 [LARGO_F + 1];
 
 /* MQTT. Private variables ---------------------------------------------------------*/
 unsigned char MQTT_read_buf[512];
-unsigned char MQTT_write_buf[512];
+unsigned char MQTT_write_buf[128];
 Network  n;
 Client  c;
 MQTTMessage  MQTT_msg;
@@ -228,6 +228,9 @@ uint8_t url_ibm[80];
 MQTT_vars mqtt_ibm_setup;
 ibm_mode_t ibm_mode;  // EQ. Move this to IBM struct.
 MQTTPacket_connectData options = MQTTPacket_connectData_initializer;
+uint8_t json_buffer[512];
+void prepare_json_pkt (uint8_t * buffer);
+void Config_MQTT_Mosquitto ( MQTT_vars *);
 
 
 //--- FUNCIONES DEL MODULO ---//
@@ -271,6 +274,7 @@ int main(void)
 	unsigned char new_lamp = 0;
 	unsigned char last_bright = 0;
 	unsigned char show_ldr = 0;
+	int dummy_resp = 0;
 
 #ifdef USE_PROD_PROGRAM
 	unsigned char jump_the_menu = 0;
@@ -513,6 +517,10 @@ int main(void)
 	//---------- Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
 #ifdef WIFI_TO_MQTT_BROKER
 	main_state = wifi_state_reset;
+
+	Client * pc;
+	pc = &c;
+
     while( 1 )
     {
     	switch (main_state)
@@ -616,18 +624,86 @@ int main(void)
 
 			case wifi_state_idle:
 				//estoy conectado al wifi
-				//me intento conectar al broker
-
+				Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
 				/* Initialize network interface for MQTT  */
+				NewNetwork(&n);
 				/* Initialize MQTT client structure */
 				MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
 
+				ESP_OpenSocketResetSM();
+				main_state = wifi_state_connecting;
+				break;
 
-				main_state = wifi_state_connected;
+			case wifi_state_connecting:
+				resp = ESP_OpenSocket();
 
+				if (resp == RESP_OK)
+				{
+					options.MQTTVersion = 3;
+					options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
+					options.username.cstring = (char*)mqtt_ibm_setup.username;
+					options.password.cstring = (char*)mqtt_ibm_setup.password;
+
+					dummy_resp = MQTTSerialize_connect(pc->buf, pc->buf_size, &options);
+					//if (MQTTConnect(&c, &options) < 0)
+					if (dummy_resp <= 0)
+					{
+						LCD_1ER_RENGLON;
+						LCDTransmitStr((const char *) "BRKR params error!!");
+						main_state = wifi_state_idle;
+					}
+					else
+					{
+						resp = TCPSendDataSocket (dummy_resp, pc->buf);
+						main_state = wifi_state_connected;
+					}
+				}
+
+				if (resp == RESP_NOK)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "Cant open a socket");
+					main_state = wifi_state_idle;
+				}
 				break;
 
 			case wifi_state_connected:
+				//espero CONNACK
+				if (esp_unsolicited_pckt == RESP_READY)
+				{
+					esp_unsolicited_pckt = RESP_CONTINUE;
+
+			        unsigned char connack_rc = 255;
+			        char sessionPresent = 0;
+
+			        if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
+			        {
+			        	main_state = mqtt_connect;
+			        }
+			        else
+			        	main_state = wifi_state_idle;
+
+				}
+				break;
+
+			case mqtt_connect:
+			      /* Prepare MQTT message */
+			      prepare_json_pkt(json_buffer);
+			      MQTT_msg.qos=QOS0;
+			      MQTT_msg.dup=0;
+			      MQTT_msg.retained=1;
+			      MQTT_msg.payload= (char *) json_buffer;
+			      MQTT_msg.payloadlen=strlen( (char *) json_buffer);
+
+			      /* Publish MQTT message */
+			      if ( MQTTPublish(&c,(char*)mqtt_ibm_setup.pub_topic,&MQTT_msg) < 0)
+			      {
+			    	  LCD_1ER_RENGLON;
+			    	  LCDTransmitStr((const char *) "Failed to publish");
+			          main_state = wifi_state_connected;
+			      }
+
+
 				break;
 
 //			case MAIN_WAIT_CONNECT_1:
@@ -1256,6 +1332,57 @@ void UpdatePackets (void)
 	}
 }
 
+
+void Config_MQTT_Mosquitto ( MQTT_vars *mqtt_ibm_setup)
+{
+    strcpy((char*)mqtt_ibm_setup->pub_topic, "iot-2/evt/status/fmt/json");
+    strcpy((char*)mqtt_ibm_setup->sub_topic, "");
+    strcpy((char*)mqtt_ibm_setup->clientid,"d:quickstart:nucleo:");
+    //strcat((char*)mqtt_ibm_setup->clientid,(char *)macadd);
+    mqtt_ibm_setup->qos = QOS0;
+    strcpy((char*)mqtt_ibm_setup->username,"");
+    strcpy((char*)mqtt_ibm_setup->password,"");
+    strcpy((char*)mqtt_ibm_setup->hostname,"quickstart.messaging.internetofthings.ibmcloud.com");
+    strcpy((char*)mqtt_ibm_setup->device_type,"");
+    strcpy((char*)mqtt_ibm_setup->org_id,"");
+    mqtt_ibm_setup->port = 8883; //TLS
+    mqtt_ibm_setup->protocol = 's'; // TLS no certificates
+
+}
+
+
+void prepare_json_pkt (uint8_t * buffer)
+{
+      int32_t d1 = 1, d2 = 2, d3 = 3, d4 = 4, d5 = 5, d6 = 6;
+      char tempbuff[40];
+      volatile float HUMIDITY_Value;
+      volatile float TEMPERATURE_Value;
+      volatile float PRESSURE_Value;
+
+
+
+      strcpy((char *)buffer,"{\"d\":{\"myName\":\"Nucleo\"");
+//      BSP_HUM_TEMP_GetTemperature((float *)&TEMPERATURE_Value);
+//      floatToInt(TEMPERATURE_Value, &d1, &d2, 2);
+      sprintf(tempbuff, ",\"A_Temperature\":%lu.%lu",d1, d2);
+      strcat((char *)buffer,tempbuff);
+
+//      BSP_HUM_TEMP_GetHumidity((float *)&HUMIDITY_Value);
+//      floatToInt(HUMIDITY_Value, &d3, &d4, 2);
+      sprintf(tempbuff, ",\"A_Humidity\":%lu.%lu",d3,d4 );
+      strcat(  (char *)buffer,tempbuff);
+
+//      BSP_PRESSURE_GetPressure((float *)&PRESSURE_Value);
+//      floatToInt(PRESSURE_Value, &d5, &d6, 2);
+      sprintf(tempbuff, ",\"A_Pressure\":%lu.%lu",d5,d6 );
+      strcat((char *)buffer,tempbuff);
+
+
+      strcat((char *)buffer,"}}");
+
+      return;
+}
+
 void EXTI4_15_IRQHandler(void)
 {
 	unsigned short aux;
@@ -1436,6 +1563,11 @@ void TimingDelay_Decrement(void)
 	}
 	else
 		secs++;
+
+#ifdef WIFI_TO_MQTT_BROKER
+	//timer del MQTT
+	SysTickIntHandler();
+#endif
 }
 
 //------ EOF -------//

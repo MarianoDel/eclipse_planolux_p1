@@ -276,6 +276,40 @@ unsigned char TCPSendData (unsigned char port, char * data)
 	return resp;
 }
 
+//el bufftcpsend de transmision es port,lenght,data
+unsigned char TCPSendDataSocket (unsigned char lenght, unsigned char * data)
+{
+	char * p;
+	unsigned char length = 0;
+	unsigned char i;
+	unsigned char resp = RESP_NOK;
+
+	unsigned char port = 0;
+	//aca reviso si el puerto esta conectado
+	if ((port >= 0) && (port <= 4))
+	{
+		//length = strlen(data);
+
+		//busco buffer tcp vacio
+		for (i = 0; i < 5; i++)
+		{
+			p = &bufftcpsend [i] [0];
+			if (*(p+1) == 0)
+				i = 10;				//buffer vacio, lo uso
+		}
+
+		if ((i >= 10) && (length < (SIZEOF_BUFFTCP_SEND - 2)))
+		{
+			*p = port;
+			*(p+1) = length;
+			strcpy ((p+2), (char *) data);
+			resp = RESP_OK;
+		}
+	}
+
+	return resp;
+}
+
 unsigned char ReadPcktR(unsigned char * p, unsigned short own_addr, unsigned char * new_r, unsigned char * len)
 {
 	unsigned char new_shine;
@@ -470,28 +504,32 @@ unsigned char IpIsValid (char * ip)
 		return RESP_NOK;
 
 	size1 = dot1;
-	size2 = dot2 - dot1;
-	size3 = dot3 - dot2;
-	size4 = dot4 - dot3;
+	size2 = dot2 - dot1 - 1;
+	size3 = dot3 - dot2 - 1;
+	size4 = dot4 - dot3 - 1;
 
 	//me fijo que no tengan mucho espacio
 	if ((size1 > 3) || (size2 > 3) || (size3 > 3) || (size4 > 3))
 		return RESP_NOK;
 
 	//los puntos son validos, ahora reviso los numeros
+	memset (s_octet, '\0', sizeof(s_octet));
 	strncpy (s_octet, ip, size1);
 	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
 		return RESP_NOK;
 
-	strncpy (s_octet, ip + size1, size2);
+	memset (s_octet, '\0', sizeof(s_octet));
+	strncpy (s_octet, ip + dot1 + 1, size2);
 	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
 		return RESP_NOK;
 
-	strncpy (s_octet, ip + size1 + size2, size3);
+	memset (s_octet, '\0', sizeof(s_octet));
+	strncpy (s_octet, ip + dot2 + 1, size3);
 	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
 		return RESP_NOK;
 
-	strncpy (s_octet, ip + size1 + size2 + size3, size4);
+	memset (s_octet, '\0', sizeof(s_octet));
+	strncpy (s_octet, ip + dot3 + 1, size4);
 	if (OctetIsValid (s_octet, &new_val) == RESP_NOK)
 		return RESP_NOK;
 

@@ -37,6 +37,7 @@ unsigned char ReadPcktR(unsigned char *, unsigned short, unsigned char *, unsign
 void ReadPcktS(unsigned char *);
 unsigned short GetValue (unsigned char *);
 unsigned char TCPSendData (unsigned char , char *);
+unsigned char TCPSendDataSocket (unsigned char, unsigned char *);
 void TCPProcess (void);
 void TCPProcessInit (void);
 

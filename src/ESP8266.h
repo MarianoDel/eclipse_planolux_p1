@@ -122,6 +122,9 @@ unsigned char ESP_SendData (unsigned char, unsigned char *);
 void ESP_SendDataResetSM (void);
 unsigned char ESP_GetIP (char *);
 
+unsigned char ESP_OpenSocket (void);
+void ESP_OpenSocketResetSM (void);
+
 #endif /* HLK_RM04_H_ */
 
 

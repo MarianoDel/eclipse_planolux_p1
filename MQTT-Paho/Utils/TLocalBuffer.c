@@ -62,7 +62,13 @@ void LocalBufferInit(TLocalBuffer* localBuffer)
 uint8_t LocalBufferPopBuffer(TLocalBuffer* localBuffer,void* Buffer,int Size)
 {
   while(localBuffer->Semaphore)
-    HAL_Delay(1);
+  {
+	  //HAL_Delay(1);
+	  asm (	"nop \n\t"
+	  						"nop \n\t"
+	  						"nop \n\t" );
+  }
+
 
   if((localBuffer->PushIndex-localBuffer->PopIndex)<(uint32_t)Size || Size==0)
     return 0;

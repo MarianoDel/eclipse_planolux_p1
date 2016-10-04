@@ -306,6 +306,40 @@ unsigned char ESP_SendConfigAP (void)
 	return resp;
 }
 
+void ESP_OpenSocketResetSM (void)
+{
+	esp_config_state = CONF_INIT;
+}
+
+//Configura como cliente WiFi
+unsigned char ESP_OpenSocket (void)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	switch (esp_config_state)
+	{
+		case CONF_INIT:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = CONF_AT_CONFIG_0;
+			break;
+
+		case CONF_AT_CONFIG_0:
+			//protocol server IP & port
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.100\",1883\r\n");
+
+			if (resp == RESP_TIMEOUT)
+				resp = RESP_NOK;
+			//utilizo esta respuesta como salida de la funcion
+			break;
+
+		default:
+			esp_config_state = CONF_INIT;
+			break;
+	}
+
+	return resp;
+}
+
 void ESP_SendDataResetSM (void)
 {
 	esp_config_state = SEND_DATA_INIT;
