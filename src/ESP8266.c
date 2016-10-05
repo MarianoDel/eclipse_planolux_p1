@@ -139,7 +139,8 @@ unsigned char ESP_SendConfigClient (void)
 			if (strncmp((char *)rx2buff, (const char *) "OK", (sizeof((const char *) "OK") - 1)) == 0)
 			{
 				//tengo link e IP
-				resp = RESP_OK;
+				//resp = RESP_OK;
+				resp = RESP_CONTINUE;
 				esp_config_state = CONF_AT_CONFIG_3;	//avanzo
 			}
 
@@ -179,9 +180,25 @@ unsigned char ESP_SendConfigClient (void)
 
 		case CONF_AT_CONFIG_3B:
 			resp = SendCommandWaitAnswer((const char *) "AT+CWDHCP_CUR=1,1\r\n");
+
+			if (resp == RESP_OK)
+			{
+				esp_config_state = CONF_AT_CONFIG_4;
+				resp = RESP_CONTINUE;
+			}
+			break;
+
+		case CONF_AT_CONFIG_4:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = CONF_AT_CONFIG_4B;
+			break;
+
+		case CONF_AT_CONFIG_4B:
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPMUX=1\r\n");
 			//utilizo esta respuesta como salida de la funcion
 
 			break;
+
 
 		default:
 			esp_config_state = CONF_INIT;
@@ -330,17 +347,22 @@ unsigned char ESP_OpenSocket (void)
 		case OPEN_SOCKET_ASK_SOCKET:
 			//protocol server IP & port
 
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883\r\n");
+			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=0,\"TCP\",\"192.168.0.102\",1883\r\n");
+			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883\r\n");
+			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.100\",1883\r\n");
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=0,\"TCP\",\"192.168.0.100\",1883\r\n");
 
 			if ((resp == RESP_OK) || (resp == RESP_READY))
 			{
 				//ajusto buffer
 				//unsigned char len = sizeof ((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883");	//me da 4 que loco??
-				unsigned char len = 38;
+				//unsigned char len = 38;
+				unsigned char len = 40;
 				strcpy ((char *) rx2buff, (char *) (rx2buff + len));
 
 				//reviso respuestas
-				if (strncmp((char *) rx2buff, (char *) (const char *) "CONNECTOK", sizeof ((const char *) "CONNECTOK") - 1) == 0)
+//				if (strncmp((char *) rx2buff, (char *) (const char *) "CONNECTOK", sizeof ((const char *) "CONNECTOK") - 1) == 0)
+				if (strncmp((char *) rx2buff, (char *) (const char *) "0,CONNECTOK", sizeof ((const char *) "0,CONNECTOK") - 1) == 0)
 					resp = RESP_OK;
 				else if (strncmp((char *)rx2buff, (char *) (const char *) "ALREADY CONNECTED", sizeof ((const char *) "ALREADY CONNECTED") - 1) == 0)
 					resp = RESP_OK;
@@ -369,7 +391,8 @@ unsigned char ESP_OpenSocket (void)
 				ESPPreParser((unsigned char *)rx2buff);
 
 				//reviso respuestas
-				if (strncmp((char *) (const char *) "CONNECTOK", (char *)rx2buff, (sizeof ((const char *) "CONNECTOK")) - 1) == 0)
+//				if (strncmp((char *) (const char *) "CONNECTOK", (char *)rx2buff, (sizeof ((const char *) "CONNECTOK")) - 1) == 0)
+				if (strncmp((char *) (const char *) "0,CONNECTOK", (char *)rx2buff, (sizeof ((const char *) "0,CONNECTOK")) - 1) == 0)
 					resp = RESP_OK;
 				else if (strncmp((char *) (const char *) "ALREADY CONNECTED", (char *)rx2buff, (sizeof ((const char *) "ALREADY CONNECTED")) - 1) == 0)
 					resp = RESP_OK;
