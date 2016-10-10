@@ -5,11 +5,30 @@
  *      Author: Mariano
  */
 
+#include "mqtt_wifi_interface.h"
 #include "ESP8266.h"
 #include "main_menu.h"
 
+
 #include <stdint.h>
 
+
+void Config_MQTT_Mosquitto ( MQTT_vars *mqtt_ibm_setup)
+{
+    strcpy((char*)mqtt_ibm_setup->pub_topic, "iot/json");
+    strcpy((char*)mqtt_ibm_setup->sub_topic, "");
+    strcpy((char*)mqtt_ibm_setup->clientid,"plano:p1:0001");
+    //strcat((char*)mqtt_ibm_setup->clientid,(char *)macadd);
+    mqtt_ibm_setup->qos = QOS0;
+    strcpy((char*)mqtt_ibm_setup->username,"test");
+    strcpy((char*)mqtt_ibm_setup->password,"test");
+    strcpy((char*)mqtt_ibm_setup->hostname,"quickstart.messaging.internetofthings.ibmcloud.com");
+    strcpy((char*)mqtt_ibm_setup->device_type,"");
+    strcpy((char*)mqtt_ibm_setup->org_id,"");
+    mqtt_ibm_setup->port = 1883; //TLS
+    mqtt_ibm_setup->protocol = 't'; // TLS no certificates
+
+}
 
 
 /**

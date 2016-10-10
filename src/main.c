@@ -51,8 +51,9 @@
 //para MQTT
 #include "MQTT_SPWF_interface.h"
 #include "MQTTClient.h"
-#include "IBM_Bluemix_Config.h"
+//#include "IBM_Bluemix_Config.h"
 #include "rdm_util.h"
+#include "mqtt_wifi_interface.h"
 
 //--- VARIABLES EXTERNAS ---//
 volatile unsigned char timer_1seg = 0;
@@ -201,9 +202,11 @@ unsigned char v_opt [10];
 
 
 // ------- del DMX -------
+#ifdef USE_DMX
 volatile unsigned char signal_state = 0;
 volatile unsigned char dmx_timeout_timer = 0;
 //unsigned short tim_counter_65ms = 0;
+#endif
 
 // ------- de los filtros DMX -------
 #define LARGO_F		32
@@ -232,7 +235,7 @@ ibm_mode_t ibm_mode;  // EQ. Move this to IBM struct.
 MQTTPacket_connectData options = MQTTPacket_connectData_initializer;
 uint8_t json_buffer[512];
 void prepare_json_pkt (uint8_t * buffer);
-void Config_MQTT_Mosquitto ( MQTT_vars *);
+
 
 
 //--- FUNCIONES DEL MODULO ---//
@@ -892,6 +895,7 @@ int main(void)
 
 				if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
 				{
+					pc->isconnected = 1;
 					main_state = mqtt_connect;
 				}
 				else
@@ -1546,22 +1550,6 @@ int main(void)
 //--- End of Main ---//
 
 
-void Config_MQTT_Mosquitto ( MQTT_vars *mqtt_ibm_setup)
-{
-    strcpy((char*)mqtt_ibm_setup->pub_topic, "iot/json");
-    strcpy((char*)mqtt_ibm_setup->sub_topic, "");
-    strcpy((char*)mqtt_ibm_setup->clientid,"plano:p1:0001");
-    //strcat((char*)mqtt_ibm_setup->clientid,(char *)macadd);
-    mqtt_ibm_setup->qos = QOS0;
-    strcpy((char*)mqtt_ibm_setup->username,"test");
-    strcpy((char*)mqtt_ibm_setup->password,"test");
-    strcpy((char*)mqtt_ibm_setup->hostname,"quickstart.messaging.internetofthings.ibmcloud.com");
-    strcpy((char*)mqtt_ibm_setup->device_type,"");
-    strcpy((char*)mqtt_ibm_setup->org_id,"");
-    mqtt_ibm_setup->port = 1883; //TLS
-    mqtt_ibm_setup->protocol = 't'; // TLS no certificates
-
-}
 
 
 void prepare_json_pkt (uint8_t * buffer)
