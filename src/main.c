@@ -49,9 +49,8 @@
 #include "tcp_transceiver.h"
 
 //para MQTT
-#include "MQTT_SPWF_interface.h"
+//#include "MQTT_SPWF_interface.h"
 #include "MQTTClient.h"
-//#include "IBM_Bluemix_Config.h"
 #include "rdm_util.h"
 #include "mqtt_wifi_interface.h"
 
@@ -330,8 +329,9 @@ int main(void)
 
 	//TIM Configuration.
 	TIM_3_Init();
-	TIM_14_Init();
-	TIM_16_Init();		//para OneShoot() cuando funciona en modo master
+	TIM_14_Init();		//lo uso en la interrupcion de RX DMX
+	TIM_15_Init();		//lo uso para SysTick en MQTT
+	TIM_16_Init();		//para OneShoot() cuando funciona en modo master en envio de DMX
 	TIM_17_Init();		//lo uso para el ADC de Igrid
 
 	//--- PRUEBA DISPLAY LCD ---
@@ -847,6 +847,7 @@ int main(void)
 			case mqtt_init:
 				Usart2Send((char *) (const char *)"MQTT Memory Only Test...\r\n");
 
+				MQTTtimer_init();
 				Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
 				/* Initialize network interface for MQTT  */
 				NewNetwork(&n);

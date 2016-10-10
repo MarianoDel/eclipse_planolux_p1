@@ -14,6 +14,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f0xx.h"
 #include "stm32f0x_tim.h"
 #include "stm32f0xx_tim.h"
 #include "stm32f0xx_misc.h"
@@ -21,6 +22,9 @@
 #include "hard.h"
 
 #include "dmx_transceiver.h"
+//#include "mqtt_wifi_interface.h"
+#include "MQTT_SPWF_interface.h"
+
 
 //--- VARIABLES EXTERNAS ---//
 extern volatile unsigned char timer_1seg;
@@ -174,8 +178,25 @@ void TIM_6_Init (void)
 	//Configuracion del timer.
 	TIM6->CR1 = 0x00;		//clk int / 1; upcounting
 	TIM6->PSC = 47;			//tick cada 1us
-	TIM6->ARR = 0xFFFF;			//para que arranque
-	//TIM6->CR1 |= TIM_CR1_CEN;
+	TIM6->ARR = 1000;		//cuenta 1ms
+//	TIM6->DIER |= TIM_DIER_UIE;
+//	TIM6->CR1 |= TIM_CR1_URS | TIM_CR1_CEN;	//solo int cuando hay overflow
+//
+//	NVIC_EnableIRQ(TIM6_IRQn);
+//	NVIC_SetPriority(TIM6_IRQn, 9);
+
+}
+
+void TIM_14_Init (void)
+{
+	if (!RCC_TIM14_CLK)
+		RCC_TIM14_CLK_ON;
+
+	//Configuracion del timer.
+	TIM14->CR1 = 0x00;		//clk int / 1; upcounting; uev
+	TIM14->PSC = 47;			//tick cada 1us
+	TIM14->ARR = 0xFFFF;			//para que arranque
+	TIM14->EGR |= 0x0001;
 }
 
 void TIM14_IRQHandler (void)	//100uS
@@ -187,46 +208,33 @@ void TIM14_IRQHandler (void)	//100uS
 }
 
 
-void TIM_14_Init (void)
+void TIM_15_Init (void)
 {
-
-	//NVIC_InitTypeDef NVIC_InitStructure;
-
-	if (!RCC_TIM14_CLK)
-		RCC_TIM14_CLK_ON;
-
-	/*
-	//Configuracion del timer.
-	TIM14->ARR = 2000; //10m
-	TIM14->CNT = 0;
-	TIM14->PSC = 479;
-	TIM14->EGR = TIM_EGR_UG;
-
-	// Enable timer ver UDIS
-	TIM14->DIER |= TIM_DIER_UIE;
-	TIM14->CR1 |= TIM_CR1_CEN;
-
-	NVIC_InitStructure.NVIC_IRQChannel = TIM14_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPriority = 5;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-	*/
+	if (!RCC_TIM15_CLK)
+		RCC_TIM15_CLK_ON;
 
 	//Configuracion del timer.
-	TIM14->CR1 = 0x00;		//clk int / 1; upcounting; uev
-	TIM14->PSC = 47;			//tick cada 1us
-	TIM14->ARR = 0xFFFF;			//para que arranque
-	TIM14->EGR |= 0x0001;
+	TIM15->CR1 = 0x00;		//clk int / 1; upcounting; uev
+	TIM15->PSC = 47;			//tick cada 1us
+	TIM15->ARR = 1000;			//cada 1ms
+	TIM15->EGR |= 0x0001;
+
+	// Enable timer interrupt ver UDIS
+	TIM15->DIER |= TIM_DIER_UIE;
+	TIM15->CR1 |= TIM_CR1_URS | TIM_CR1_CEN;	//solo int cuando hay overflow
+
+	NVIC_EnableIRQ(TIM15_IRQn);
+	NVIC_SetPriority(TIM15_IRQn, 9);
+
 }
 
-void TIM16_IRQHandler (void)	//es one shoot
+void TIM15_IRQHandler (void)	//1ms
 {
-#ifdef USE_DMX
-	SendDMXPacket(PCKT_UPDATE);
-#endif
-	if (TIM16->SR & 0x01)
+	SysTickIntHandler ();
+
+	if (TIM15->SR & 0x01)
 		//bajar flag
-		TIM16->SR = 0x00;
+		TIM15->SR = 0x00;
 }
 
 
@@ -248,19 +256,20 @@ void TIM_16_Init (void)
 	NVIC_SetPriority(TIM16_IRQn, 7);
 }
 
+void TIM16_IRQHandler (void)	//es one shoot
+{
+#ifdef USE_DMX
+	SendDMXPacket(PCKT_UPDATE);
+#endif
+	if (TIM16->SR & 0x01)
+		//bajar flag
+		TIM16->SR = 0x00;
+}
+
 void OneShootTIM16 (unsigned short a)
 {
 	TIM16->ARR = a;
 	TIM16->CR1 |= TIM_CR1_CEN;
-}
-
-void TIM17_IRQHandler (void)	//200uS
-{
-	igrid_timer = 1;
-	vgrid_timer = 1;
-
-	if (TIM17->SR & 0x01)
-		TIM17->SR = 0x00;		//bajar flag
 }
 
 
@@ -276,10 +285,19 @@ void TIM_17_Init (void)
 
 	// Enable timer interrupt ver UDIS
 	TIM17->DIER |= TIM_DIER_UIE;
-	TIM17->CR1 |= TIM_CR1_URS | TIM_CR1_CEN;	//solo int cuando hay overflow y one shot
+	TIM17->CR1 |= TIM_CR1_URS | TIM_CR1_CEN;	//solo int cuando hay overflow
 
 	NVIC_EnableIRQ(TIM17_IRQn);
 	NVIC_SetPriority(TIM17_IRQn, 8);
+}
+
+void TIM17_IRQHandler (void)	//200uS
+{
+	igrid_timer = 1;
+	vgrid_timer = 1;
+
+	if (TIM17->SR & 0x01)
+		TIM17->SR = 0x00;		//bajar flag
 }
 
 //--- end of file ---//

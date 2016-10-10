@@ -73,15 +73,7 @@ typedef struct mqtt_vars
 } MQTT_vars;
 
 
-
-/* MQTT IBM Functions */
-void Config_MQTT_IBM ( MQTT_vars *mqtt_ibm_setup, uint8_t *macadd );
-void Compose_Quickstart_URL ( uint8_t *url_ibm, uint8_t *macadd );
 void MQTTtimer_init(void);
-
-/* Time config variables for MQTT Paho */
-#define SCALE 84000000/10000
-#define COUNTER_TM 10000/1000
 
 void Config_MQTT_Mosquitto ( MQTT_vars *);
 void TIM4_IRQHandler(void);

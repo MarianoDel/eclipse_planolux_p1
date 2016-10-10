@@ -12,22 +12,32 @@
 
 #include <stdint.h>
 
+//--- Globals ------------------------//
+unsigned long MilliTimer;
 
-void Config_MQTT_Mosquitto ( MQTT_vars *mqtt_ibm_setup)
+
+//--- Function Definitions -----------//
+
+void Config_MQTT_Mosquitto ( MQTT_vars *mqtt_broker_setup)
 {
-    strcpy((char*)mqtt_ibm_setup->pub_topic, "iot/json");
-    strcpy((char*)mqtt_ibm_setup->sub_topic, "");
-    strcpy((char*)mqtt_ibm_setup->clientid,"plano:p1:0001");
-    //strcat((char*)mqtt_ibm_setup->clientid,(char *)macadd);
-    mqtt_ibm_setup->qos = QOS0;
-    strcpy((char*)mqtt_ibm_setup->username,"test");
-    strcpy((char*)mqtt_ibm_setup->password,"test");
-    strcpy((char*)mqtt_ibm_setup->hostname,"quickstart.messaging.internetofthings.ibmcloud.com");
-    strcpy((char*)mqtt_ibm_setup->device_type,"");
-    strcpy((char*)mqtt_ibm_setup->org_id,"");
-    mqtt_ibm_setup->port = 1883; //TLS
-    mqtt_ibm_setup->protocol = 't'; // TLS no certificates
+    strcpy((char*)mqtt_broker_setup->pub_topic, "iot/json");
+    strcpy((char*)mqtt_broker_setup->sub_topic, "");
+    strcpy((char*)mqtt_broker_setup->clientid,"plano:p1:0001");
+    //strcat((char*)mqtt_broker_setup->clientid,(char *)macadd);
+    mqtt_broker_setup->qos = QOS0;
+    strcpy((char*)mqtt_broker_setup->username,"test");
+    strcpy((char*)mqtt_broker_setup->password,"test");
+    strcpy((char*)mqtt_broker_setup->hostname,"quickstart.messaging.internetofthings.ibmcloud.com");
+    strcpy((char*)mqtt_broker_setup->device_type,"");
+    strcpy((char*)mqtt_broker_setup->org_id,"");
+    mqtt_broker_setup->port = 1883; //TLS
+    mqtt_broker_setup->protocol = 't'; // TLS no certificates
 
+}
+
+void MQTTtimer_init(void)
+{
+	MilliTimer = 0;
 }
 
 
