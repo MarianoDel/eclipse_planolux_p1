@@ -38,6 +38,7 @@ void DMX_Disa(void)
 	USART1->CR1 &= ~USART_CR1_UE;
 }
 
+#ifdef USE_DMX
 //revisa si existe paquete RDM y que hacer con el mismo
 //
 void UpdateRDMResponder(void)
@@ -112,3 +113,4 @@ void SendDMXPacket (unsigned char new_func)
 	}
 }
 
+#endif

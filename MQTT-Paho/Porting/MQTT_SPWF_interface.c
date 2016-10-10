@@ -185,7 +185,8 @@ int spwf_socket_write (Network* net, unsigned char* buffer, int lenBuf, int time
 //   }
 //   return lenBuf;
 	//wrapper de TCP para ESP
-	if (TCPSendDataSocket (net->my_socket, lenBuf, buffer) == RESP_NOK)
+	//if (TCPSendDataSocket (net->my_socket, lenBuf, buffer) == RESP_NOK)
+	if (TCPSendDataSocket (lenBuf, buffer) == RESP_NOK)
 		return BROKER_ERR;
 
 	return lenBuf;

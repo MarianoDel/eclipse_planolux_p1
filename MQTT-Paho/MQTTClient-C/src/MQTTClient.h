@@ -85,6 +85,11 @@ void setDefaultMessageHandler(Client*, messageHandler);
 
 void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, unsigned char*, size_t);
 
+//los mios para poder llamar desde afuera
+int getNextPacketId(Client *);
+int sendPacket(Client*, int, Timer*);
+int waitfor(Client*, int , Timer*);
+
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 

@@ -87,7 +87,7 @@ unsigned char wifi_socket_client_write(uint8_t sock_id, uint16_t DataLength,char
 */
 unsigned char wifi_socket_client_close(uint8_t sock_close_id)
 {
-
+	unsigned char resp = RESP_CONTINUE;
 //  WiFi_Status_t status = WiFi_MODULE_SUCCESS;
 //  Reset_AT_CMD_Buffer();
 //
@@ -101,4 +101,5 @@ unsigned char wifi_socket_client_close(uint8_t sock_close_id)
 //
 //  Set_AT_Cmd_Response_False = WIFI_TRUE;
 //  return status;
+	return resp;
 }

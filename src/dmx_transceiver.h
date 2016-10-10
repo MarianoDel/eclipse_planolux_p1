@@ -10,17 +10,17 @@
 
 
 //---------- Estructura de Paquetes RDM_KIRNO --------//
-typedef struct RDMKirnoPckt
-{
-	unsigned char start_code;
-	unsigned char msg_lenght;
-	unsigned int dest_addr;
-	unsigned int source_addr;
-	unsigned char transc_number;
-	unsigned char * pDUB;
-	unsigned char end_code0;	//0xFE
-	unsigned char end_code1;	//0xFE
-};
+//typedef struct RDMKirnoPckt
+//{
+//	unsigned char start_code;
+//	unsigned char msg_lenght;
+//	unsigned int dest_addr;
+//	unsigned int source_addr;
+//	unsigned char transc_number;
+//	unsigned char * pDUB;
+//	unsigned char end_code0;	//0xFE
+//	unsigned char end_code1;	//0xFE
+//};
 
 
 //--- ESTADOS DE TRANSMISION DE PAQUETES DMX512

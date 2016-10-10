@@ -52,6 +52,7 @@
 #include "MQTT_SPWF_interface.h"
 #include "MQTTClient.h"
 #include "IBM_Bluemix_Config.h"
+#include "rdm_util.h"
 
 //--- VARIABLES EXTERNAS ---//
 volatile unsigned char timer_1seg = 0;
@@ -73,6 +74,7 @@ volatile unsigned char rx2buff[SIZEOF_DATA];
 //volatile unsigned char spi_bytes_left = 0;
 
 // ------- Externals del DMX -------
+#ifdef USE_DMX
 volatile unsigned char Packet_Detected_Flag;
 volatile unsigned char DMX_packet_flag;
 volatile unsigned char RDM_packet_flag;
@@ -84,7 +86,7 @@ volatile unsigned char DMX_channel_quantity = 4;
 volatile unsigned char data1[SIZEOF_DATA1];
 //static unsigned char data_back[10];
 volatile unsigned char data[SIZEOF_DATA];
-
+#endif
 // ------- Externals de los timers -------
 //volatile unsigned short prog_timer = 0;
 //volatile unsigned short mainmenu_timer = 0;
@@ -822,6 +824,222 @@ int main(void)
 #endif
     //---------- Fin Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
 
+	//---------- Prueba Conexiones Prueba MQTT_MEM_ONLY ---------//
+#ifdef MQTT_MEM_ONLY
+	main_state = mqtt_init;
+
+	Client * pc;
+	pc = &c;
+	int rc = FAILURE;
+	char topicName [80];
+	unsigned char s_connack [] = {0x20, 0x02};		//Deserialize_connack no le da bola al length
+	unsigned char connack_rc = 255;
+	char sessionPresent = 0;
+
+
+    while( 1 )
+    {
+    	switch (main_state)
+    	{
+			case mqtt_init:
+				Usart2Send((char *) (const char *)"MQTT Memory Only Test...\r\n");
+
+				Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
+				/* Initialize network interface for MQTT  */
+				NewNetwork(&n);
+				/* Initialize MQTT client structure */
+				MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
+
+				main_state++;
+				break;
+
+			case mqtt_sending_connect:
+				options.MQTTVersion = 3;
+				options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
+				options.username.cstring = (char*)mqtt_ibm_setup.username;
+				options.password.cstring = (char*)mqtt_ibm_setup.password;
+
+				dummy_resp = MQTTSerialize_connect(pc->buf, pc->buf_size, &options);
+				//if (MQTTConnect(&c, &options) < 0)
+				if (dummy_resp <= 0)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "BRKR params error!!");
+					main_state = mqtt_connect_failed;
+				}
+				else
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "CONNECT     ");
+					//resp = TCPSendDataSocket (dummy_resp, pc->buf);
+					main_state = mqtt_waiting_connack_load;
+					timer_standby = 3000;
+				}
+				break;
+
+			case mqtt_waiting_connack_load:
+
+				RDMUtil_StringCopy(pc->readbuf, pc->readbuf_size, s_connack, sizeof(s_connack));
+				main_state = mqtt_waiting_connack;
+				break;
+
+			case mqtt_waiting_connack:
+				//espero CONNACK o  TIMEOUT
+//				unsigned char connack_rc = 255;
+//				char sessionPresent = 0;
+				connack_rc = 255;
+				sessionPresent = 0;
+
+				if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
+				{
+					main_state = mqtt_connect;
+				}
+				else
+					main_state = mqtt_connect_failed;
+
+				break;
+
+			case mqtt_connect_failed:
+				break;
+
+
+			case mqtt_connect:
+
+				if (!timer_standby)		//cuando agoto el timer publico
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "PUB new data    ");
+					LCD_2DO_RENGLON;
+					LCDTransmitStr(s_blank_line);
+					timer_standby = 5000;
+
+					main_state = mqtt_pub_prepare;
+				}
+				break;
+
+			case mqtt_pub_prepare:
+				/* Prepare MQTT message */
+				prepare_json_pkt(json_buffer);
+				MQTT_msg.qos=QOS0;
+				MQTT_msg.dup=0;
+				MQTT_msg.retained=1;
+				MQTT_msg.payload= (char *) json_buffer;
+				MQTT_msg.payloadlen=strlen( (char *) json_buffer);
+				strcpy(topicName, (const char *)"prueba");
+				main_state = mqtt_pub;
+				break;
+
+			case mqtt_pub:
+				/* Publish MQTT message */
+			    rc = FAILURE;
+			    Timer timer;
+			    MQTTString topic = MQTTString_initializer;
+			    topic.cstring = (char *)topicName;
+			    int len = 0;
+
+			    InitTimer(&timer);
+			    countdown_ms(&timer, pc->command_timeout_ms);
+
+			    if (!pc->isconnected)
+			    	main_state = mqtt_pub_failed;
+
+			    if (MQTT_msg.qos == QOS1 || MQTT_msg.qos == QOS2)
+			    	MQTT_msg.id = getNextPacketId(pc);
+
+			    len = MQTTSerialize_publish(pc->buf, pc->buf_size, 0, MQTT_msg.qos, MQTT_msg.retained, MQTT_msg.id,
+			              topic, (unsigned char*)MQTT_msg.payload, MQTT_msg.payloadlen);
+
+			    if (len <= 0)
+			    	main_state = mqtt_pub_failed;
+			    if ((rc = sendPacket(pc, len, &timer)) != OK) // send the subscribe packet
+			    	main_state = mqtt_pub_failed;
+
+			    if (MQTT_msg.qos == QOS1)
+			    {
+			    	main_state = mqtt_waiting_puback;
+			    }
+			    else if (MQTT_msg.qos == QOS2)
+			    {
+			    	main_state = mqtt_waiting_pubcomp;
+			    }
+
+			    //resultado de las funciones
+//				exit:
+//				    return rc;
+
+			    if (rc == FAILURE)
+			    	main_state = mqtt_pub_failed;
+
+				break;
+
+			case mqtt_pub_failed:
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Failed to publish");
+				main_state = mqtt_connect;
+				break;
+
+			case mqtt_waiting_puback:
+		        if (waitfor(pc, PUBACK, &timer) == PUBACK)
+		        {
+		            unsigned short mypacketid;
+		            unsigned char dup, type;
+		            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, pc->readbuf, pc->readbuf_size) != 1)
+		                rc = FAILURE;
+		        }
+		        else
+		            rc = FAILURE;
+				break;
+
+			case mqtt_waiting_pubcomp:
+		        if (waitfor(pc, PUBCOMP, &timer) == PUBCOMP)
+		        {
+		            unsigned short mypacketid;
+		            unsigned char dup, type;
+		            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, pc->readbuf, pc->readbuf_size) != 1)
+		                rc = FAILURE;
+		        }
+		        else
+		            rc = FAILURE;
+		        break;
+
+			default:
+				main_state = mqtt_init;
+				break;
+    	}
+    	//Procesos continuos
+    	ESP_ATProcess ();
+    	TCPProcess();
+
+    	if (!timer_wifi_bright)
+    	{
+    		timer_wifi_bright = 5;	//muevo un punto cada 5ms
+    		if (new_room > last_bright)		//TODO: en vez de new_room deberia utilizar un filtro de los ultimos valores recibidos
+    		{
+    			last_bright++;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+    		else if (new_room < last_bright)
+    		{
+    			last_bright--;
+    			Update_TIM3_CH1 (last_bright);
+    		}
+
+    		//prendo relay
+//    		if (last_bright > 20)
+//    		{
+//    			if (!RELAY)
+//    				RELAY_ON;
+//    		}
+//    		else if (last_bright < 10)
+//    		{
+//    			if (RELAY)
+//    				RELAY_OFF;
+//    		}
+    	}
+    }
+#endif
+    //---------- Fin Prueba MQTT_MEM_ONLY ---------//
+
 	//---------- Prueba Conexiones ESP8266 & HLK_RM04  --------//
 #ifdef WIFI_TO_CEL_PHONE_PROGRAM
     while( 1 )
@@ -1328,35 +1546,20 @@ int main(void)
 //--- End of Main ---//
 
 
-void UpdatePackets (void)
-{
-	if (Packet_Detected_Flag)
-	{
-		if (data[0] == 0x00)
-			DMX_packet_flag = 1;
-
-		if (data[0] == 0xCC)
-			RDM_packet_flag = 1;
-
-		Packet_Detected_Flag = 0;
-	}
-}
-
-
 void Config_MQTT_Mosquitto ( MQTT_vars *mqtt_ibm_setup)
 {
-    strcpy((char*)mqtt_ibm_setup->pub_topic, "iot-2/evt/status/fmt/json");
+    strcpy((char*)mqtt_ibm_setup->pub_topic, "iot/json");
     strcpy((char*)mqtt_ibm_setup->sub_topic, "");
-    strcpy((char*)mqtt_ibm_setup->clientid,"d:quickstart:nucleo:");
+    strcpy((char*)mqtt_ibm_setup->clientid,"plano:p1:0001");
     //strcat((char*)mqtt_ibm_setup->clientid,(char *)macadd);
     mqtt_ibm_setup->qos = QOS0;
-    strcpy((char*)mqtt_ibm_setup->username,"");
-    strcpy((char*)mqtt_ibm_setup->password,"");
+    strcpy((char*)mqtt_ibm_setup->username,"test");
+    strcpy((char*)mqtt_ibm_setup->password,"test");
     strcpy((char*)mqtt_ibm_setup->hostname,"quickstart.messaging.internetofthings.ibmcloud.com");
     strcpy((char*)mqtt_ibm_setup->device_type,"");
     strcpy((char*)mqtt_ibm_setup->org_id,"");
-    mqtt_ibm_setup->port = 8883; //TLS
-    mqtt_ibm_setup->protocol = 's'; // TLS no certificates
+    mqtt_ibm_setup->port = 1883; //TLS
+    mqtt_ibm_setup->protocol = 't'; // TLS no certificates
 
 }
 
@@ -1391,6 +1594,21 @@ void prepare_json_pkt (uint8_t * buffer)
       strcat((char *)buffer,"}}");
 
       return;
+}
+
+#ifdef USE_DMX
+void UpdatePackets (void)
+{
+	if (Packet_Detected_Flag)
+	{
+		if (data[0] == 0x00)
+			DMX_packet_flag = 1;
+
+		if (data[0] == 0xCC)
+			RDM_packet_flag = 1;
+
+		Packet_Detected_Flag = 0;
+	}
 }
 
 void EXTI4_15_IRQHandler(void)
@@ -1483,6 +1701,7 @@ void EXTI4_15_IRQHandler(void)
 		EXTI->PR |= 0x0100;
 	}
 }
+#endif
 
 void TimingDelay_Decrement(void)
 {
@@ -1501,8 +1720,10 @@ void TimingDelay_Decrement(void)
 	if (acswitch_timer)
 		acswitch_timer--;
 
+#ifdef USE_DMX
 	if (dmx_timeout_timer)
 		dmx_timeout_timer--;
+#endif
 
 //	if (prog_timer)
 //		prog_timer--;

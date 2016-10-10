@@ -221,8 +221,9 @@ void TIM_14_Init (void)
 
 void TIM16_IRQHandler (void)	//es one shoot
 {
+#ifdef USE_DMX
 	SendDMXPacket(PCKT_UPDATE);
-
+#endif
 	if (TIM16->SR & 0x01)
 		//bajar flag
 		TIM16->SR = 0x00;

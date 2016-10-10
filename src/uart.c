@@ -79,9 +79,11 @@ void USART1_IRQHandler(void)
 	/* USART in mode Receiver --------------------------------------------------*/
 	if (USART1->ISR & USART_ISR_RXNE)
 	{
+
 		//RX DMX
 		dummy = USART1->RDR & 0x0FF;
 
+#ifdef USE_DMX
 		if (dmx_receive_flag != PCKT_NOT_READY)
 		{
 			if (DMX_channel_received == 0)		//empieza paquete me fijo si es DMX o RDM
@@ -169,6 +171,7 @@ void USART1_IRQHandler(void)
 		}
 		else
 			USART1->RQR |= 0x08;	//hace un flush de los datos sin leerlos
+#endif
 	}
 
 	/* USART in mode Transmitter -------------------------------------------------*/
@@ -182,7 +185,7 @@ void USART1_IRQHandler(void)
 	//		USARTx->CR1 &= ~0x00000088;	//bajo TXEIE bajo TE
 			//USART1->CR1 &= ~USART_CR1_TXEIE;
 			//USARTx->TDR = 0x00;
-
+#ifdef USE_DMX
 			if (pdmx < &data1[512])
 			{
 				USART1->TDR = *pdmx;
@@ -219,7 +222,7 @@ void USART1_IRQHandler(void)
 
 			}
 */
-
+#endif
 		}
 
 	}
@@ -293,6 +296,7 @@ void USART2_IRQHandler(void)
 	}
 }
 
+#ifdef USE_DMX
 void UsartSendDMX (void)
 {
 	//data1[0] = 0x00;
@@ -300,6 +304,7 @@ void UsartSendDMX (void)
 	//USART_ITConfig(USARTx, USART_IT_TXE, ENABLE);
 	USART1->CR1 |= USART_CR1_TXEIE;
 }
+#endif
 
 void Usart2Send (char * send)
 {
