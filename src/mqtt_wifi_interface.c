@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 //--- Globals ------------------------//
-unsigned long MilliTimer;
+extern unsigned long MilliTimer;
 
 
 //--- Function Definitions -----------//
@@ -40,6 +40,18 @@ void MQTTtimer_init(void)
 	MilliTimer = 0;
 }
 
+int CheckForPubs (Client * c, unsigned short timeout_ms)
+{
+    int rc = OK;
+    Timer timer;
+
+    InitTimer(&timer);
+    countdown_ms(&timer, timeout_ms);
+
+    rc = cycle(c, &timer);
+
+    return rc;
+}
 
 /**
 * @brief  wifi_socket_client_open

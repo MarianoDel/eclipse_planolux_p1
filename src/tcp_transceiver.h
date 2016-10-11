@@ -23,6 +23,7 @@ enum TcpMessages
 
 #define TT_KALIVE	8000	//8 segundos de keep alive para el tcp
 #define SIZEOF_BUFFTCP_SEND		128
+#define MAX_BUFF_INDEX			5
 #define TT_TCP_SEND		1000
 
 //--- ESTADOS DEL TCP SEND ---------//
@@ -38,8 +39,11 @@ void ReadPcktS(unsigned char *);
 unsigned short GetValue (unsigned char *);
 unsigned char TCPSendData (unsigned char , char *);
 unsigned char TCPSendDataSocket (unsigned char, unsigned char *);
+unsigned char TCPReadDataSocket (unsigned char *, unsigned char *, unsigned char *);
 void TCPProcess (void);
 void TCPProcessInit (void);
+
+unsigned char ReadSocket (unsigned char *, unsigned char);
 
 unsigned char IpIsValid (char *);
 unsigned char OctetIsValid (char *, unsigned char *);

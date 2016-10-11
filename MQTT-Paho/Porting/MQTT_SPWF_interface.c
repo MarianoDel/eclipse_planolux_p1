@@ -200,31 +200,34 @@ int spwf_socket_write (Network* net, unsigned char* buffer, int lenBuf, int time
   *         timeout : timeout for writing to socket 
   * @retval sizeReceived : number of bytes read
   */
-int spwf_socket_read (Network* net, unsigned char* i, int ch, int timeout){
-    
-  int sizeReceived;
- 
-  sizeReceived = LocalBufferGetSizeBuffer(&localBufferReading);
-  
-  if(sizeReceived > 0) 
-  {
-    if(sizeReceived >= ch)
-    {
-      LocalBufferPopBuffer(&localBufferReading, i, ch);
-      return ch;
-    }
-    else
-    {  
-      LocalBufferPopBuffer(&localBufferReading, i, sizeReceived);
-      return sizeReceived;
-    }     
-  }
-  return 0;
+int spwf_socket_read (Network* net, unsigned char* i, int ch, int timeout)
+{
+
+	return ReadSocket(i, (unsigned char) ch);
+
+//  int sizeReceived;
+//
+//  sizeReceived = LocalBufferGetSizeBuffer(&localBufferReading);
+//
+//  if(sizeReceived > 0)
+//  {
+//    if(sizeReceived >= ch)
+//    {
+//      LocalBufferPopBuffer(&localBufferReading, i, ch);
+//      return ch;
+//    }
+//    else
+//    {
+//      LocalBufferPopBuffer(&localBufferReading, i, sizeReceived);
+//      return sizeReceived;
+//    }
+//  }
+//  return 0;
  }
 
 /**
-  * @brief  Map MQTT network interface with SPWF wrapper functions 
-  * @param  n : Network structure 
+  * @brief  Map MQTT network interface with SPWF wrapper functions
+  * @param  n : Network structure
   * @retval None
   */
 void NewNetwork(Network* n) {

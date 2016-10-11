@@ -87,7 +87,7 @@ void countdown(Timer*, unsigned int);
 int left_ms(Timer*);
 void InitTimer(Timer*);
 
-void NewNetwork(Network*);   
+void NewNetwork(Network*);
 int spwf_socket_create (Network*, uint8_t*, uint32_t, uint8_t*);
 int spwf_socket_write (Network*, unsigned char*, int, int);
 int spwf_socket_read (Network*, unsigned char*, int, int);

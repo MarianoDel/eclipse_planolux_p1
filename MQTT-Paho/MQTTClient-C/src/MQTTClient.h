@@ -89,6 +89,7 @@ void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, unsigne
 int getNextPacketId(Client *);
 int sendPacket(Client*, int, Timer*);
 int waitfor(Client*, int , Timer*);
+int cycle(Client*, Timer*);
 
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}

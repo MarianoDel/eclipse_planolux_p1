@@ -17,21 +17,19 @@
 
 
 //--- Externals -----------------------------------//
-
-//extern volatile unsigned char data1[];
-extern volatile unsigned char data[];
-//
-//#define data512		data1
-#define data256		data
-
 extern volatile unsigned short tcp_send_timeout;
 extern unsigned char esp_answer;
+extern unsigned char esp_unsolicited_pckt;
+extern volatile unsigned char bufftcp[];
 
 //--- Globals -------------------------------------//
-char bufftcpsend [5] [SIZEOF_BUFFTCP_SEND];
-char * ptcp;
+unsigned char bufftcpsend [MAX_BUFF_INDEX] [SIZEOF_BUFFTCP_SEND];
+//unsigned char bport_index_send [5] [5];
+unsigned char * ptcp;
 unsigned char tcp_tx_state = 0;
 
+unsigned char bufftcprecv [MAX_BUFF_INDEX] [SIZEOF_BUFFTCP_SEND];
+unsigned char bport_index_receiv [MAX_BUFF_INDEX];
 
 //--- Module Functions ----------------------------//
 
@@ -94,11 +92,12 @@ void TCPProcessInit (void)
 {
 	unsigned char i;
 
-	for (i = 0; i < 5; i++)
+	for (i = 0; i < MAX_BUFF_INDEX; i++)
 	{
 		ptcp = &bufftcpsend[i] [0];
 		*(ptcp+1) = 0;
 	}
+
 }
 
 //me llaman continuamente para avanzar las maquinas de estado
@@ -106,14 +105,15 @@ void TCPProcessInit (void)
 void TCPProcess (void)
 {
 	//char * ptcp; a global
-	unsigned char i;
+	unsigned char i, rxlen;
 	unsigned char resp = RESP_CONTINUE;
 
+	//--- En transmision ---//
 	switch (tcp_tx_state)
 	{
 		case TCP_TX_IDLE:
 			//reviso si tengo algo que enviar
-			for (i = 0; i < 5; i++)
+			for (i = 0; i < MAX_BUFF_INDEX; i++)
 			{
 				ptcp = &bufftcpsend[i] [0];
 				if (*(ptcp+1) != 0)
@@ -169,6 +169,27 @@ void TCPProcess (void)
 		default:
 			tcp_tx_state = TCP_TX_IDLE;
 			break;
+	}
+
+	//--- En recepcion ---//
+	if (esp_unsolicited_pckt == RESP_READY)
+	{
+		esp_unsolicited_pckt = RESP_CONTINUE;
+
+		//guardo en el proximo buffer vacio o vuelvo
+		for (i = 0; i < MAX_BUFF_INDEX; i++)
+		{
+			if (bport_index_receiv[i] == 0)	//buffer vacio, lo uso
+			{
+				if (TCPReadDataSocket((unsigned char*) bufftcp, &bufftcprecv[i] [0], &rxlen) != 0xFF)
+				{
+					if (rxlen > 0)
+						bport_index_receiv[i] = rxlen;
+
+					i = MAX_BUFF_INDEX;
+				}
+			}
+		}
 	}
 }
 
@@ -257,7 +278,7 @@ unsigned char TCPSendData (unsigned char port, char * data)
 		length = strlen(data);
 
 		//busco buffer tcp vacio
-		for (i = 0; i < 5; i++)
+		for (i = 0; i < MAX_BUFF_INDEX; i++)
 		{
 			p = &bufftcpsend [i] [0];
 			if (*(p+1) == 0)
@@ -290,7 +311,7 @@ unsigned char TCPSendDataSocket (unsigned char length, unsigned char * data)
 		//length = strlen(data);
 
 		//busco buffer tcp vacio
-		for (i = 0; i < 5; i++)
+		for (i = 0; i < MAX_BUFF_INDEX; i++)
 		{
 			p = &bufftcpsend [i] [0];
 			if (*(p+1) == 0)
@@ -311,6 +332,78 @@ unsigned char TCPSendDataSocket (unsigned char length, unsigned char * data)
 	return resp;
 }
 
+//Revisa tipo de mensaje y puerto (0 a 4)
+//procesa el buffer en crudo y lo copia en un buffer de salida con solo numeros y letras
+//devuelve length
+unsigned char TCPReadDataSocket(unsigned char * d, unsigned char * output, unsigned char * length)
+{
+	unsigned char port = 0xFF;
+	unsigned char len_index = 0;
+	unsigned char i;
+	unsigned char max_len = 0;
+	unsigned char * d_offset;
+
+	//llega:
+	//+IPD,0,6:geta;\n
+	if (strncmp((char *) (const char *) "+IPD,", (char *) d, sizeof((char *) (const char *) "+IPD,")) == 0)
+	{
+		if ((*(d+5) >= '0') && (*(d+5) <= '4'))
+		{
+			port = *(d+5) - '0';
+			for (i = 0; i < 4; i++)	//busco length
+			{
+				if (*(d+7+i) == ':')
+					i = 4;
+
+				len_index++;
+			}
+
+			max_len = (unsigned char) atoi ((char *) (d+7));
+
+			if (max_len > 0)
+			{
+				d_offset = (d+7+len_index);
+				memcpy (output, d_offset, max_len);
+				*length = max_len;
+			}
+			else
+				port = 0xFF;
+		}
+	}
+	return port;
+}
+
+unsigned char ReadSocket (unsigned char * buff, unsigned char maxlen)
+{
+	unsigned char i, len = 0;
+
+	//levanto los buffers utilizados
+	for (i = 0; i < MAX_BUFF_INDEX; i++)
+	{
+		if (bport_index_receiv[i] != 0)	//buffer con data, lo mando
+		{
+			if (bport_index_receiv[i] < maxlen)	//tengo lugar
+			{
+				memcpy (buff, &bufftcprecv[i] [0], bport_index_receiv[i]);
+				len = bport_index_receiv[i];
+				bport_index_receiv[i] = 0;
+			}
+			else
+			{
+				memcpy (buff, &bufftcprecv[i] [0], maxlen);
+				len = maxlen;
+				bport_index_receiv[i] -= maxlen;
+			}
+
+
+
+			i = MAX_BUFF_INDEX;
+		}
+	}
+
+	return len;
+
+}
 unsigned char ReadPcktR(unsigned char * p, unsigned short own_addr, unsigned char * new_r, unsigned char * len)
 {
 	unsigned char new_shine;

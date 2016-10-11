@@ -79,9 +79,7 @@ void Config_MQTT_Mosquitto ( MQTT_vars *);
 void TIM4_IRQHandler(void);
 void Error_Handler(void);
 void messageArrived(MessageData* md);
-
-
-
+int CheckForPubs (Client * c, unsigned short timeout_ms);
 
 
 unsigned char wifi_socket_client_open(uint8_t * hostname, uint32_t port_number, uint8_t * protocol, uint8_t * sock_id);

@@ -910,7 +910,7 @@ int main(void)
 
 			case mqtt_connect:
 
-				if (!timer_standby)		//cuando agoto el timer publico
+				if (!timer_standby)		//cuando agoto el timer, publico
 				{
 					LCD_1ER_RENGLON;
 					LCDTransmitStr((const char *) "PUB new data    ");
@@ -920,6 +920,10 @@ int main(void)
 
 					main_state = mqtt_pub_prepare;
 				}
+
+				//reviso nuevos paquetes
+				CheckForPubs (pc, 1000);
+
 				break;
 
 			case mqtt_pub_prepare:
