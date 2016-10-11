@@ -57,12 +57,14 @@
 void TIM3_IRQHandler (void);
 void TIM_3_Init(void);
 void TIM_6_Init (void);
-void TIM14_IRQHandler (void);
 void TIM_14_Init(void);
-void TIM16_IRQHandler (void);
+void TIM14_IRQHandler (void);
+void TIM_15_Init(void);
+void TIM15_IRQHandler (void);
 void TIM_16_Init(void);
-void TIM17_IRQHandler (void);
+void TIM16_IRQHandler (void);
 void TIM_17_Init(void);
+void TIM17_IRQHandler (void);
 void Update_TIM3_CH1 (unsigned short);
 void Update_TIM3_CH2 (unsigned short);
 void Update_TIM3_CH3 (unsigned short);

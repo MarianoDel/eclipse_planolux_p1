@@ -345,26 +345,6 @@ typedef enum {
 } wifi_state_t;
 #endif
 
-//ESTADOS DEL PROGRAMA PRINCIPAL EN MODO MQTT_MEM_ONLY
-#ifdef MQTT_MEM_ONLY
-typedef enum {
-	mqtt_init = 0,
-	mqtt_sending_connect,
-	mqtt_waiting_connack_load,
-	mqtt_waiting_connack,
-	mqtt_connect_failed,
-	mqtt_connect,
-	mqtt_pub_prepare,
-	mqtt_pub,
-	mqtt_pub_failed,
-	mqtt_waiting_pubcomp,
-	mqtt_waiting_puback,
-	mqtt_sub,
-
-	mqtt_device_control,
-	wifi_undefine_state       = 0xFF,
-} wifi_state_t;
-#endif
 
 //---- Temperaturas en el LM335
 //37	2,572

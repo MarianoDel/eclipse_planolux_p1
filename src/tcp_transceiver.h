@@ -21,9 +21,12 @@ enum TcpMessages
 	LIGHTS_ON
 };
 
-#define TT_KALIVE	8000	//8 segundos de keep alive para el tcp
+//--- SIZE OF TCP BUFFERS ---------//
 #define SIZEOF_BUFFTCP_SEND		128
 #define MAX_BUFF_INDEX			5
+
+//--- TIMEOUTS TIMERS FOR TCP ---------//
+#define TT_KALIVE	8000	//8 segundos de keep alive para el tcp
 #define TT_TCP_SEND		1000
 
 //--- ESTADOS DEL TCP SEND ---------//

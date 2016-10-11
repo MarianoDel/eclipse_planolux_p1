@@ -37,7 +37,7 @@
 
 #include "MQTT_SPWF_interface.h"
 #include "MQTTClient.h"
-#include "TLocalBuffer.h"
+//#include "TLocalBuffer.h"
 
 #include "mqtt_wifi_interface.h"
 #include "tcp_transceiver.h"
@@ -66,15 +66,15 @@
 /** @addtogroup MQTT_MODULE_Private_Variables
   * @{
   */
-uint8_t receive_data[APPLICATION_BUFFER_SIZE];
-uint32_t application_idx = 0;
-uint8_t  sock_id;
+//uint8_t receive_data[APPLICATION_BUFFER_SIZE];
+//uint32_t application_idx = 0;
+//uint8_t  sock_id;
 
-static TLocalBuffer localBufferReading;
+//static TLocalBuffer localBufferReading;
 
 unsigned long MilliTimer;
-uint32_t intcounter=0;
-WiFi_Status_t status = WiFi_MODULE_SUCCESS;
+//uint32_t intcounter=0;
+//WiFi_Status_t status = WiFi_MODULE_SUCCESS;
 /**
   * @}
   */
@@ -147,15 +147,15 @@ void InitTimer(Timer* timer) {
   */
 int spwf_socket_create (Network* net, uint8_t * hostname, uint32_t port_number,uint8_t * protocol){
 
-  status = wifi_socket_client_open(hostname, port_number,  protocol, &sock_id);
-  net->my_socket = sock_id;
-  if(status==WiFi_MODULE_SUCCESS)
-  {  
-      /* Initialize buffer to manage data read via callbacks from WiFi module */
-      LocalBufferInit(&localBufferReading);    
-     return BROKER_OK;
-  }
-  else
+//  status = wifi_socket_client_open(hostname, port_number,  protocol, &sock_id);
+//  net->my_socket = sock_id;
+//  if(status==WiFi_MODULE_SUCCESS)
+//  {
+//      /* Initialize buffer to manage data read via callbacks from WiFi module */
+//      LocalBufferInit(&localBufferReading);
+//     return BROKER_OK;
+//  }
+//  else
      return BROKER_ERR;
   
  }
@@ -247,28 +247,28 @@ void NewNetwork(Network* n) {
   */
 void ind_wifi_socket_data_received(uint8_t * data_ptr, uint32_t message_size, uint32_t chunck_size)
 {
- if ( message_size > APPLICATION_BUFFER_SIZE )
- {
-     // printf("\r\nError...receive_data buffer should be managed dynamically. \r\n");
-     return;
- }
-
- if ( message_size == chunck_size){
-    memcpy(receive_data, data_ptr, chunck_size);       
- }
- else
- {     
-     memcpy(&receive_data[application_idx], data_ptr, chunck_size);
-     application_idx += chunck_size;
-    
-     if (application_idx == message_size){              
-       application_idx = 0;      
-     }
-     else
-       return;
-  }
-
-  LocalBufferPushBuffer(&localBufferReading,(char *)&receive_data,message_size);
+// if ( message_size > APPLICATION_BUFFER_SIZE )
+// {
+//     // printf("\r\nError...receive_data buffer should be managed dynamically. \r\n");
+//     return;
+// }
+//
+// if ( message_size == chunck_size){
+//    memcpy(receive_data, data_ptr, chunck_size);
+// }
+// else
+// {
+//     memcpy(&receive_data[application_idx], data_ptr, chunck_size);
+//     application_idx += chunck_size;
+//
+//     if (application_idx == message_size){
+//       application_idx = 0;
+//     }
+//     else
+//       return;
+//  }
+//
+//  LocalBufferPushBuffer(&localBufferReading,(char *)&receive_data,message_size);
 }
 
 

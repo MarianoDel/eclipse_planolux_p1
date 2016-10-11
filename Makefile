@@ -126,13 +126,14 @@ SRC += .\src\tcp_transceiver.c
 SRC += .\src\rdm_util.c
 ## MQTT libraries
 SRC += .\src\mqtt_wifi_interface.c
+SRC += .\src\network_functions.c
 SRC += .\MQTT-Paho\MQTTClient-C\src\MQTTClient.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTPacket.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTConnectClient.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTDeserializePublish.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTSerializePublish.c
 SRC += .\MQTT-Paho\Porting\MQTT_SPWF_interface.c
-SRC += .\MQTT-Paho\Utils\TLocalBuffer.c
+#SRC += .\MQTT-Paho\Utils\TLocalBuffer.c
 ## System Support
 #SRC += .\cmsis_boot\system_stm32f0xx.c
 #SRC += $(DISCOVERY)\stm32f0_discovery.c

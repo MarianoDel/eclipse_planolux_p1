@@ -12,8 +12,10 @@
 
 #include <stdint.h>
 
-//--- Globals ------------------------//
+//--- Externals ----------------------//
 extern unsigned long MilliTimer;
+
+//--- Globals ------------------------//
 
 
 //--- Function Definitions -----------//

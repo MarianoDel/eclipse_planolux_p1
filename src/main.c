@@ -53,6 +53,7 @@
 #include "MQTTClient.h"
 #include "rdm_util.h"
 #include "mqtt_wifi_interface.h"
+#include "network_functions.h"
 
 //--- VARIABLES EXTERNAS ---//
 volatile unsigned char timer_1seg = 0;
@@ -194,6 +195,7 @@ volatile unsigned char filter_timer;
 //volatile unsigned char take_sample;
 //volatile unsigned char move_relay;
 volatile unsigned short secs = 0;
+unsigned short mqtt_timer = 0;
 
 
 // ------- del display -------
@@ -223,16 +225,16 @@ unsigned char vd4 [LARGO_F + 1];
 #define LOOK_FOR_START	3
 
 /* MQTT. Private variables ---------------------------------------------------------*/
-unsigned char MQTT_read_buf[512];
-unsigned char MQTT_write_buf[128];
+unsigned char MQTT_read_buf[SIZEOF_BUFFTCP_SEND];
+unsigned char MQTT_write_buf[SIZEOF_BUFFTCP_SEND];
 Network  n;
 Client  c;
 MQTTMessage  MQTT_msg;
-uint8_t url_ibm[80];
+//uint8_t url_ibm[80];
 MQTT_vars mqtt_ibm_setup;
-ibm_mode_t ibm_mode;  // EQ. Move this to IBM struct.
+//ibm_mode_t ibm_mode;  // EQ. Move this to IBM struct.
 MQTTPacket_connectData options = MQTTPacket_connectData_initializer;
-uint8_t json_buffer[512];
+uint8_t json_buffer[SIZEOF_BUFFTCP_SEND];
 void prepare_json_pkt (uint8_t * buffer);
 
 
@@ -831,190 +833,20 @@ int main(void)
 #ifdef MQTT_MEM_ONLY
 	main_state = mqtt_init;
 
-	Client * pc;
-	pc = &c;
-	int rc = FAILURE;
-	char topicName [80];
-	unsigned char s_connack [] = {0x20, 0x02};		//Deserialize_connack no le da bola al length
-	unsigned char connack_rc = 255;
-	char sessionPresent = 0;
+//	Client * pc;
+//	pc = &c;
+//	int rc = FAILURE;
+//	char topicName [80];
+//	unsigned char s_connack [] = {0x20, 0x02};		//Deserialize_connack no le da bola al length
+//	unsigned char connack_rc = 255;
+//	char sessionPresent = 0;
 
+	MQTTFunctionResetSM();
 
     while( 1 )
     {
-    	switch (main_state)
-    	{
-			case mqtt_init:
-				Usart2Send((char *) (const char *)"MQTT Memory Only Test...\r\n");
+    	resp = MQTTFunction();
 
-				MQTTtimer_init();
-				Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
-				/* Initialize network interface for MQTT  */
-				NewNetwork(&n);
-				/* Initialize MQTT client structure */
-				MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
-
-				main_state++;
-				break;
-
-			case mqtt_sending_connect:
-				options.MQTTVersion = 3;
-				options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
-				options.username.cstring = (char*)mqtt_ibm_setup.username;
-				options.password.cstring = (char*)mqtt_ibm_setup.password;
-
-				dummy_resp = MQTTSerialize_connect(pc->buf, pc->buf_size, &options);
-				//if (MQTTConnect(&c, &options) < 0)
-				if (dummy_resp <= 0)
-				{
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "BRKR params error!!");
-					main_state = mqtt_connect_failed;
-				}
-				else
-				{
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "CONNECT     ");
-					//resp = TCPSendDataSocket (dummy_resp, pc->buf);
-					main_state = mqtt_waiting_connack_load;
-					timer_standby = 3000;
-				}
-				break;
-
-			case mqtt_waiting_connack_load:
-
-				RDMUtil_StringCopy(pc->readbuf, pc->readbuf_size, s_connack, sizeof(s_connack));
-				main_state = mqtt_waiting_connack;
-				break;
-
-			case mqtt_waiting_connack:
-				//espero CONNACK o  TIMEOUT
-//				unsigned char connack_rc = 255;
-//				char sessionPresent = 0;
-				connack_rc = 255;
-				sessionPresent = 0;
-
-				if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
-				{
-					pc->isconnected = 1;
-					main_state = mqtt_connect;
-				}
-				else
-					main_state = mqtt_connect_failed;
-
-				break;
-
-			case mqtt_connect_failed:
-				break;
-
-
-			case mqtt_connect:
-
-				if (!timer_standby)		//cuando agoto el timer, publico
-				{
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "PUB new data    ");
-					LCD_2DO_RENGLON;
-					LCDTransmitStr(s_blank_line);
-					timer_standby = 5000;
-
-					main_state = mqtt_pub_prepare;
-				}
-
-				//reviso nuevos paquetes
-				CheckForPubs (pc, 1000);
-
-				break;
-
-			case mqtt_pub_prepare:
-				/* Prepare MQTT message */
-				prepare_json_pkt(json_buffer);
-				MQTT_msg.qos=QOS0;
-				MQTT_msg.dup=0;
-				MQTT_msg.retained=1;
-				MQTT_msg.payload= (char *) json_buffer;
-				MQTT_msg.payloadlen=strlen( (char *) json_buffer);
-				strcpy(topicName, (const char *)"prueba");
-				main_state = mqtt_pub;
-				break;
-
-			case mqtt_pub:
-				/* Publish MQTT message */
-			    rc = FAILURE;
-			    Timer timer;
-			    MQTTString topic = MQTTString_initializer;
-			    topic.cstring = (char *)topicName;
-			    int len = 0;
-
-			    InitTimer(&timer);
-			    countdown_ms(&timer, pc->command_timeout_ms);
-
-			    if (!pc->isconnected)
-			    	main_state = mqtt_pub_failed;
-
-			    if (MQTT_msg.qos == QOS1 || MQTT_msg.qos == QOS2)
-			    	MQTT_msg.id = getNextPacketId(pc);
-
-			    len = MQTTSerialize_publish(pc->buf, pc->buf_size, 0, MQTT_msg.qos, MQTT_msg.retained, MQTT_msg.id,
-			              topic, (unsigned char*)MQTT_msg.payload, MQTT_msg.payloadlen);
-
-			    if (len <= 0)
-			    	main_state = mqtt_pub_failed;
-			    if ((rc = sendPacket(pc, len, &timer)) != OK) // send the subscribe packet
-			    	main_state = mqtt_pub_failed;
-
-			    if (MQTT_msg.qos == QOS1)
-			    {
-			    	main_state = mqtt_waiting_puback;
-			    }
-			    else if (MQTT_msg.qos == QOS2)
-			    {
-			    	main_state = mqtt_waiting_pubcomp;
-			    }
-
-			    //resultado de las funciones
-//				exit:
-//				    return rc;
-
-			    if (rc == FAILURE)
-			    	main_state = mqtt_pub_failed;
-
-				break;
-
-			case mqtt_pub_failed:
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "Failed to publish");
-				main_state = mqtt_connect;
-				break;
-
-			case mqtt_waiting_puback:
-		        if (waitfor(pc, PUBACK, &timer) == PUBACK)
-		        {
-		            unsigned short mypacketid;
-		            unsigned char dup, type;
-		            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, pc->readbuf, pc->readbuf_size) != 1)
-		                rc = FAILURE;
-		        }
-		        else
-		            rc = FAILURE;
-				break;
-
-			case mqtt_waiting_pubcomp:
-		        if (waitfor(pc, PUBCOMP, &timer) == PUBCOMP)
-		        {
-		            unsigned short mypacketid;
-		            unsigned char dup, type;
-		            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, pc->readbuf, pc->readbuf_size) != 1)
-		                rc = FAILURE;
-		        }
-		        else
-		            rc = FAILURE;
-		        break;
-
-			default:
-				main_state = mqtt_init;
-				break;
-    	}
     	//Procesos continuos
     	ESP_ATProcess ();
     	TCPProcess();
@@ -1778,6 +1610,9 @@ void TimingDelay_Decrement(void)
 	if (tcp_send_timeout)
 		tcp_send_timeout--;
 #endif
+
+	if (mqtt_timer)
+		mqtt_timer--;
 
 	//cuenta de a 1 minuto
 	if (secs > 59999)	//pasaron 1 min
