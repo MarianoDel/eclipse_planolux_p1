@@ -9,10 +9,13 @@
 #include "MQTTClient.h"
 #include "mqtt_wifi_interface.h"
 #include "tcp_transceiver.h"
+#include "ESP8266.h"
+#include "rdm_util.h"
 
 #include "uart.h"
 #include "lcd.h"
 #include "main_menu.h"
+#include "stm32f0xx.h"
 
 //--- Externals ----------------------//
 extern Client  c;
@@ -27,10 +30,12 @@ extern const char s_blank_line [];
 extern uint8_t json_buffer[SIZEOF_BUFFTCP_SEND];
 extern void prepare_json_pkt (uint8_t *);
 
-extern unsigned short mqtt_timer;
+extern volatile unsigned short mqtt_func_timer;
+extern volatile unsigned short wifi_func_timer;
 
 //--- Globals ------------------------//
 mqtt_state_t mqtt_state;
+wifi_state_t wifi_state;
 
 
 //--- Function Definitions -----------//
@@ -45,7 +50,6 @@ void MQTTFunctionResetSM (void)
 unsigned char MQTTFunction (void)
 {
 	unsigned char resp = RESP_CONTINUE;
-	mqtt_state = mqtt_init;
 	int dummy_resp = 0;
 
 	Client * pc;
@@ -92,7 +96,7 @@ unsigned char MQTTFunction (void)
 				LCDTransmitStr((const char *) "CONNECT     ");
 				//resp = TCPSendDataSocket (dummy_resp, pc->buf);
 				mqtt_state = mqtt_waiting_connack_load;
-				mqtt_timer = 3000;
+				mqtt_func_timer = 3000;
 			}
 			break;
 
@@ -125,13 +129,13 @@ unsigned char MQTTFunction (void)
 
 		case mqtt_connect:
 
-			if (!mqtt_timer)		//cuando agoto el timer, publico
+			if (!mqtt_func_timer)		//cuando agoto el timer, publico
 			{
 				LCD_1ER_RENGLON;
 				LCDTransmitStr((const char *) "PUB new data    ");
 				LCD_2DO_RENGLON;
 				LCDTransmitStr(s_blank_line);
-				mqtt_timer = 5000;
+				mqtt_func_timer = 5000;
 
 				mqtt_state = mqtt_pub_prepare;
 			}
@@ -193,7 +197,11 @@ unsigned char MQTTFunction (void)
 
 			if (rc == FAILURE)
 				mqtt_state = mqtt_pub_failed;
-
+			else
+			{
+				mqtt_state = mqtt_connect;
+				mqtt_func_timer = 2000;
+			}
 			break;
 
 		case mqtt_pub_failed:
@@ -238,3 +246,183 @@ unsigned char MQTTFunction (void)
     //---------- Fin Prueba MQTT_MEM_ONLY ---------//
 }
 
+
+void WIFIFunctionResetSM (void)
+{
+	wifi_state = mqtt_init;
+}
+
+
+unsigned char WIFIFunction (void)
+{
+	unsigned char resp = RESP_CONTINUE;
+	char s_lcd [20];
+//	int dummy_resp = 0;
+
+//	Client * pc;
+//	pc = &c;
+
+    switch (wifi_state)
+    {
+		case wifi_state_reset:
+			//USARTSend("ESP8266 Test...\r\n");
+			Usart2Send("ESP8266 Test...\r\n");
+			WRST_OFF;
+			Wait_ms(2);
+			WRST_ON;
+
+			LCD_1ER_RENGLON;
+			LCDTransmitStr((const char *) "Reseting WiFi...");
+
+			TCPProcessInit ();
+			wifi_func_timer = 5000;	//espero 5 seg despues del reset
+			wifi_state++;
+			break;
+
+		case wifi_state_ready:
+			if (!wifi_func_timer)
+			{
+				wifi_state++;
+
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Send to ESP Conf");
+				ESP_SendConfigResetSM ();
+			}
+			break;
+
+		case wifi_state_sending_conf:
+			resp = ESP_SendConfigClient ();
+
+			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+			{
+				LCD_2DO_RENGLON;
+				if (resp == RESP_TIMEOUT)
+					LCDTransmitStr((const char *) "ESP: Timeout    ");
+				else
+					LCDTransmitStr((const char *) "ESP: Error      ");
+				wifi_state = wifi_state_error;
+				wifi_func_timer = 20000;	//20 segundos de error
+			}
+
+			if (resp == RESP_OK)
+			{
+				LCD_2DO_RENGLON;
+				LCDTransmitStr((const char *) "ESP: Configured ");
+				wifi_func_timer = 1000;
+				wifi_state = wifi_state_wait_ip;
+			}
+			break;
+
+		case wifi_state_wait_ip:
+			if (!wifi_func_timer)
+			{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Getting DHCP IP ");
+				LCD_2DO_RENGLON;
+				LCDTransmitStr(s_blank_line);
+				wifi_func_timer = 5000;
+
+				wifi_state = wifi_state_wait_ip1;
+			}
+			break;
+
+		case wifi_state_wait_ip1:
+			resp = ESP_GetIP (s_lcd);
+
+			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
+			{
+				LCD_2DO_RENGLON;
+				if (resp == RESP_TIMEOUT)
+					LCDTransmitStr((const char *) "ESP: Timeout    ");
+				else
+					LCDTransmitStr((const char *) "ESP: Err no IP  ");
+				wifi_state = wifi_state_error;
+				wifi_func_timer = 20000;	//20 segundos de error
+			}
+
+			if (resp == RESP_OK)
+			{
+				if (IpIsValid(s_lcd) == RESP_OK)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "IP valid on:    ");
+					wifi_func_timer = 1000;
+					wifi_state = wifi_state_idle;
+				}
+				else
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((const char *) "IP is not valid!!");
+					wifi_state = wifi_state_error;
+					wifi_func_timer = 20000;	//20 segundos de error
+				}
+				LCD_2DO_RENGLON;
+				LCDTransmitStr(s_lcd);
+			}
+			break;
+
+		case wifi_state_idle:
+//			//estoy conectado al wifi
+//			Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
+//			/* Initialize network interface for MQTT  */
+//			NewNetwork(&n);
+//			/* Initialize MQTT client structure */
+//			MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
+
+			ESP_OpenSocketResetSM();
+			wifi_state = wifi_state_connecting;
+			break;
+
+		case wifi_state_connecting:
+			resp = ESP_OpenSocket();
+
+			if (resp == RESP_OK)
+			{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Socket Open     ");
+				wifi_state = wifi_state_connected;
+
+//				options.MQTTVersion = 3;
+//				options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
+//				options.username.cstring = (char*)mqtt_ibm_setup.username;
+//				options.password.cstring = (char*)mqtt_ibm_setup.password;
+//
+//				dummy_resp = MQTTSerialize_connect(pc->buf, pc->buf_size, &options);
+//				//if (MQTTConnect(&c, &options) < 0)
+//				if (dummy_resp <= 0)
+//				{
+//					LCD_1ER_RENGLON;
+//					LCDTransmitStr((const char *) "BRKR params error!!");
+//					wifi_state = wifi_state_idle;
+//				}
+//				else
+//				{
+//					LCD_1ER_RENGLON;
+//					LCDTransmitStr((const char *) "CONNECT     ");
+//					resp = TCPSendDataSocket (dummy_resp, pc->buf);
+//					wifi_state = wifi_state_connected;
+//					wifi_func_timer = 3000;
+//				}
+			}
+
+			if (resp == RESP_NOK)
+			{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Cant open a socket");
+				wifi_state = wifi_state_idle;
+			}
+			break;
+
+		case wifi_state_connected:
+			break;
+
+		case wifi_state_error:
+			if (!wifi_func_timer)
+				wifi_state = wifi_state_reset;
+			break;
+
+		default:
+			wifi_state = wifi_state_reset;
+			break;
+   	}
+}

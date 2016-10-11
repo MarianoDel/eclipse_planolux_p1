@@ -8,9 +8,23 @@
 #ifndef NETWORK_FUNCTIONS_H_
 #define NETWORK_FUNCTIONS_H_
 
+//--- WIFI Function States ---//
+typedef enum {
+  wifi_state_reset = 0,
+  wifi_state_ready,
+  wifi_state_sending_conf,
+  wifi_state_wait_ip,
+  wifi_state_wait_ip1,
+  wifi_state_idle,
+  wifi_state_connected,
+  wifi_state_connecting,
+  wifi_state_disconnected,
+  wifi_state_error,
+  wifi_state_socket_close,
+  wifi_undefine_state       = 0xFF,
+} wifi_state_t;
 
-//--- MQTT States Functions ---//
-
+//--- MQTT Function States ---//
 typedef enum {
 	mqtt_init = 0,
 	mqtt_sending_connect,
@@ -26,9 +40,12 @@ typedef enum {
 	mqtt_sub,
 
 	mqtt_device_control,
-	wifi_undefine_state       = 0xFF,
+	mqtt_undefine_state       = 0xFF,
 } mqtt_state_t;
 
+
+void WIFIFunctionResetSM (void);
+unsigned char WIFIFunction (void);
 
 void MQTTFunctionResetSM (void);
 unsigned char MQTTFunction (void);

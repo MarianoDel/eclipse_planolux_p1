@@ -195,7 +195,8 @@ volatile unsigned char filter_timer;
 //volatile unsigned char take_sample;
 //volatile unsigned char move_relay;
 volatile unsigned short secs = 0;
-unsigned short mqtt_timer = 0;
+volatile unsigned short mqtt_func_timer = 0;
+volatile unsigned short wifi_func_timer = 0;
 
 
 // ------- del display -------
@@ -521,331 +522,27 @@ int main(void)
 //	}
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
-	//---------- Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
-#ifdef WIFI_TO_MQTT_BROKER
-	main_state = wifi_state_reset;
-
-	Client * pc;
-	pc = &c;
-
-    while( 1 )
-    {
-    	switch (main_state)
-    	{
-			case wifi_state_reset:
-				//USARTSend("ESP8266 Test...\r\n");
-				Usart2Send("ESP8266 Test...\r\n");
-				WRST_OFF;
-				Wait_ms(2);
-				WRST_ON;
-
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "Reseting WiFi...");
-
-				TCPProcessInit ();
-				timer_standby = 5000;	//espero 5 seg despues del reset
-				main_state++;
-				break;
-
-			case wifi_state_ready:
-				if (!timer_standby)
-				{
-					main_state++;
-
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "Send to ESP Conf");
-					ESP_SendConfigResetSM ();
-				}
-				break;
-
-			case wifi_state_sending_conf:
-				resp = ESP_SendConfigClient ();
-
-    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
-    			{
-					LCD_2DO_RENGLON;
-					if (resp == RESP_TIMEOUT)
-						LCDTransmitStr((const char *) "ESP: Timeout    ");
-					else
-						LCDTransmitStr((const char *) "ESP: Error      ");
-					main_state = wifi_state_error;
-					timer_standby = 20000;	//20 segundos de error
-				}
-
-    			if (resp == RESP_OK)
-    			{
-					LCD_2DO_RENGLON;
-					LCDTransmitStr((const char *) "ESP: Configured ");
-					timer_standby = 1000;
-					main_state = wifi_state_wait_ip;
-				}
-				break;
-
-			case wifi_state_wait_ip:
-				if (!timer_standby)
-				{
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "Getting DHCP IP ");
-					LCD_2DO_RENGLON;
-					LCDTransmitStr(s_blank_line);
-					timer_standby = 5000;
-
-					main_state = wifi_state_wait_ip1;
-				}
-				break;
-
-			case wifi_state_wait_ip1:
-				resp = ESP_GetIP (s_lcd);
-
-    			if ((resp == RESP_TIMEOUT) || (resp == RESP_NOK))
-    			{
-					LCD_2DO_RENGLON;
-					if (resp == RESP_TIMEOUT)
-						LCDTransmitStr((const char *) "ESP: Timeout    ");
-					else
-						LCDTransmitStr((const char *) "ESP: Err no IP  ");
-					main_state = wifi_state_error;
-					timer_standby = 20000;	//20 segundos de error
-				}
-
-    			if (resp == RESP_OK)
-    			{
-    				if (IpIsValid(s_lcd) == RESP_OK)
-    				{
-    					LCD_1ER_RENGLON;
-    					LCDTransmitStr((const char *) "IP valid on:    ");
-    					timer_standby = 1000;
-    					main_state = wifi_state_idle;
-    				}
-    				else
-    				{
-    					LCD_1ER_RENGLON;
-    					LCDTransmitStr((const char *) "IP is not valid!!");
-    					main_state = wifi_state_error;
-    					timer_standby = 20000;	//20 segundos de error
-    				}
-					LCD_2DO_RENGLON;
-					LCDTransmitStr(s_lcd);
-				}
-				break;
-
-			case wifi_state_idle:
-				//estoy conectado al wifi
-				Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
-				/* Initialize network interface for MQTT  */
-				NewNetwork(&n);
-				/* Initialize MQTT client structure */
-				MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
-
-				ESP_OpenSocketResetSM();
-				main_state = wifi_state_connecting;
-				break;
-
-			case wifi_state_connecting:
-				resp = ESP_OpenSocket();
-
-				if (resp == RESP_OK)
-				{
-					options.MQTTVersion = 3;
-					options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
-					options.username.cstring = (char*)mqtt_ibm_setup.username;
-					options.password.cstring = (char*)mqtt_ibm_setup.password;
-
-					dummy_resp = MQTTSerialize_connect(pc->buf, pc->buf_size, &options);
-					//if (MQTTConnect(&c, &options) < 0)
-					if (dummy_resp <= 0)
-					{
-						LCD_1ER_RENGLON;
-						LCDTransmitStr((const char *) "BRKR params error!!");
-						main_state = wifi_state_idle;
-					}
-					else
-					{
-						LCD_1ER_RENGLON;
-						LCDTransmitStr((const char *) "CONNECT     ");
-						resp = TCPSendDataSocket (dummy_resp, pc->buf);
-						main_state = wifi_state_connected;
-						timer_standby = 3000;
-					}
-				}
-
-				if (resp == RESP_NOK)
-				{
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "Cant open a socket");
-					main_state = wifi_state_idle;
-				}
-				break;
-
-			case wifi_state_connected:
-				//espero CONNACK o  TIMEOUT
-				if (esp_unsolicited_pckt == RESP_READY)
-				{
-					esp_unsolicited_pckt = RESP_CONTINUE;
-
-			        unsigned char connack_rc = 255;
-			        char sessionPresent = 0;
-
-			        if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
-			        {
-			        	main_state = mqtt_connect;
-			        }
-			        else
-			        	main_state = wifi_state_idle;
-
-				}
-
-				if (!timer_standby)
-				{
-					LCD_1ER_RENGLON;
-					LCDTransmitStr((const char *) "Cant open a socket");
-					main_state = wifi_state_idle;
-				}
-				break;
-
-			case mqtt_connect:
-			      /* Prepare MQTT message */
-			      prepare_json_pkt(json_buffer);
-			      MQTT_msg.qos=QOS0;
-			      MQTT_msg.dup=0;
-			      MQTT_msg.retained=1;
-			      MQTT_msg.payload= (char *) json_buffer;
-			      MQTT_msg.payloadlen=strlen( (char *) json_buffer);
-
-			      /* Publish MQTT message */
-			      if ( MQTTPublish(&c,(char*)mqtt_ibm_setup.pub_topic,&MQTT_msg) < 0)
-			      {
-			    	  LCD_1ER_RENGLON;
-			    	  LCDTransmitStr((const char *) "Failed to publish");
-			          main_state = wifi_state_connected;
-			      }
-
-
-				break;
-
-//			case MAIN_WAIT_CONNECT_1:
-//					main_state = MAIN_WAIT_CONNECT_2;
-//    			break;
-//
-//			case MAIN_WAIT_CONNECT_2:
-//				if (esp_unsolicited_pckt == RESP_READY)
-//				{
-//					esp_unsolicited_pckt = RESP_CONTINUE;
-//					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
-//					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
-//					{
-//						if (bytes_remain > 0)
-//							main_state = MAIN_READING_TCP;
-//					}
-//				}
-//    			break;
-//
-//			case MAIN_READING_TCP:
-//				//estoy como en modo transparente y tengo el buffer guardado
-//				bytes_read = 0;
-//				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
-//
-//				if (tcp_msg != NONE_MSG)	//es un mensaje valido
-//					tcp_kalive_timer = TT_KALIVE;
-//				else
-//					bytes_remain = 0;
-//
-//				if (tcp_msg == KEEP_ALIVE)
-//				{
-//					resp = TCPSendData(0, "kAL_ACK\r\n");
-//					if (resp == RESP_NOK)
-//					{
-//						LCD_2DO_RENGLON;
-//						LCDTransmitStr((char *) (const char *) "No free buffer  ");
-//					}
-//				}
-//
-//				if (tcp_msg == GET_A)	//tira error en apk de android
-//				{
-////						USARTSend((char *) (const char *) "t,50,50,50,50;\r\n");
-//				}
-//
-//				if ((tcp_msg == LAMP_BRIGHT) || (tcp_msg == LIGHTS_OFF) || (tcp_msg == ROOM_BRIGHT))
-//				{
-//					need_ack = 1;
-//				}
-//
-//				if (bytes_read < bytes_remain)
-//					bytes_remain -= bytes_read;
-//				else
-//				{
-//					bytes_remain = 0;
-//					main_state = MAIN_WAIT_CONNECT_2;
-//
-//					//mando ACK de luces solo al final del ultimo mensaje de paquete
-//					if (need_ack)
-//					{
-//						need_ack = 0;
-//						TCPSendData(0, "ACK\r\n");
-//					}
-//				}
-//    			break;
-
-			case wifi_state_error:
-				if (!timer_standby)
-					main_state = MAIN_INIT_1;
-				break;
-
-			default:
-				main_state = wifi_state_reset;
-				break;
-    	}
-    	//Procesos continuos
-    	ESP_ATProcess ();
-    	TCPProcess();
-
-    	if (!timer_wifi_bright)
-    	{
-    		timer_wifi_bright = 5;	//muevo un punto cada 5ms
-    		if (new_room > last_bright)		//TODO: en vez de new_room deberia utilizar un filtro de los ultimos valores recibidos
-    		{
-    			last_bright++;
-    			Update_TIM3_CH1 (last_bright);
-    		}
-    		else if (new_room < last_bright)
-    		{
-    			last_bright--;
-    			Update_TIM3_CH1 (last_bright);
-    		}
-
-    		//prendo relay
-//    		if (last_bright > 20)
-//    		{
-//    			if (!RELAY)
-//    				RELAY_ON;
-//    		}
-//    		else if (last_bright < 10)
-//    		{
-//    			if (RELAY)
-//    				RELAY_OFF;
-//    		}
-    	}
-    }
-#endif
-    //---------- Fin Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
-
-	//---------- Prueba Conexiones Prueba MQTT_MEM_ONLY ---------//
 #ifdef MQTT_MEM_ONLY
 	main_state = mqtt_init;
-
-//	Client * pc;
-//	pc = &c;
-//	int rc = FAILURE;
-//	char topicName [80];
-//	unsigned char s_connack [] = {0x20, 0x02};		//Deserialize_connack no le da bola al length
-//	unsigned char connack_rc = 255;
-//	char sessionPresent = 0;
-
 	MQTTFunctionResetSM();
+#endif
+
+#ifdef WIFI_TO_MQTT_BROKER
+	main_state = wifi_state_reset;
+	WIFIFunctionResetSM();
+#endif
 
     while( 1 )
     {
+#ifdef MQTT_MEM_ONLY
+    	//---------- Prueba Conexiones Prueba MQTT_MEM_ONLY ---------//
     	resp = MQTTFunction();
+#endif
+
+#ifdef WIFI_TO_MQTT_BROKER
+    	//---------- Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
+	resp = WIFIFunction();
+#endif
 
     	//Procesos continuos
     	ESP_ATProcess ();
@@ -878,8 +575,6 @@ int main(void)
 //    		}
     	}
     }
-#endif
-    //---------- Fin Prueba MQTT_MEM_ONLY ---------//
 
 	//---------- Prueba Conexiones ESP8266 & HLK_RM04  --------//
 #ifdef WIFI_TO_CEL_PHONE_PROGRAM
@@ -1611,8 +1306,11 @@ void TimingDelay_Decrement(void)
 		tcp_send_timeout--;
 #endif
 
-	if (mqtt_timer)
-		mqtt_timer--;
+	if (wifi_func_timer)
+		wifi_func_timer--;
+
+	if (mqtt_func_timer)
+		mqtt_func_timer--;
 
 	//cuenta de a 1 minuto
 	if (secs > 59999)	//pasaron 1 min

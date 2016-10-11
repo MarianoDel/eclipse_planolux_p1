@@ -21,10 +21,10 @@
 
 //-------- Type of Program ----------------
 //#define WIFI_TO_CEL_PHONE_PROGRAM
-//#define WIFI_TO_MQTT_BROKER
+#define WIFI_TO_MQTT_BROKER
 //#define USE_CERT_PROGRAM
 //#define USE_PROD_PROGRAM
-#define MQTT_MEM_ONLY
+//#define MQTT_MEM_ONLY
 
 //-------- Hardware resources for Type of Program ----------------
 #ifdef WIFI_TO_CEL_PHONE_PROGRAM
@@ -321,29 +321,6 @@
 #define MAIN_NETWORKED_1		13
 #define MAIN_IN_MAIN_MENU		14
 
-//ESTADOS DEL PROGRAMA PRINCIPAL EN MODO MQTT
-#ifdef WIFI_TO_MQTT_BROKER
-typedef enum {
-  wifi_state_reset = 0,
-  wifi_state_ready,
-  wifi_state_sending_conf,
-  wifi_state_wait_ip,
-  wifi_state_wait_ip1,
-  wifi_state_idle,
-  wifi_state_connecting,
-  wifi_state_connected,
-  wifi_state_disconnected,
-  wifi_state_error,
-  wifi_state_socket_close,
-  mqtt_socket_create,
-  client_conn,
-  mqtt_connect,
-  mqtt_sub,
-  mqtt_pub,
-  mqtt_device_control,
-  wifi_undefine_state       = 0xFF,
-} wifi_state_t;
-#endif
 
 
 //---- Temperaturas en el LM335
