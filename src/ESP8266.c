@@ -354,24 +354,9 @@ unsigned char ESP_OpenSocket (void)
 
 			if ((resp == RESP_OK) || (resp == RESP_READY))
 			{
-				//ajusto buffer
-				//unsigned char len = sizeof ((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883");	//me da 4 que loco??
-				//unsigned char len = 38;
-				unsigned char len = 40;
-				strcpy ((char *) rx2buff, (char *) (rx2buff + len));
-
-				//reviso respuestas
-//				if (strncmp((char *) rx2buff, (char *) (const char *) "CONNECTOK", sizeof ((const char *) "CONNECTOK") - 1) == 0)
-				if (strncmp((char *) rx2buff, (char *) (const char *) "0,CONNECTOK", sizeof ((const char *) "0,CONNECTOK") - 1) == 0)
-					resp = RESP_OK;
-				else if (strncmp((char *)rx2buff, (char *) (const char *) "ALREADY CONNECTED", sizeof ((const char *) "ALREADY CONNECTED") - 1) == 0)
-					resp = RESP_OK;
-				else
-				{
-					resp = RESP_CONTINUE;
-					esp_timeout = TT_AT_3SEG;
-					esp_config_state++;
-				}
+				resp = RESP_CONTINUE;
+				esp_timeout = TT_AT_3SEG;	//me quedo 3 segundos esperando respuesta
+				esp_config_state = OPEN_SOCKET_WAIT_OK;
 			}
 
 			if ((resp == RESP_NOK) || (resp == RESP_TIMEOUT))
@@ -379,38 +364,74 @@ unsigned char ESP_OpenSocket (void)
 				resp = RESP_NOK;
 				esp_config_state = OPEN_SOCKET_INIT;
 			}
-
-//			SendCommandWithAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883\r\n");
 			break;
 
 		case OPEN_SOCKET_WAIT_OK:
 			//me quedo esperando el ok de envio o timeout
-			if (esp_answer == RESP_READY)
+			if (esp_timeout)
 			{
-				//reviso si se conecto en el buffer
-				ESPPreParser((unsigned char *)rx2buff);
+				//ajusto buffer, pero no lo copio por si siguen llegando bytes
+				unsigned char len = 40;
+//				strcpy ((char *) rx2buff, (char *) (rx2buff + len));
 
 				//reviso respuestas
-//				if (strncmp((char *) (const char *) "CONNECTOK", (char *)rx2buff, (sizeof ((const char *) "CONNECTOK")) - 1) == 0)
-				if (strncmp((char *) (const char *) "0,CONNECTOK", (char *)rx2buff, (sizeof ((const char *) "0,CONNECTOK")) - 1) == 0)
+				if (strncmp((char *) (rx2buff + len), (char *) (const char *) "0,CONNECTOK", sizeof ((const char *) "0,CONNECTOK") - 1) == 0)
 					resp = RESP_OK;
-				else if (strncmp((char *) (const char *) "ALREADY CONNECTED", (char *)rx2buff, (sizeof ((const char *) "ALREADY CONNECTED")) - 1) == 0)
+				else if (strncmp((char *) (rx2buff + len), (char *) (const char *) "ALREADY CONNECTED", sizeof ((const char *) "ALREADY CONNECTED") - 1) == 0)
 					resp = RESP_OK;
-				else
-					resp = RESP_NOK;
 			}
-
-			if (!esp_timeout)
-			{
-				//tengo timeout, no pude abrir socket
-				//resp = RESP_TIMEOUT;
-				resp = RESP_NOK;
-			}
+			else
+				resp = RESP_NOK;		//se agoto timeout
 
 			break;
 
 		default:
 			esp_config_state = OPEN_SOCKET_INIT;
+			break;
+	}
+
+	return resp;
+}
+
+void ESP_CloseSocketResetSM (void)
+{
+	esp_config_state = CLOSE_SOCKET_INIT;
+}
+
+//Cierra un socket
+unsigned char ESP_CloseSocket (void)
+{
+	unsigned char resp = RESP_CONTINUE;
+
+	switch (esp_config_state)
+	{
+		case CLOSE_SOCKET_INIT:
+			esp_config_state++;
+			break;
+
+		case CLOSE_SOCKET_RST:
+			SendCommandWaitAnswerResetSM();
+			esp_config_state = CLOSE_SOCKET_CMD;
+			break;
+
+		case CLOSE_SOCKET_CMD:
+			resp = SendCommandWaitAnswer((const char *) "AT+CIPCLOSE=0\r\n");
+
+			if (resp == RESP_READY)
+			{
+				resp = RESP_OK;
+				esp_config_state = CLOSE_SOCKET_INIT;
+			}
+
+			if (resp == RESP_TIMEOUT)
+			{
+				resp = RESP_NOK;
+				esp_config_state = CLOSE_SOCKET_INIT;
+			}
+			break;
+
+		default:
+			esp_config_state = CLOSE_SOCKET_INIT;
 			break;
 	}
 

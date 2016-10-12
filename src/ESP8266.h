@@ -85,6 +85,13 @@ enum EspOpenSocketState
 	OPEN_SOCKET_WAIT_OK
 };
 
+enum EspCloseSocketState
+{
+	CLOSE_SOCKET_INIT = 0,
+	CLOSE_SOCKET_RST,
+	CLOSE_SOCKET_CMD
+};
+
 enum EspGetIPState
 {
 	GET_IP_INIT = 0,
@@ -132,6 +139,8 @@ unsigned char ESP_GetIP (char *);
 
 unsigned char ESP_OpenSocket (void);
 void ESP_OpenSocketResetSM (void);
+void ESP_CloseSocketResetSM (void);
+unsigned char ESP_CloseSocket (void);
 
 #endif /* HLK_RM04_H_ */
 

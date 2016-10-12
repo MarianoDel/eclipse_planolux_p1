@@ -369,8 +369,11 @@ unsigned char WIFIFunction (void)
 //			/* Initialize MQTT client structure */
 //			MQTTClient(&c,&n, 4000, MQTT_write_buf, sizeof(MQTT_write_buf), MQTT_read_buf, sizeof(MQTT_read_buf));
 
-			ESP_OpenSocketResetSM();
-			wifi_state = wifi_state_connecting;
+			if (!wifi_func_timer)
+			{
+				ESP_OpenSocketResetSM();
+				wifi_state = wifi_state_connecting;
+			}
 			break;
 
 		case wifi_state_connecting:
@@ -381,6 +384,7 @@ unsigned char WIFIFunction (void)
 				LCD_1ER_RENGLON;
 				LCDTransmitStr((const char *) "Socket Open     ");
 				wifi_state = wifi_state_connected;
+				wifi_func_timer = 2000;
 
 //				options.MQTTVersion = 3;
 //				options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
@@ -410,10 +414,37 @@ unsigned char WIFIFunction (void)
 				LCD_1ER_RENGLON;
 				LCDTransmitStr((const char *) "Cant open a socket");
 				wifi_state = wifi_state_idle;
+				wifi_func_timer = 500;			//espero 500 msegs antes de intenta reconectar
 			}
 			break;
 
 		case wifi_state_connected:
+			if (!wifi_func_timer)
+			{
+				ESP_CloseSocketResetSM();
+				wifi_state = wifi_state_disconnected;
+			}
+			break;
+
+		case wifi_state_disconnected:
+			resp = ESP_CloseSocket();
+
+			if (resp == RESP_OK)
+			{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Socket Close    ");
+				wifi_state = wifi_state_idle;
+				wifi_func_timer = 10000;
+
+			}
+
+			if (resp == RESP_NOK)
+			{
+				LCD_1ER_RENGLON;
+				LCDTransmitStr((const char *) "Cant close socket");
+				wifi_state = wifi_state_idle;
+				wifi_func_timer = 10000;
+			}
 			break;
 
 		case wifi_state_error:
