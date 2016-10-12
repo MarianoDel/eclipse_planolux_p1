@@ -64,8 +64,9 @@ unsigned char MQTTFunction (void)
     switch (mqtt_state)
     {
 		case mqtt_init:
+#ifdef MQTT_MEM_ONLY
 			Usart2Send((char *) (const char *)"MQTT Memory Only Test...\r\n");
-
+#endif
 			MQTTtimer_init();
 			Config_MQTT_Mosquitto ( &mqtt_ibm_setup);
 			/* Initialize network interface for MQTT  */
@@ -94,36 +95,51 @@ unsigned char MQTTFunction (void)
 			{
 				LCD_1ER_RENGLON;
 				LCDTransmitStr((const char *) "CONNECT     ");
-				//resp = TCPSendDataSocket (dummy_resp, pc->buf);
+
+#ifdef MQTT_MEM_ONLY
 				mqtt_state = mqtt_waiting_connack_load;
+#else
+				mqtt_state = mqtt_waiting_connack;
+				resp = TCPSendDataSocket (dummy_resp, pc->buf);
+#endif
 				mqtt_func_timer = 3000;
 			}
 			break;
 
+#ifdef MQTT_MEM_ONLY
 		case mqtt_waiting_connack_load:
-
 			RDMUtil_StringCopy(pc->readbuf, pc->readbuf_size, s_connack, sizeof(s_connack));
 			mqtt_state = mqtt_waiting_connack;
 			break;
+#endif
 
 		case mqtt_waiting_connack:
 			//espero CONNACK o  TIMEOUT
 			//				unsigned char connack_rc = 255;
 			//				char sessionPresent = 0;
-			connack_rc = 255;
-			sessionPresent = 0;
-
-			if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
+			if (ReadSocket(pc->readbuf, pc->readbuf_size) != 0)
 			{
-				pc->isconnected = 1;
-				mqtt_state = mqtt_connect;
+				connack_rc = 255;
+				sessionPresent = 0;
+
+				if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
+				{
+					pc->isconnected = 1;
+					mqtt_state = mqtt_connect;
+				}
+				else
+					mqtt_state = mqtt_connect_failed;
 			}
-			else
+
+			if (!mqtt_func_timer)
+			{
 				mqtt_state = mqtt_connect_failed;
+			}
 
 			break;
 
 		case mqtt_connect_failed:
+			resp = RESP_NOK;
 			break;
 
 
@@ -135,7 +151,7 @@ unsigned char MQTTFunction (void)
 				LCDTransmitStr((const char *) "PUB new data    ");
 				LCD_2DO_RENGLON;
 				LCDTransmitStr(s_blank_line);
-				mqtt_func_timer = 5000;
+				mqtt_func_timer = 2000;
 
 				mqtt_state = mqtt_pub_prepare;
 			}
@@ -384,29 +400,9 @@ unsigned char WIFIFunction (void)
 				LCD_1ER_RENGLON;
 				LCDTransmitStr((const char *) "Socket Open     ");
 				wifi_state = wifi_state_connected;
-				wifi_func_timer = 2000;
+				//wifi_func_timer = 2000;
 
-//				options.MQTTVersion = 3;
-//				options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
-//				options.username.cstring = (char*)mqtt_ibm_setup.username;
-//				options.password.cstring = (char*)mqtt_ibm_setup.password;
-//
-//				dummy_resp = MQTTSerialize_connect(pc->buf, pc->buf_size, &options);
-//				//if (MQTTConnect(&c, &options) < 0)
-//				if (dummy_resp <= 0)
-//				{
-//					LCD_1ER_RENGLON;
-//					LCDTransmitStr((const char *) "BRKR params error!!");
-//					wifi_state = wifi_state_idle;
-//				}
-//				else
-//				{
-//					LCD_1ER_RENGLON;
-//					LCDTransmitStr((const char *) "CONNECT     ");
-//					resp = TCPSendDataSocket (dummy_resp, pc->buf);
-//					wifi_state = wifi_state_connected;
-//					wifi_func_timer = 3000;
-//				}
+				MQTTFunctionResetSM();
 			}
 
 			if (resp == RESP_NOK)
@@ -419,11 +415,19 @@ unsigned char WIFIFunction (void)
 			break;
 
 		case wifi_state_connected:
-			if (!wifi_func_timer)
+			resp = MQTTFunction();
+
+			if (resp == RESP_NOK)
 			{
 				ESP_CloseSocketResetSM();
 				wifi_state = wifi_state_disconnected;
 			}
+
+//			if (!wifi_func_timer)
+//			{
+//				ESP_CloseSocketResetSM();
+//				wifi_state = wifi_state_disconnected;
+//			}
 			break;
 
 		case wifi_state_disconnected:

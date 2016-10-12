@@ -118,6 +118,7 @@ enum EspTranspState
 void CheckVersion (char *);
 //void SendCommandWithAnswer(const char *, void (*pCall) (char *));
 void SendCommandWithAnswer(const char *);
+void SendDataWithAnswer(unsigned char *, unsigned char);
 
 unsigned char ESP_AskMode(void);
 void ESP_SetMode(unsigned char);

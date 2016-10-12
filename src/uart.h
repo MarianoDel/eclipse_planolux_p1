@@ -53,6 +53,7 @@ void USARTSendUnsigned(unsigned char *, unsigned char);
 void USART2Config(void);
 void USART2_IRQHandler(void);
 void Usart2Send (char *);
+void Usart2SendUnsigned(unsigned char *, unsigned char);
 
 #endif //--- End ---//
 

@@ -470,7 +470,7 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 			if (resp == RESP_OK)
 			{
 				resp = RESP_CONTINUE;
-				SendCommandWithAnswer((char *)(pbuf + 2));		//blanquea esp_answer
+				SendDataWithAnswer((pbuf + 2), *(pbuf + 1));		//blanquea esp_answer
 				esp_timeout = TT_AT_3SEG;
 				esp_config_state++;
 			}
@@ -715,6 +715,12 @@ void SendCommandWithAnswer(const char * str)
 {
 	esp_answer = RESP_NO_ANSWER;
 	SerialSend((char *) str);
+}
+
+void SendDataWithAnswer(unsigned char * str, unsigned char len)
+{
+	esp_answer = RESP_NO_ANSWER;
+	Usart2SendUnsigned(str, len);
 }
 
 unsigned char ESP_AskMode(void)

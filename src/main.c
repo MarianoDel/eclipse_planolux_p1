@@ -541,12 +541,20 @@ int main(void)
 
 #ifdef WIFI_TO_MQTT_BROKER
     	//---------- Prueba Conexiones ESP8266 to MQTT BROKER (Mosquitto) ---------//
-	resp = WIFIFunction();
+    	resp = WIFIFunction();
 #endif
+
+		if (CheckS2())
+		{
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "S2 -> ON        ");
+			ii = 1;
+		}
 
     	//Procesos continuos
     	ESP_ATProcess ();
     	TCPProcess();
+		UpdateSwitches();
 
     	if (!timer_wifi_bright)
     	{
