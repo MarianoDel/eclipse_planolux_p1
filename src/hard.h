@@ -321,6 +321,8 @@
 #define MAIN_NETWORKED_1		13
 #define MAIN_IN_MAIN_MENU		14
 
+#define MAIN_SWITCH_ONLY		20
+
 
 
 //---- Temperaturas en el LM335

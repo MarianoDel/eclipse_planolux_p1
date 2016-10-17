@@ -991,7 +991,7 @@ unsigned char FuncStandAloneCert (void)
 		case STAND_ALONE_OFF_1:
 			if (CheckACSw() == S_NO)	//liberaron el sw
 			{
-				RELAY_ON;
+//				RELAY_ON;
 				if (standalone_selections == MENU_OFF)
 				{
 					LCD_1ER_RENGLON;
@@ -1121,7 +1121,7 @@ unsigned char FuncStandAloneCert (void)
 						LCD_1ER_RENGLON;
 						LCDTransmitStr((const char *) "  Lights OFF    ");
 					}
-					RELAY_OFF;
+//					RELAY_OFF;
 				}
 			}
 			break;

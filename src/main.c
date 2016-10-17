@@ -115,8 +115,10 @@ StandAlone_Typedef const StandAloneStruct_constant =
 				.ldr_value = 100,
 				.max_dimmer_value_percent = 100,
 				.max_dimmer_value_dmx = 255,
-				.min_dimmer_value_percent = 1,
-				.min_dimmer_value_dmx = MIN_DIMMING,
+//				.min_dimmer_value_percent = 10,
+//				.min_dimmer_value_dmx = MIN_DIMMING,
+				.min_dimmer_value_percent = 10,
+				.min_dimmer_value_dmx = 25,
 				.power_up_timer_value = 3000,
 				.dimming_up_timer_value = 3000
 		};
@@ -676,7 +678,31 @@ int main(void)
 //					//tengo datos, me fijo que son
 //					main_state = MAIN_READING_TCP;
 //				}
+
+				//IF CHECK S2
+				if (CheckS2())
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((char *) (const char *) "Going to SW Mode");
+					main_state = MAIN_SWITCH_ONLY;
+					FuncStandAloneCertReset();
+					timer_standby = 3000;
+				}
+
     			break;
+
+			case MAIN_SWITCH_ONLY:
+				resp = FuncStandAloneCert();
+
+				if ((CheckS2()) && !timer_standby)
+				{
+					LCD_1ER_RENGLON;
+					LCDTransmitStr((char *) (const char *) "Go to WIFI Mode ");
+					new_room = 0;
+					main_state = MAIN_WAIT_CONNECT_0;
+					timer_standby = 3000;
+				}
+				break;
 
 			case MAIN_READING_TCP:
 				//estoy como en modo transparente y tengo el buffer guardado
@@ -738,6 +764,7 @@ int main(void)
     	ESP_ATProcess ();
     	TCPProcess();
 		UpdateSwitches();
+		UpdateACSwitch();
 
 //    	///PRUEBA RAPIDA 28-09
 //		resp = FuncStandAloneCert();
@@ -745,12 +772,12 @@ int main(void)
 //		UpdateACSwitch();
 //		///
 
-		if (CheckS2())
-		{
-			LCD_2DO_RENGLON;
-			LCDTransmitStr((const char *) "S2 -> ON        ");
-			ii = 1;
-		}
+//		if (CheckS2())
+//		{
+//			LCD_2DO_RENGLON;
+//			LCDTransmitStr((const char *) "S2 -> ON        ");
+//			ii = 1;
+//		}
 
     	if (!timer_wifi_bright)
     	{

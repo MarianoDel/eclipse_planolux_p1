@@ -141,6 +141,8 @@ enum StandAloneMenu
 //#define ONE_TEN_INITIAL		10		//valor inicial 1 a 10V para que la fuente arranue en regimen
 #define MIN_DIMMING		5
 
+#define FuncStandAloneCertReset FuncStandAloneReset
+
 //-------- Functions -------------
 unsigned char FuncStandAlone (void);
 unsigned char MenuStandAlone(void);
