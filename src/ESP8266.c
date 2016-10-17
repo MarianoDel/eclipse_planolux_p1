@@ -470,7 +470,12 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 			if (resp == RESP_OK)
 			{
 				resp = RESP_CONTINUE;
+#ifdef WIFI_TO_CEL_PHONE_PROGRAM
+				SendCommandWithAnswer((char *) (pbuf + 2));				//solo manda chars
+#endif
+#ifdef WIFI_TO_MQTT_BROKER
 				SendDataWithAnswer((pbuf + 2), *(pbuf + 1));		//blanquea esp_answer
+#endif
 				esp_timeout = TT_AT_3SEG;
 				esp_config_state++;
 			}
