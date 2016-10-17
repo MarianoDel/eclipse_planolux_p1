@@ -717,7 +717,7 @@ int main(void)
 
 				if (tcp_msg == KEEP_ALIVE)
 				{
-					resp = TCPSendData(0, "kAL_ACK\r\n");
+					resp = TCPSendData(0, (char *) (const char *)"kAL_ACK\r\n");
 					if (resp == RESP_NOK)
 					{
 						LCD_2DO_RENGLON;
@@ -772,12 +772,12 @@ int main(void)
 //		UpdateACSwitch();
 //		///
 
-//		if (CheckS2())
-//		{
-//			LCD_2DO_RENGLON;
-//			LCDTransmitStr((const char *) "S2 -> ON        ");
-//			ii = 1;
-//		}
+		if (CheckS1())
+		{
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "S1 -> Break     ");
+			ii = 1;
+		}
 
     	if (!timer_wifi_bright)
     	{

@@ -480,6 +480,9 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 				esp_config_state++;
 			}
 
+			if (resp == RESP_READY)
+				resp = RESP_NOK;
+
 			//tengo timeout, termino transmision
 			//resp = RESP_TIMEOUT;
 			break;
@@ -645,7 +648,7 @@ void SendCommandWaitAnswerResetSM (void)
 }
 
 //Envia un comando al ESP y espera revisar la respuesta
-//Contesta RESP_TIMEOUT, RESP_CONTINUE, RESP_NOK, RESP_OK
+//Contesta RESP_TIMEOUT, RESP_CONTINUE, RESP_NOK, RESP_OK, RESP_READY
 unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 {
 	unsigned char i, length = 0;
