@@ -737,20 +737,27 @@ void ESP_SetMode(unsigned char m)
 void ESP_ATProcess (void)
 {
 	//reviso timeouts para dar aviso del fin de mensajes at
-	if ((at_start) && (at_finish) && (!esp_mini_timeout))
+	if (!esp_mini_timeout)
 	{
-		at_start = 0;
-		at_finish = 0;
-		*prx = '\0';				//ESTO es un peligro no se donde quedo apuntado
-		esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
-	}
+		if ((at_start) && (at_finish))
+		{
+			at_start = 0;
+			at_finish = 0;
+			*prx = '\0';				//ESTO es un peligro no se donde quedo apuntado
+			esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
+		}
 
-	if ((pckt_start) && (pckt_finish) && (!esp_mini_timeout))
-	{
-		pckt_start = 0;
-		pckt_finish = 0;
-		*prx = '\0';				//ESTO es un peligro no se donde quedo apuntado
-		esp_unsolicited_pckt = RESP_READY;	//aviso que tengo una respuesta para revisar
+		if ((pckt_start) && (pckt_finish))
+//		if (pckt_start)
+		{
+			pckt_start = 0;
+			pckt_finish = 0;
+			*prx = '\0';				//ESTO es un peligro no se donde quedo apuntado
+			esp_unsolicited_pckt = RESP_READY;	//aviso que tengo una respuesta para revisar
+		}
+
+//		at_start = 0;
+//		pckt_start = 0;
 	}
 }
 
@@ -767,6 +774,7 @@ void ESP_ATModeRx (unsigned char d)
 			*prx = d;													//ALREADY... o CONNECT
 			prx++;
 			at_start = 1;
+			at_finish = 0;
 		}
 		else if (((d >= '0') && (d <= '4'))	|| (d == '+'))	//pueden ser nuevas conexiones o paquete TCP
 		{
@@ -774,6 +782,7 @@ void ESP_ATModeRx (unsigned char d)
 			*prx = d;
 			prx++;
 			pckt_start = 1;
+			pckt_finish = 0;
 		}
 	}
 	else if (at_start)
@@ -806,6 +815,7 @@ void ESP_ATModeRx (unsigned char d)
 			//salgo por error
 			prx = (unsigned char *) bufftcp;
 			esp_unsolicited_pckt = RESP_NOK;
+			//pckt_start = 0;
 		}
 	}
 

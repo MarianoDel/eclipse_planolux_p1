@@ -102,8 +102,8 @@ void GPIO_Config (void)
 	GPIOB->MODER = temp;
 
 	temp = GPIOB->OTYPER;	//1 bit por pin
-	temp &= 0xFFFFDFFF;
-	temp |= 0x00002000;		//PB13 open drain
+	temp &= 0xFFFFDFFE;
+	temp |= 0x00002001;		//PB0 PB13 open drain
 	GPIOB->OTYPER = temp;
 
 	temp = GPIOB->OSPEEDR;	//2 bits por pin

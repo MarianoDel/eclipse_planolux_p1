@@ -182,6 +182,9 @@ char bufftcp_transp[SIZEOF_BUFFTCP - 5];
 volatile unsigned short tcp_send_timeout;
 #endif
 
+//#ifdef WIFI_TO_CEL_PHONE_PROGRAM
+//unsigned char messages [100];
+//#endif
 //--- VARIABLES GLOBALES ---//
 parameters_typedef param_struct;
 
@@ -323,9 +326,9 @@ int main(void)
 	WRST_ON;
 #endif
 
-#ifdef WIFI_TO_CEL_PHONE_PROGRAM
-	RELAY_ON;
-#endif
+//#ifdef WIFI_TO_CEL_PHONE_PROGRAM
+//	RELAY_ON;
+//#endif
 
 	//ADC Configuration
 	AdcConfig();
@@ -522,6 +525,7 @@ int main(void)
 //	}
 	//---------- Fin Prueba Recibir DMX Pckts --------//
 
+#if defined (MQTT_MEM_ONLY) || defined (WIFI_TO_MQTT_BROKER)
 #ifdef MQTT_MEM_ONLY
 	main_state = mqtt_init;
 	MQTTFunctionResetSM();
@@ -583,9 +587,12 @@ int main(void)
 //    		}
     	}
     }
-
+#endif
 	//---------- Prueba Conexiones ESP8266 & HLK_RM04  --------//
 #ifdef WIFI_TO_CEL_PHONE_PROGRAM
+    main_state = MAIN_INIT;
+	RELAY_ON;
+
     while( 1 )
     {
 
@@ -596,8 +603,11 @@ int main(void)
 				//USARTSend("ESP8266 Test...\r\n");
 				Usart2Send("ESP8266 Test...\r\n");
 				TCPProcessInit ();
-				timer_standby = 100;
+				timer_standby = 6000;
 				main_state++;
+				WRST_OFF;
+				Wait_ms(20);
+				WRST_ON;
 				break;
 
 			case MAIN_INIT_1:
@@ -661,12 +671,18 @@ int main(void)
 							main_state = MAIN_READING_TCP;
 					}
 				}
+//				if (ReadSocket (messages, sizeof (messages)))
+//				{
+//					//tengo datos, me fijo que son
+//					main_state = MAIN_READING_TCP;
+//				}
     			break;
 
 			case MAIN_READING_TCP:
 				//estoy como en modo transparente y tengo el buffer guardado
 				bytes_read = 0;
 				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
+//				tcp_msg = CheckTCPMessage(messages, &new_room, &new_lamp, &bytes_read);
 
 				if (tcp_msg != NONE_MSG)	//es un mensaje valido
 					tcp_kalive_timer = TT_KALIVE;
@@ -711,7 +727,7 @@ int main(void)
 
 			case MAIN_ERROR:
 				if (!timer_standby)
-					main_state = MAIN_INIT_1;
+					main_state = MAIN_INIT;
 				break;
 
 			default:
@@ -721,12 +737,20 @@ int main(void)
     	//Procesos continuos
     	ESP_ATProcess ();
     	TCPProcess();
+		UpdateSwitches();
 
 //    	///PRUEBA RAPIDA 28-09
 //		resp = FuncStandAloneCert();
 ////		UpdateSwitches();
 //		UpdateACSwitch();
 //		///
+
+		if (CheckS2())
+		{
+			LCD_2DO_RENGLON;
+			LCDTransmitStr((const char *) "S2 -> ON        ");
+			ii = 1;
+		}
 
     	if (!timer_wifi_bright)
     	{
