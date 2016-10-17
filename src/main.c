@@ -117,8 +117,8 @@ StandAlone_Typedef const StandAloneStruct_constant =
 				.max_dimmer_value_dmx = 255,
 //				.min_dimmer_value_percent = 10,
 //				.min_dimmer_value_dmx = MIN_DIMMING,
-				.min_dimmer_value_percent = 10,
-				.min_dimmer_value_dmx = 25,
+				.min_dimmer_value_percent = 15,
+				.min_dimmer_value_dmx = 37,
 				.power_up_timer_value = 3000,
 				.dimming_up_timer_value = 3000
 		};
