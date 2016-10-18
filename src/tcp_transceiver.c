@@ -36,14 +36,14 @@ unsigned char bport_index_receiv [MAX_BUFF_INDEX];
 enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsigned char * new_lamp_bright, unsigned char * bytes)
 {
 	//reviso que tipo de mensaje tengo en data
-	if (strncmp((char *) (const char *) "kAlive;", (char *)d, (sizeof((char *) (const char *) "kAlive;") - 1)) == 0)
+	if (strncmp((char *) (const char *) "kAlive;", (char *)d, (sizeof("kAlive;") - 1)) == 0)
 	{
 		strcpy ((char *) d, (char *) (d + 7));
 		*bytes = 7;
 		return KEEP_ALIVE;
 	}
 
-	if (strncmp((char *) (const char *) "geta;", (char *)d, (sizeof((char *) (const char *) "geta;") - 1)) == 0)
+	if (strncmp((char *) (const char *) "geta;", (char *)d, (sizeof("geta;") - 1)) == 0)
 	{
 		strcpy ((char *) d, (char *) (d + 5));
 		*bytes = 5;
@@ -70,7 +70,7 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 		return LAMP_BRIGHT;
 	}
 
-	if (strncmp((char *) (const char *) "o0,0;", (char *)d, sizeof((char *) (const char *) "o0,0;")) == 0)
+	if (strncmp((char *) (const char *) "o0,0;", (char *)d, sizeof("o0,0;") - 1) == 0)
 	{
 		strcpy ((char *) d, (char *) (d + 5));
 		*bytes = 5;
@@ -78,7 +78,7 @@ enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsi
 		return LIGHTS_OFF;
 	}
 
-	if (strncmp((char *) (const char *) "o0,1;", (char *)d, sizeof((char *) (const char *) "o0,1;")) == 0)
+	if (strncmp((char *) (const char *) "o0,1;", (char *)d, sizeof("o0,1;") - 1) == 0)
 	{
 		strcpy ((char *) d, (char *) (d + 5));
 		*bytes = 5;
@@ -211,16 +211,16 @@ unsigned char TCPPreProcess(unsigned char * d, unsigned char * output, unsigned 
 	//primero reviso estados de conexiones
 //	if ((*d >= '0') && (*d <= '4') && (*(d+1) == ','))
 //	{
-//		if (strncmp((char *) (const char *) "CONNECT\r", (char *) (d + 2), sizeof((char *) (const char *) "CONNECT\r")) == 0)
+//		if (strncmp((char *) (const char *) "CONNECT\r", (char *) (d + 2), sizeof("CONNECT\r") - 1) == 0)
 //			return KEEP_ALIVE;
 //
-//		if (strncmp((char *) (const char *) "CLOSED\r", (char *) (d + 2), sizeof((char *) (const char *) "CLOSED\r")) == 0)
+//		if (strncmp((char *) (const char *) "CLOSED\r", (char *) (d + 2), sizeof("CLOSED\r") - 1) == 0)
 //			return KEEP_ALIVE;
 //	}
 
 	//llega:
 	//+IPD,0,6:geta;\n
-	if (strncmp((char *) (const char *) "+IPD,", (char *) d, sizeof((char *) (const char *) "+IPD,")) == 0)
+	if (strncmp((char *) (const char *) "+IPD,", (char *) d, sizeof("+IPD,") - 1) == 0)
 	{
 		if ((*(d+5) >= '0') && (*(d+5) <= '4'))
 		{
@@ -347,7 +347,7 @@ unsigned char TCPReadDataSocket(unsigned char * d, unsigned char * output, unsig
 
 	//llega:
 	//+IPD,0,6:geta;\n
-	if (strncmp((char *) (const char *) "+IPD,", (char *) d, sizeof((char *) (const char *) "+IPD,")) == 0)
+	if (strncmp((char *) (const char *) "+IPD,", (char *) d, sizeof("+IPD,") - 1) == 0)
 	{
 		if ((*(d+5) >= '0') && (*(d+5) <= '4'))
 		{

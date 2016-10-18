@@ -541,7 +541,7 @@ unsigned char HLKVerifyVersion(unsigned char * d)
 	char comp;
 
 	//primero reviso el echo del at
-	comp = strncmp ((char *) d, (const char *) "at+ver=?", (sizeof ((const char *) "at+ver=?")) - 1);
+	comp = strncmp ((char *) d, (const char *) "at+ver=?", (sizeof ("at+ver=?")) - 1);
 	if (comp == 0)
 	{
 		//ahora reviso solo algunos valores
@@ -555,7 +555,7 @@ void CheckVersion (char * answer)
 {
 	unsigned char comp = 0;
 
-	comp = strncmp (answer, (const char *) "VER 1.8", (sizeof ((const char *) "VER 1.8")) - 1);
+	comp = strncmp (answer, (const char *) "VER 1.8", (sizeof ("VER 1.8")) - 1);
 
 	if (comp == 0)
 		hlk_answer = RESP_OK;

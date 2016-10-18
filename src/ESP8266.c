@@ -136,7 +136,7 @@ unsigned char ESP_SendConfigClient (void)
 			//sigo esperando la respuesta
 			esp_config_state = CONF_AT_CONFIG_1B;
 
-			if (strncmp((char *)rx2buff, (const char *) "OK", (sizeof((const char *) "OK") - 1)) == 0)
+			if (strncmp((char *)rx2buff, (const char *) "OK", (sizeof("OK") - 1)) == 0)
 			{
 				//tengo link e IP
 				//resp = RESP_OK;
@@ -144,7 +144,7 @@ unsigned char ESP_SendConfigClient (void)
 				esp_config_state = CONF_AT_CONFIG_3;	//avanzo
 			}
 
-			if (strncmp((char *)rx2buff, (const char *) "FAIL", (sizeof((const char *) "FAIL") - 1)) == 0)
+			if (strncmp((char *)rx2buff, (const char *) "FAIL", (sizeof("FAIL") - 1)) == 0)
 			{
 				//tengo algun error
 				resp = RESP_NOK;
@@ -375,9 +375,9 @@ unsigned char ESP_OpenSocket (void)
 //				strcpy ((char *) rx2buff, (char *) (rx2buff + len));
 
 				//reviso respuestas
-				if (strncmp((char *) (rx2buff + len), (char *) (const char *) "0,CONNECTOK", sizeof ((const char *) "0,CONNECTOK") - 1) == 0)
+				if (strncmp((char *) (rx2buff + len), (char *) (const char *) "0,CONNECTOK", sizeof ("0,CONNECTOK") - 1) == 0)
 					resp = RESP_OK;
-				else if (strncmp((char *) (rx2buff + len), (char *) (const char *) "ALREADY CONNECTED", sizeof ((const char *) "ALREADY CONNECTED") - 1) == 0)
+				else if (strncmp((char *) (rx2buff + len), (char *) (const char *) "ALREADY CONNECTED", sizeof ("ALREADY CONNECTED") - 1) == 0)
 					resp = RESP_OK;
 			}
 			else
@@ -470,12 +470,7 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 			if (resp == RESP_OK)
 			{
 				resp = RESP_CONTINUE;
-#ifdef WIFI_TO_CEL_PHONE_PROGRAM
-				SendCommandWithAnswer((char *) (pbuf + 2));				//solo manda chars
-#endif
-#ifdef WIFI_TO_MQTT_BROKER
 				SendDataWithAnswer((pbuf + 2), *(pbuf + 1));		//blanquea esp_answer
-#endif
 				esp_timeout = TT_AT_3SEG;
 				esp_config_state++;
 			}
@@ -495,9 +490,9 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 				ESPPreParser((unsigned char *)rx2buff);
 
 				//si me recibe los bytes doy como el paquete enviado
-				if (strncmp((char *) (const char *) "Recv ", (char *)rx2buff, (sizeof ((const char *) "Recv ")) - 1) == 0)
+				if (strncmp((char *) (const char *) "Recv ", (char *)rx2buff, (sizeof ("Recv ")) - 1) == 0)
 					resp = RESP_OK;
-				else if (strncmp((char *) (const char *) "SEND OK", (char *)rx2buff, (sizeof ((const char *) "SEND OK")) - 1) == 0)
+				else if (strncmp((char *) (const char *) "SEND OK", (char *)rx2buff, (sizeof ("SEND OK")) - 1) == 0)
 					resp = RESP_OK;
 				else
 					resp = RESP_NOK;
@@ -698,7 +693,7 @@ unsigned char SendCommandWaitAnswer (const char * comm)	//blanquea esp_answer
 				if ((*(rx2buff + length) == 'O') && (*(rx2buff + length + 1) == 'K'))
 					resp = RESP_OK;
 
-				if (strncmp((char *) (const char *) "no change OK", (char *)(rx2buff + length), (sizeof ((const char *) "no change OK")) - 1) == 0)
+				if (strncmp((char *) (const char *) "no change OK", (char *)(rx2buff + length), (sizeof ("no change OK")) - 1) == 0)
 					resp = RESP_OK;
 
 				if (*(rx2buff + length) == '>')
@@ -887,7 +882,7 @@ unsigned char ESPVerifyVersion(unsigned char * d)
 	char comp;
 
 	//primero reviso el echo del at
-	comp = strncmp ((char *) d, (const char *) "AT+GMR", (sizeof ((const char *) "AT+GMR")) - 1);
+	comp = strncmp ((char *) d, (const char *) "AT+GMR", (sizeof ("AT+GMR")) - 1);
 	if (comp == 0)
 	{
 		//ahora reviso solo algunos valores
@@ -901,7 +896,7 @@ void CheckVersion (char * answer)
 {
 	unsigned char comp = 0;
 
-	comp = strncmp (answer, (const char *) "VER 1.8", (sizeof ((const char *) "VER 1.8")) - 1);
+	comp = strncmp (answer, (const char *) "VER 1.8", (sizeof ("VER 1.8")) - 1);
 
 	if (comp == 0)
 		esp_answer = RESP_OK;

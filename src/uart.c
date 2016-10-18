@@ -63,7 +63,6 @@ volatile unsigned short rdm_bytes_left = 0;
 
 volatile unsigned char * ptx2;
 volatile unsigned char * ptx2_pckt_index;
-volatile unsigned char sendpacket = 0;
 
 //Reception buffer.
 
@@ -278,32 +277,16 @@ void USART2_IRQHandler(void)
 	{
 		if (USART2->ISR & USART_ISR_TXE)
 		{
-			if (sendpacket)
+			if ((ptx2 < &tx2buff[SIZEOF_DATA]) && (ptx2 < ptx2_pckt_index))
 			{
-				if ((ptx2 < &tx2buff[SIZEOF_DATA]) && (ptx2 < ptx2_pckt_index))
-				{
-					USART2->TDR = *ptx2;
-					ptx2++;
-				}
-				else
-				{
-					ptx2 = tx2buff;
-					sendpacket = 0;
-					USART2->CR1 &= ~USART_CR1_TXEIE;
-				}
+				USART2->TDR = *ptx2;
+				ptx2++;
 			}
 			else
 			{
-				if ((ptx2 < &tx2buff[SIZEOF_DATA]) && (*ptx2 != '\0'))
-				{
-					USART2->TDR = *ptx2;
-					ptx2++;
-				}
-				else
-				{
-					ptx2 = tx2buff;
-					USART2->CR1 &= ~USART_CR1_TXEIE;
-				}
+				ptx2 = tx2buff;
+				ptx2_pckt_index = tx2buff;
+				USART2->CR1 &= ~USART_CR1_TXEIE;
 			}
 		}
 	}
@@ -330,23 +313,15 @@ void Usart2Send (char * send)
 	unsigned char i;
 
 	i = strlen(send);
-
-	if ((ptx2 + i) < &tx2buff[SIZEOF_DATA])
-	{
-		strcpy((char*)ptx2, (const char *)send);
-
-		USART2->CR1 |= USART_CR1_TXEIE;
-	}
+	Usart2SendUnsigned(send, i);
 }
 
 void Usart2SendUnsigned(unsigned char * send, unsigned char size)
 {
 	if ((ptx2_pckt_index + size) < &tx2buff[SIZEOF_DATA])
 	{
-		memcpy((unsigned char *)ptx2, send, size);
+		memcpy((unsigned char *)ptx2_pckt_index, send, size);
 		ptx2_pckt_index += size;
-
-		sendpacket = 1;
 		USART2->CR1 |= USART_CR1_TXEIE;
 	}
 }
@@ -396,7 +371,6 @@ void USART2Config(void)
 
 	ptx2 = tx2buff;
 	ptx2_pckt_index = tx2buff;
-	sendpacket = 0;
 	//prx2 = rx2buff;
 	NVIC_EnableIRQ(USART2_IRQn);
 	NVIC_SetPriority(USART2_IRQn, 7);

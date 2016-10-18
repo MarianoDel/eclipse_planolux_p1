@@ -420,6 +420,43 @@ int main(void)
 //	}
 	//---------- Fin Prueba DMX_INPUT con y sin INT ----//
 
+	//---------- Prueba USART2 --------//
+
+//    while( 1 )
+//    {
+////    	Usart2SendUnsigned((unsigned char *) (const char *) "Primero\r\n", sizeof("Primero\r\n") - 1);
+////    	Usart2SendUnsigned((unsigned char *) (const char *) "Segundo\r\n", sizeof("Segundo\r\n") - 1);
+////    	Usart2SendUnsigned((unsigned char *) (const char *) "Tercero\r\n", sizeof("Tercero\r\n") - 1);
+////    	Usart2SendUnsigned((unsigned char *) (const char *) "Cuarto\r\n", sizeof("Cuarto\r\n") - 1);
+////      Wait_ms(3000);
+//
+////    	Usart2SendUnsigned((unsigned char *) (const char *) "PrimeroPrimero\r\n", sizeof("PrimeroPrimero\r\n") - 1);
+////        Wait_ms(1);
+////    	Usart2SendUnsigned((unsigned char *) (const char *) "SegundoSegundo\r\n", sizeof("SegundoSegundo\r\n") - 1);
+////        Wait_ms(1);
+////        Usart2SendUnsigned((unsigned char *) (const char *) "TerceroTercero\r\n", sizeof("TerceroTercero\r\n") - 1);
+////        Wait_ms(1);
+////        Usart2SendUnsigned((unsigned char *) (const char *) "CuartoCuarto\r\n", sizeof("CuartoCuarto\r\n") - 1);
+////        Wait_ms(3000);
+//
+////    	for (i = 0; i < 255; i++)
+////    	{
+////        	Usart2SendUnsigned((unsigned char *) (const char *) "Primero\r\n", sizeof("Primero\r\n") - 1);
+////        	Usart2SendUnsigned((unsigned char *) (const char *) "Segundo\r\n", sizeof("Segundo\r\n") - 1);
+////        	Usart2SendUnsigned((unsigned char *) (const char *) "Tercero\r\n", sizeof("Tercero\r\n") - 1);
+////        	Usart2SendUnsigned((unsigned char *) (const char *) "Cuarto\r\n", sizeof("Cuarto\r\n") - 1);
+////    	}
+////    	Wait_ms(3000);
+//
+//    	Usart2Send((char *) (const char *) "Primero\r\n");
+//    	Usart2Send((char *) (const char *) "Segundo\r\n");
+//    	Usart2Send((char *) (const char *) "Tercero\r\n");
+//    	Usart2Send((char *) (const char *) "Cuarto\r\n");
+//    	Wait_ms(3000);
+//
+//    }
+
+    //---------- Fin Prueba USART2 --------//
 
 	//---------- Prueba USART --------//
 
