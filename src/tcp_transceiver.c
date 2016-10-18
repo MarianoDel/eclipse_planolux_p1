@@ -171,7 +171,6 @@ void TCPProcess (void)
 			break;
 	}
 
-#ifndef WIFI_TO_CEL_PHONE_PROGRAM
 	//--- En recepcion ---//
 	if (esp_unsolicited_pckt == RESP_READY)
 	{
@@ -192,7 +191,6 @@ void TCPProcess (void)
 			}
 		}
 	}
-#endif
 }
 
 //Revisa tipo de mensaje y puerto (0 a 4)
@@ -396,8 +394,6 @@ unsigned char ReadSocket (unsigned char * buff, unsigned char maxlen)
 				len = maxlen;
 				bport_index_receiv[i] -= maxlen;
 			}
-
-
 
 			i = MAX_BUFF_INDEX;
 		}

@@ -20,8 +20,8 @@
 #define USE_ESP_WIFI
 
 //-------- Type of Program ----------------
-#define WIFI_TO_CEL_PHONE_PROGRAM
-//#define WIFI_TO_MQTT_BROKER
+//#define WIFI_TO_CEL_PHONE_PROGRAM
+#define WIFI_TO_MQTT_BROKER
 //#define USE_CERT_PROGRAM
 //#define USE_PROD_PROGRAM
 //#define MQTT_MEM_ONLY

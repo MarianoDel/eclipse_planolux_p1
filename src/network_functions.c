@@ -102,7 +102,7 @@ unsigned char MQTTFunction (void)
 				mqtt_state = mqtt_waiting_connack;
 				resp = TCPSendDataSocket (dummy_resp, pc->buf);
 #endif
-				mqtt_func_timer = 3000;
+				mqtt_func_timer = 100;	//espero 30 segundos para ver conexion
 			}
 			break;
 

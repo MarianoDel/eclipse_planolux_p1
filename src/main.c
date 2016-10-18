@@ -185,7 +185,7 @@ volatile unsigned short tcp_send_timeout;
 #endif
 
 //#ifdef WIFI_TO_CEL_PHONE_PROGRAM
-//unsigned char messages [100];
+unsigned char messages [100];
 //#endif
 //--- VARIABLES GLOBALES ---//
 parameters_typedef param_struct;
@@ -700,21 +700,21 @@ int main(void)
     			break;
 
 			case MAIN_WAIT_CONNECT_2:
-				if (esp_unsolicited_pckt == RESP_READY)
-				{
-					esp_unsolicited_pckt = RESP_CONTINUE;
-					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
-					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
-					{
-						if (bytes_remain > 0)
-							main_state = MAIN_READING_TCP;
-					}
-				}
-//				if (ReadSocket (messages, sizeof (messages)))
+//				if (esp_unsolicited_pckt == RESP_READY)
 //				{
-//					//tengo datos, me fijo que son
-//					main_state = MAIN_READING_TCP;
+//					esp_unsolicited_pckt = RESP_CONTINUE;
+//					//TODO: quitar lenght desde TCPPreProcess y pasarlo a CheckTCPMessages para quedarme con lo ultimo
+//					if (TCPPreProcess((unsigned char *) bufftcp, bufftcp_transp, &bytes_remain) < 5)
+//					{
+//						if (bytes_remain > 0)
+//							main_state = MAIN_READING_TCP;
+//					}
 //				}
+				if (ReadSocket (messages, sizeof (messages)))
+				{
+					//tengo datos, me fijo que son
+					main_state = MAIN_READING_TCP;
+				}
 
 				//IF CHECK S2
 				if (CheckS2())
@@ -744,8 +744,8 @@ int main(void)
 			case MAIN_READING_TCP:
 				//estoy como en modo transparente y tengo el buffer guardado
 				bytes_read = 0;
-				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
-//				tcp_msg = CheckTCPMessage(messages, &new_room, &new_lamp, &bytes_read);
+//				tcp_msg = CheckTCPMessage(bufftcp_transp, &new_room, &new_lamp, &bytes_read);
+				tcp_msg = CheckTCPMessage((char *)messages, &new_room, &new_lamp, &bytes_read);
 
 				if (tcp_msg != NONE_MSG)	//es un mensaje valido
 					tcp_kalive_timer = TT_KALIVE;
