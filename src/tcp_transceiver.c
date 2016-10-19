@@ -267,7 +267,7 @@ unsigned char TCPPreProcess(unsigned char * d, unsigned char * output, unsigned 
 //el bufftcpsend de transmision es port,lenght,data
 unsigned char TCPSendData (unsigned char port, char * data)
 {
-	char * p;
+	unsigned char * p;
 	unsigned char length = 0;
 	unsigned char i;
 	unsigned char resp = RESP_NOK;
@@ -297,10 +297,46 @@ unsigned char TCPSendData (unsigned char port, char * data)
 	return resp;
 }
 
+unsigned char FirstTxEmptyBuffer (void)
+{
+	unsigned char i;
+	//busco buffer tcp vacio
+	for (i = 0; i < MAX_BUFF_INDEX; i++)
+	{
+		if (bufftcpsend [i] [1] == 0)
+			return i;
+	}
+	return i;
+}
+
+unsigned char CheckTxEmptyBuffer (void)
+{
+	unsigned char i, res = 0;
+	//busco buffer tcp vacio
+	for (i = 0; i < MAX_BUFF_INDEX; i++)
+	{
+		res |= bufftcpsend [i] [1];
+	}
+
+	return res;
+}
+
+unsigned char FirstRxEmptyBuffer (void)
+{
+	unsigned char i;
+	//busco buffer tcp vacio
+	for (i = 0; i < MAX_BUFF_INDEX; i++)
+	{
+		if (bport_index_receiv[i] == 0)
+			return i;
+	}
+	return i;
+}
+
 //el bufftcpsend de transmision es port,lenght,data
 unsigned char TCPSendDataSocket (unsigned char length, unsigned char * data)
 {
-	char * p;
+	unsigned char * p;
 	unsigned char i;
 	unsigned char resp = RESP_NOK;
 
@@ -308,27 +344,21 @@ unsigned char TCPSendDataSocket (unsigned char length, unsigned char * data)
 	//aca reviso si el puerto esta conectado
 	if ((port >= 0) && (port <= 4))
 	{
-		//length = strlen(data);
-
 		//busco buffer tcp vacio
-		for (i = 0; i < MAX_BUFF_INDEX; i++)
+		i = FirstTxEmptyBuffer();
+
+		if ((i < MAX_BUFF_INDEX) && (length < (SIZEOF_BUFFTCP_SEND - 2)))
 		{
 			p = &bufftcpsend [i] [0];
-			if (*(p+1) == 0)
-				i = 10;				//buffer vacio, lo uso
-		}
-
-		if ((i >= 10) && (length < (SIZEOF_BUFFTCP_SEND - 2)))
-		{
 			*p = port;
 			*(p+1) = length;
 			//strcpy ((p+2), (char *) data);
 			for (i = 0; i < length; i++)
 				*(p + 2 + i) = *(data + i);
+
 			resp = RESP_OK;
 		}
 	}
-
 	return resp;
 }
 

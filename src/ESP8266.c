@@ -487,7 +487,9 @@ unsigned char ESP_SendData (unsigned char port, unsigned char * pbuf)
 			if (esp_answer == RESP_READY)
 			{
 				//reviso si tengo SEND OK en el buffer
-				ESPPreParser((unsigned char *)rx2buff);
+//				ESPPreParser((unsigned char *)rx2buff);		//no toco el buffer por si lo necesito usar afuera
+				//o po si siguen entrando bytes
+
 
 				//si me recibe los bytes doy como el paquete enviado
 				if (strncmp((char *) (const char *) "Recv ", (char *)rx2buff, (sizeof ("Recv ")) - 1) == 0)
