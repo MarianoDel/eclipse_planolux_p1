@@ -8,6 +8,8 @@
 #ifndef NETWORK_FUNCTIONS_H_
 #define NETWORK_FUNCTIONS_H_
 
+#include "MQTTClient.h"
+
 //--- WIFI Function States ---//
 typedef enum {
   wifi_state_reset = 0,
@@ -37,8 +39,9 @@ typedef enum {
 	mqtt_pub_failed,
 	mqtt_waiting_pubcomp,
 	mqtt_waiting_puback,
-	mqtt_sub,
-
+	mqtt_sending_subscribe,
+	mqtt_waiting_suback,
+	mqtt_subscribe_failed,
 	mqtt_device_control,
 	mqtt_undefine_state       = 0xFF,
 } mqtt_state_t;
@@ -49,5 +52,6 @@ unsigned char WIFIFunction (void);
 
 void MQTTFunctionResetSM (void);
 unsigned char MQTTFunction (void);
+void SubsCallBack(MessageData*);
 
 #endif /* NETWORK_FUNCTIONS_H_ */

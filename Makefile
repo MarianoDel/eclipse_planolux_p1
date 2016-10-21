@@ -132,6 +132,7 @@ SRC += .\MQTT-Paho\MQTTPacket\src\MQTTPacket.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTConnectClient.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTDeserializePublish.c
 SRC += .\MQTT-Paho\MQTTPacket\src\MQTTSerializePublish.c
+SRC += .\MQTT-Paho\MQTTPacket\src\MQTTSubscribeClient.c
 SRC += .\MQTT-Paho\Porting\MQTT_SPWF_interface.c
 #SRC += .\MQTT-Paho\Utils\TLocalBuffer.c
 ## System Support

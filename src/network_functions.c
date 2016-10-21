@@ -61,7 +61,11 @@ unsigned char MQTTFunction (void)
 	pc = &c;
 	int rc = FAILURE;
 	char topicName [80];
+	MQTTString topic = MQTTString_initializer;
+	Timer timer;
+#ifdef MQTT_MEM_ONLY
 	unsigned char s_connack [] = {0x20, 0x02};		//Deserialize_connack no le da bola al length
+#endif
 	unsigned char connack_rc = 255;
 	char sessionPresent = 0;
 
@@ -83,6 +87,8 @@ unsigned char MQTTFunction (void)
 			break;
 
 		case mqtt_sending_connect:
+			//parser de...
+			//int MQTTConnect(Client* c, MQTTPacket_connectData* options)
 			options.MQTTVersion = 3;
 			options.clientID.cstring = (char*)mqtt_ibm_setup.clientid;
 			options.username.cstring = (char*)mqtt_ibm_setup.username;
@@ -160,7 +166,11 @@ unsigned char MQTTFunction (void)
 				if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
 				{
 					pc->isconnected = 1;
+#ifdef USE_SUBSCRIBE
+					mqtt_state = mqtt_sending_subscribe;
+#else
 					mqtt_state = mqtt_connect;
+#endif
 					mqtt_func_timer = 2;		//publico al toque
 				}
 				else
@@ -174,10 +184,113 @@ unsigned char MQTTFunction (void)
 
 			break;
 
+		case mqtt_sending_subscribe:
+			//parser de...
+			//int MQTTSubscribe(Client* c, const char* topicFilter, enum QoS qos, messageHandler messageHandler)
+
+			strcpy(topicName, (const char *) "testsub");
+			topic.cstring = (char *)topicName;
+			int qos = QOS0;
+
+			InitTimer(&timer);
+			countdown_ms(&timer, pc->command_timeout_ms);
+
+		    if (!pc->isconnected)
+		    {
+		    	mqtt_state = mqtt_subscribe_failed;
+		    	break;
+		    }
+
+		    dummy_resp = MQTTSerialize_subscribe(pc->buf, pc->buf_size, 0, getNextPacketId(pc), 1, &topic, &qos);
+		    if (dummy_resp <= 0)
+		    {
+		    	mqtt_state = mqtt_subscribe_failed;
+		    	break;
+		    }
+
+		    if ((rc = sendPacket(pc, dummy_resp, &timer)) != OK) // send the subscribe packet
+		    {
+		    	mqtt_state = mqtt_subscribe_failed;
+		    	break;
+		    }
+
+		    mqtt_state = mqtt_waiting_suback;
+		    mqtt_func_timer = 10000;	//espero 10 segundos el suback
+			break;
+
+		case mqtt_waiting_suback:
+			//espero CONNACK o  TIMEOUT
+			//				unsigned char connack_rc = 255;
+			//				char sessionPresent = 0;
+
+			//reviso que no se este transmitiendo nada, ni recibiendo bytes
+			if ((CheckTxEmptyBuffer() == 0) && (!esp_mini_timeout))
+			{
+				unsigned char bindex, lookplus, rxlen = 0;
+
+				//parseo el rx2buff buscando respuestas
+				bindex = FirstRxEmptyBuffer();
+
+				if (bindex < MAX_BUFF_INDEX)	//tengo lugar
+				{
+					//busco en el buffer un +IPD
+					for (lookplus = 0; lookplus < (SIZEOF_BUFFTCP_SEND - 1); lookplus++)
+					{
+						if ((rx2buff[lookplus] == '+') && (rx2buff[lookplus + 1] == 'I'))
+						{
+							if (TCPReadDataSocket((unsigned char *)&rx2buff[lookplus], &bufftcprecv[bindex] [0], &rxlen) != 0xFF)
+							{
+								if (rxlen > 0)
+									bport_index_receiv[bindex] = rxlen;
+							}
+
+							//ya lo procese, lo marco
+							rx2buff[lookplus] = '-';
+							lookplus = SIZEOF_BUFFTCP_SEND;
+						}
+					}
+				}
+			}
+
+			if (ReadSocket(pc->readbuf, pc->readbuf_size) != 0)
+			{
+		        int count = 0, grantedQoS = -1;
+		        unsigned short mypacketid;
+		        if (MQTTDeserialize_suback(&mypacketid, 1, &count, &grantedQoS, pc->readbuf, pc->readbuf_size) == 1)
+		            rc = grantedQoS; // 0, 1, 2 or 0x80
+		        if (rc != 0x80)
+		        {
+		            int i;
+		            for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+		            {
+		                if (pc->messageHandlers[i].topicFilter == 0)
+		                {
+		                    pc->messageHandlers[i].topicFilter = &topicName[0];
+		                    pc->messageHandlers[i].fp = SubsCallBack;
+		                    rc = 0;
+		                    break;
+		                }
+		            }
+		        }
+			}
+
+			if (!mqtt_func_timer)
+			{
+				mqtt_state = mqtt_subscribe_failed;
+			}
+
+			break;
+
 		case mqtt_connect_failed:
 			resp = RESP_NOK;
 			break;
 
+		case mqtt_subscribe_failed:
+			//me quedo haciendo solo pubs
+			LCD_1ER_RENGLON;
+			LCDTransmitStr((const char *) "SUBS params error!!");
+			mqtt_state = mqtt_connect;
+			break;
 
 		case mqtt_connect:
 
@@ -212,8 +325,7 @@ unsigned char MQTTFunction (void)
 		case mqtt_pub:
 			/* Publish MQTT message */
 			rc = FAILURE;
-			Timer timer;
-			MQTTString topic = MQTTString_initializer;
+
 			topic.cstring = (char *)topicName;
 			int len = 0;
 
@@ -298,6 +410,21 @@ unsigned char MQTTFunction (void)
     //---------- Fin Prueba MQTT_MEM_ONLY ---------//
 }
 
+/**
+  * @brief  MQTT Callback function
+  * @param  MessageData : MQTT message received
+  * @retval WiFi_Status_t
+  */
+//void messageArrived(MessageData* md)
+void SubsCallBack(MessageData* md)
+{
+    MQTTMessage* message = md->message;
+
+	LCD_1ER_RENGLON;
+	LCDTransmitStr((const char *) "Subs publish    ");
+	LCD_2DO_RENGLON;
+	LCDTransmitStr((const char *)message->payload);
+}
 
 void WIFIFunctionResetSM (void)
 {
@@ -496,4 +623,6 @@ unsigned char WIFIFunction (void)
 			wifi_state = wifi_state_reset;
 			break;
    	}
+
+    return resp;
 }

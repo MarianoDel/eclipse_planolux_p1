@@ -32,7 +32,7 @@
 #endif
 
 #ifdef WIFI_TO_MQTT_BROKER
-
+#define SUBSCRIBE
 #endif
 
 #ifdef USE_CERT_PROGRAM
@@ -44,7 +44,7 @@
 #endif
 
 #ifdef MQTT_MEM_ONLY
-
+//#define SUBSCRIBE
 #endif
 
 
