@@ -37,7 +37,7 @@ volatile unsigned char * prx;
 volatile unsigned char at_start = 0;
 volatile unsigned char at_finish = 0;
 volatile unsigned char pckt_start = 0;
-volatile unsigned char pckt_finish = 0;
+//volatile unsigned char pckt_finish = 0;
 enum EspConfigState esp_config_state = CONF_INIT;
 
 //OJO OJO OJO no esta terminada y no se si se necesita
@@ -752,11 +752,10 @@ void ESP_ATProcess (void)
 			esp_answer = RESP_READY;	//aviso que tengo una respuesta para revisar
 		}
 
-		if ((pckt_start) && (pckt_finish))
-//		if (pckt_start)
+//		if ((pckt_start) && (pckt_finish))
+		if (pckt_start)
 		{
 			pckt_start = 0;
-			pckt_finish = 0;
 			*prx = '\0';				//ESTO es un peligro no se donde quedo apuntado
 			esp_unsolicited_pckt = RESP_READY;	//aviso que tengo una respuesta para revisar
 		}
@@ -787,7 +786,6 @@ void ESP_ATModeRx (unsigned char d)
 			*prx = d;
 			prx++;
 			pckt_start = 1;
-			pckt_finish = 0;
 		}
 	}
 	else if (at_start)
@@ -808,8 +806,8 @@ void ESP_ATModeRx (unsigned char d)
 	}
 	else if (pckt_start)
 	{
-		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
-			pckt_finish = 1;
+//		if (d == '\n')		//no se cuantos finales de linea voy a tener en la misma respuesta
+//			pckt_finish = 1;
 
 		*prx = d;
 		if (prx < &bufftcp[SIZEOF_BUFFTCP])

@@ -31,6 +31,10 @@ unsigned char tcp_tx_state = 0;
 unsigned char bufftcprecv [MAX_BUFF_INDEX] [SIZEOF_BUFFTCP_SEND];
 unsigned char bport_index_receiv [MAX_BUFF_INDEX];
 
+extern unsigned char esp_mini_timeout;
+extern volatile unsigned char rx2buff[];
+
+
 //--- Module Functions ----------------------------//
 
 enum TcpMessages CheckTCPMessage(char * d, unsigned char * new_room_bright, unsigned char * new_lamp_bright, unsigned char * bytes)
@@ -193,6 +197,39 @@ void TCPProcess (void)
 	}
 }
 
+//revisa el rxbuff del puerto serie buscando alguna respuesta que no se haya levantado o reconocido
+void CycleAnswers (void)
+{
+	if ((CheckTxEmptyBuffer() == 0) && (!esp_mini_timeout))
+	{
+		unsigned char bindex, lookplus, rxlen = 0;
+
+		//parseo el rx2buff buscando respuestas
+		bindex = FirstRxEmptyBuffer();
+
+		if (bindex < MAX_BUFF_INDEX)	//tengo lugar
+		{
+			//busco en el buffer un +IPD
+			for (lookplus = 0; lookplus < (SIZEOF_BUFFTCP_SEND - 1); lookplus++)
+			{
+				if ((rx2buff[lookplus] == '+') && (rx2buff[lookplus + 1] == 'I'))
+				{
+					if (TCPReadDataSocket((unsigned char *)&rx2buff[lookplus], &bufftcprecv[bindex] [0], &rxlen) != 0xFF)
+					{
+						if (rxlen > 0)
+							bport_index_receiv[bindex] = rxlen;
+					}
+
+					//ya lo procese, lo marco
+					rx2buff[lookplus] = '-';
+					lookplus = SIZEOF_BUFFTCP_SEND;
+				}
+			}
+		}
+	}
+}
+
+
 //Revisa tipo de mensaje y puerto (0 a 4)
 //procesa el buffer en crudo y lo copia en un buffer de salida con solo numeros y letras
 //devuelve length
@@ -352,9 +389,10 @@ unsigned char TCPSendDataSocket (unsigned char length, unsigned char * data)
 			p = &bufftcpsend [i] [0];
 			*p = port;
 			*(p+1) = length;
-			//strcpy ((p+2), (char *) data);
-			for (i = 0; i < length; i++)
-				*(p + 2 + i) = *(data + i);
+
+//			for (i = 0; i < length; i++)
+//				*(p + 2 + i) = *(data + i);
+			memcpy((p + 2), data, length);
 
 			resp = RESP_OK;
 		}
@@ -423,6 +461,9 @@ unsigned char ReadSocket (unsigned char * buff, unsigned char maxlen)
 				memcpy (buff, &bufftcprecv[i] [0], maxlen);
 				len = maxlen;
 				bport_index_receiv[i] -= maxlen;
+				//ajusto el buffer
+				memcpy (&bufftcprecv[i] [0], &bufftcprecv[i] [maxlen], bport_index_receiv[i]);
+
 			}
 
 			i = MAX_BUFF_INDEX;

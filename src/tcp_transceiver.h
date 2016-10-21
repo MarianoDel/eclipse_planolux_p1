@@ -50,6 +50,7 @@ unsigned char ReadSocket (unsigned char *, unsigned char);
 unsigned char FirstTxEmptyBuffer (void);
 unsigned char FirstRxEmptyBuffer (void);
 unsigned char CheckTxEmptyBuffer (void);
+void CycleAnswers (void);
 
 unsigned char IpIsValid (char *);
 unsigned char OctetIsValid (char *, unsigned char *);

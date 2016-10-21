@@ -33,14 +33,15 @@ extern void prepare_json_pkt (uint8_t *);
 extern volatile unsigned short mqtt_func_timer;
 extern volatile unsigned short wifi_func_timer;
 
-extern unsigned char esp_mini_timeout;
-extern volatile unsigned char rx2buff[];
+//extern unsigned char esp_mini_timeout;
+//extern volatile unsigned char rx2buff[];
 extern unsigned char bufftcprecv [MAX_BUFF_INDEX] [SIZEOF_BUFFTCP_SEND];
 extern unsigned char bport_index_receiv [MAX_BUFF_INDEX];
 
 //--- Globals ------------------------//
 mqtt_state_t mqtt_state;
 wifi_state_t wifi_state;
+char s_payload [20];
 
 
 //--- Function Definitions -----------//
@@ -130,33 +131,7 @@ unsigned char MQTTFunction (void)
 			//				char sessionPresent = 0;
 
 			//reviso que no se este transmitiendo nada, ni recibiendo bytes
-			if ((CheckTxEmptyBuffer() == 0) && (!esp_mini_timeout))
-			{
-				unsigned char bindex, lookplus, rxlen = 0;
-
-				//parseo el rx2buff buscando respuestas
-				bindex = FirstRxEmptyBuffer();
-
-				if (bindex < MAX_BUFF_INDEX)	//tengo lugar
-				{
-					//busco en el buffer un +IPD
-					for (lookplus = 0; lookplus < (SIZEOF_BUFFTCP_SEND - 1); lookplus++)
-					{
-						if ((rx2buff[lookplus] == '+') && (rx2buff[lookplus + 1] == 'I'))
-						{
-							if (TCPReadDataSocket((unsigned char *)&rx2buff[lookplus], &bufftcprecv[bindex] [0], &rxlen) != 0xFF)
-							{
-								if (rxlen > 0)
-									bport_index_receiv[bindex] = rxlen;
-							}
-
-							//ya lo procese, lo marco
-							rx2buff[lookplus] = '-';
-							lookplus = SIZEOF_BUFFTCP_SEND;
-						}
-					}
-				}
-			}
+			CycleAnswers();
 
 			if (ReadSocket(pc->readbuf, pc->readbuf_size) != 0)
 			{
@@ -224,34 +199,12 @@ unsigned char MQTTFunction (void)
 			//				char sessionPresent = 0;
 
 			//reviso que no se este transmitiendo nada, ni recibiendo bytes
-			if ((CheckTxEmptyBuffer() == 0) && (!esp_mini_timeout))
-			{
-				unsigned char bindex, lookplus, rxlen = 0;
+			CycleAnswers();
 
-				//parseo el rx2buff buscando respuestas
-				bindex = FirstRxEmptyBuffer();
-
-				if (bindex < MAX_BUFF_INDEX)	//tengo lugar
-				{
-					//busco en el buffer un +IPD
-					for (lookplus = 0; lookplus < (SIZEOF_BUFFTCP_SEND - 1); lookplus++)
-					{
-						if ((rx2buff[lookplus] == '+') && (rx2buff[lookplus + 1] == 'I'))
-						{
-							if (TCPReadDataSocket((unsigned char *)&rx2buff[lookplus], &bufftcprecv[bindex] [0], &rxlen) != 0xFF)
-							{
-								if (rxlen > 0)
-									bport_index_receiv[bindex] = rxlen;
-							}
-
-							//ya lo procese, lo marco
-							rx2buff[lookplus] = '-';
-							lookplus = SIZEOF_BUFFTCP_SEND;
-						}
-					}
-				}
-			}
-
+			//TODO: cambiar luego por...
+			//if (waitfor(c, SUBACK, &timer) == SUBACK)      // wait for suback
+			//o mejor por...
+			//(rc = cycle(c, timer)) != packet_type);
 			if (ReadSocket(pc->readbuf, pc->readbuf_size) != 0)
 			{
 		        int count = 0, grantedQoS = -1;
@@ -271,6 +224,8 @@ unsigned char MQTTFunction (void)
 		                    break;
 		                }
 		            }
+		            mqtt_state = mqtt_connect;
+		            mqtt_func_timer = 5000;		//5 segs antes de publicar
 		        }
 			}
 
@@ -296,16 +251,17 @@ unsigned char MQTTFunction (void)
 
 			if (!mqtt_func_timer)		//cuando agoto el timer, publico
 			{
-				LCD_1ER_RENGLON;
-				LCDTransmitStr((const char *) "PUB new data    ");
-				LCD_2DO_RENGLON;
-				LCDTransmitStr(s_blank_line);
-				mqtt_func_timer = 2000;
+//				LCD_1ER_RENGLON;
+//				LCDTransmitStr((const char *) "PUB new data    ");
+//				LCD_2DO_RENGLON;
+//				LCDTransmitStr(s_blank_line);
 
 				mqtt_state = mqtt_pub_prepare;
 			}
 
 			//reviso nuevos paquetes
+			//TODO: mejorarlo y que devuelva rc para que se pueda ir haciendo un cycle y linea 257
+			CycleAnswers();
 			CheckForPubs (pc, 1000);
 
 			break;
@@ -319,6 +275,15 @@ unsigned char MQTTFunction (void)
 			MQTT_msg.payload= (char *) json_buffer;
 			MQTT_msg.payloadlen=strlen( (char *) json_buffer);
 			strcpy(topicName, (const char *)"prueba");
+
+//			MQTT_msg.qos=QOS0;
+//			MQTT_msg.dup=0;
+//			MQTT_msg.retained=0;
+//			strcpy (s_payload, (const char *)"helloWorld");
+//			MQTT_msg.payload= (char *) s_payload;
+//			MQTT_msg.payloadlen=strlen( (char *) s_payload);
+//			strcpy(topicName, (const char *)"testsub");
+
 			mqtt_state = mqtt_pub;
 			break;
 
@@ -364,7 +329,7 @@ unsigned char MQTTFunction (void)
 			else
 			{
 				mqtt_state = mqtt_connect;
-				mqtt_func_timer = 2000;
+				mqtt_func_timer = 20000;	//espero 10 segundos par publicar
 			}
 			break;
 
@@ -372,6 +337,7 @@ unsigned char MQTTFunction (void)
 			LCD_1ER_RENGLON;
 			LCDTransmitStr((const char *) "Failed to publish");
 			mqtt_state = mqtt_connect;
+			//TODO: Implementar contador de fallas para luego chequear socketconnect y en todo caso bajarlo
 			break;
 
 		case mqtt_waiting_puback:
