@@ -43,6 +43,9 @@ mqtt_state_t mqtt_state;
 wifi_state_t wifi_state;
 char s_payload [20];
 
+char topicsub0 [20];
+char topicpub [20];
+
 
 //--- Function Definitions -----------//
 
@@ -61,7 +64,7 @@ unsigned char MQTTFunction (void)
 	Client * pc;
 	pc = &c;
 	int rc = FAILURE;
-	char topicName [80];
+
 	MQTTString topic = MQTTString_initializer;
 	Timer timer;
 #ifdef MQTT_MEM_ONLY
@@ -163,8 +166,8 @@ unsigned char MQTTFunction (void)
 			//parser de...
 			//int MQTTSubscribe(Client* c, const char* topicFilter, enum QoS qos, messageHandler messageHandler)
 
-			strcpy(topicName, (const char *) "testsub");
-			topic.cstring = (char *)topicName;
+			strcpy(topicsub0, (const char *) "testsub");
+			topic.cstring = (char *)topicsub0;
 			int qos = QOS0;
 
 			InitTimer(&timer);
@@ -218,7 +221,8 @@ unsigned char MQTTFunction (void)
 		            {
 		                if (pc->messageHandlers[i].topicFilter == 0)
 		                {
-		                    pc->messageHandlers[i].topicFilter = &topicName[0];
+		                    //pc->messageHandlers[i].topicFilter = &topicName[0];
+		                	pc->messageHandlers[i].topicFilter = topicsub0;
 		                    pc->messageHandlers[i].fp = SubsCallBack;
 		                    rc = 0;
 		                    break;
@@ -274,7 +278,7 @@ unsigned char MQTTFunction (void)
 			MQTT_msg.retained=1;
 			MQTT_msg.payload= (char *) json_buffer;
 			MQTT_msg.payloadlen=strlen( (char *) json_buffer);
-			strcpy(topicName, (const char *)"prueba");
+			strcpy(topicpub, (const char *)"prueba");
 
 //			MQTT_msg.qos=QOS0;
 //			MQTT_msg.dup=0;
@@ -291,7 +295,7 @@ unsigned char MQTTFunction (void)
 			/* Publish MQTT message */
 			rc = FAILURE;
 
-			topic.cstring = (char *)topicName;
+			topic.cstring = (char *)topicpub;
 			int len = 0;
 
 			InitTimer(&timer);
