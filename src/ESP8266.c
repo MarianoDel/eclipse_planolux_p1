@@ -40,6 +40,9 @@ volatile unsigned char pckt_start = 0;
 //volatile unsigned char pckt_finish = 0;
 enum EspConfigState esp_config_state = CONF_INIT;
 
+#define BARRA_R_BARRA_N		2
+const char s_connect_string [] = { "AT+CIPSTART=0,\"TCP\",\"iot.eclipse.org\",1883\r\n" };
+
 //OJO OJO OJO no esta terminada y no se si se necesita
 unsigned char ESP_EnableNewConn (unsigned char p)
 {
@@ -350,7 +353,9 @@ unsigned char ESP_OpenSocket (void)
 			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=0,\"TCP\",\"192.168.0.102\",1883\r\n");
 			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.102\",1883\r\n");
 			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=\"TCP\",\"192.168.0.100\",1883\r\n");
-			resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=0,\"TCP\",\"192.168.0.100\",1883\r\n");
+			//resp = SendCommandWaitAnswer((const char *) "AT+CIPSTART=0,\"TCP\",\"192.168.0.100\",1883\r\n");
+			////Con s_connect_string
+			resp = SendCommandWaitAnswer(s_connect_string);
 
 			if ((resp == RESP_OK) || (resp == RESP_READY))
 			{
@@ -371,14 +376,20 @@ unsigned char ESP_OpenSocket (void)
 			if (esp_timeout)
 			{
 				//ajusto buffer, pero no lo copio por si siguen llegando bytes
-				unsigned char len = 40;
+				//unsigned char len = 40;
+				unsigned char len = sizeof (s_connect_string) - 1;
 //				strcpy ((char *) rx2buff, (char *) (rx2buff + len));
 
 				//reviso respuestas
-				if (strncmp((char *) (rx2buff + len), (char *) (const char *) "0,CONNECTOK", sizeof ("0,CONNECTOK") - 1) == 0)
+				if (strncmp((char *) (rx2buff + len + BARRA_R_BARRA_N), (char *) (const char *) "0,CONNECT", sizeof ("0,CONNECT") - 1) == 0)
 					resp = RESP_OK;
-				else if (strncmp((char *) (rx2buff + len), (char *) (const char *) "ALREADY CONNECTED", sizeof ("ALREADY CONNECTED") - 1) == 0)
+				else if (strncmp((char *) (rx2buff + len + BARRA_R_BARRA_N), (char *) (const char *) "ALREADY CONNECTED", sizeof ("ALREADY CONNECTED") - 1) == 0)
 					resp = RESP_OK;
+
+				//reviso respuestas tardias en bufftcp
+				if (strncmp((char *) bufftcp, (char *) (const char *) "0,CONNECT", sizeof ("0,CONNECT") - 1) == 0)
+					resp = RESP_OK;
+
 			}
 			else
 				resp = RESP_NOK;		//se agoto timeout

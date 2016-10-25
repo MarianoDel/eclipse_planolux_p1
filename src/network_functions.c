@@ -144,6 +144,7 @@ unsigned char MQTTFunction (void)
 				if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, pc->readbuf, pc->readbuf_size) == 1)
 				{
 					pc->isconnected = 1;
+					pc->keepAliveInterval = 60;
 #ifdef USE_SUBSCRIBE
 					mqtt_state = mqtt_sending_subscribe;
 #else
@@ -255,11 +256,6 @@ unsigned char MQTTFunction (void)
 
 			if (!mqtt_func_timer)		//cuando agoto el timer, publico
 			{
-//				LCD_1ER_RENGLON;
-//				LCDTransmitStr((const char *) "PUB new data    ");
-//				LCD_2DO_RENGLON;
-//				LCDTransmitStr(s_blank_line);
-
 				mqtt_state = mqtt_pub_prepare;
 			}
 
@@ -278,7 +274,7 @@ unsigned char MQTTFunction (void)
 			MQTT_msg.retained=1;
 			MQTT_msg.payload= (char *) json_buffer;
 			MQTT_msg.payloadlen=strlen( (char *) json_buffer);
-			strcpy(topicpub, (const char *)"prueba");
+			strcpy(topicpub, (const char *)"prueba_esp_med");
 
 //			MQTT_msg.qos=QOS0;
 //			MQTT_msg.dup=0;
@@ -333,7 +329,7 @@ unsigned char MQTTFunction (void)
 			else
 			{
 				mqtt_state = mqtt_connect;
-				mqtt_func_timer = 20000;	//espero 10 segundos par publicar
+				mqtt_func_timer = 10000;	//espero 10 segundos par publicar
 			}
 			break;
 

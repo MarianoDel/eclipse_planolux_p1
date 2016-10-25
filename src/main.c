@@ -361,6 +361,25 @@ int main(void)
 	while (FuncShowBlink ((const char *) "  PLANOLUX LLC  ", (const char *) "  Smart Driver  ", 2, BLINK_NO) != RESP_FINISH);
 	LED_OFF;
 
+	//----- Prueba de Timers MQTT ---------//
+//    Timer tim;
+//    InitTimer(&tim);
+//	countdown_ms(&tim, 50);
+//	while (1)
+//	{
+//
+//
+//		//Wait_ms(50);
+//		if (expired(&tim))
+//		{
+//			countdown_ms(&tim, 50);
+//			if (LED)
+//				LED_OFF;
+//			else
+//				LED_ON;
+//		}
+//	}
+	//----- Fin Prueba de Timers MQTT ---------//
 	//----- Prueba switches ---------//
 //	while (1)
 //	{
@@ -1417,10 +1436,6 @@ void TimingDelay_Decrement(void)
 	else
 		secs++;
 
-#ifdef WIFI_TO_MQTT_BROKER
-	//timer del MQTT
-	SysTickIntHandler();
-#endif
 }
 
 //------ EOF -------//

@@ -21,7 +21,8 @@
 #define TT_ESP_AT_MINI		5		//timeout de esopera de chars luego de una comienzo
 									//con 5 esta OK para AT pero puerde SEND OK en tx
 #define TT_AT_1SEG			1000
-#define TT_AT_3SEG			1000
+#define TT_AT_3SEG			3000
+#define TT_AT_10SEG			10000
 
 //--- Estados para el ESP -----------------------------------//
 #define COMM_INIT			0
