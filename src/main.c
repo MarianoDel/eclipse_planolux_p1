@@ -64,6 +64,8 @@ volatile unsigned short timer_for_cat_display = 0;
 
 volatile unsigned short wait_ms_var = 0;
 
+unsigned char new_ldr_sample;
+
 // ------- Externals del Puerto serie  -------
 volatile unsigned char tx2buff[SIZEOF_DATA];
 volatile unsigned char rx2buff[SIZEOF_DATA];
@@ -103,6 +105,7 @@ volatile unsigned short standalone_enable_menu_timer;
 //volatile unsigned short standalone_menu_timer;
 volatile unsigned char grouped_master_timeout_timer;
 volatile unsigned short take_temp_sample = 0;
+volatile unsigned short take_ldr_sample = 0;
 volatile unsigned short minutes = 0;
 volatile unsigned char timer_wifi_bright = 0;
 
@@ -1107,6 +1110,26 @@ int main(void)
 #endif
 	//---------- Fin Programa de Certificacion S.E. --------//
 
+    //---------- Programa de Produccion solo LDR --------//
+#ifdef USE_PROD_PROGRAM_ONLY_LDR
+	while (1)
+	{
+		resp = FuncStandAloneOnlyLDR();
+
+
+		UpdateSwitches();
+		UpdateLDR();
+
+		//UpdateACSwitch();
+		//UpdatePackets();
+		//UpdateTemp();
+		//UpdateIGrid();
+		//UpdateVGrid();
+
+	}	//termina while(1)
+#endif
+	//---------- Fin Programa de Produccion solo LDR --------//
+
     //---------- Programa de Produccion --------//
 #ifdef USE_PROD_PROGRAM
 	//--- PRUEBA FUNCION MAIN_MENU
@@ -1365,6 +1388,9 @@ void TimingDelay_Decrement(void)
 
 	if (take_temp_sample)
 		take_temp_sample--;
+
+	if (take_ldr_sample)
+		take_ldr_sample--;
 
 	if (filter_timer)
 		filter_timer--;

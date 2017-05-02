@@ -25,6 +25,8 @@ extern volatile unsigned short standalone_enable_menu_timer;
 extern volatile unsigned short minutes;
 extern volatile unsigned short scroll1_timer;
 
+extern unsigned char new_ldr_sample;
+
 extern const char * s_blank_line [];
 
 extern StandAlone_Typedef StandAloneStruct_constant;
@@ -45,6 +47,10 @@ unsigned short standalone_last_temp = 0;
 unsigned short standalone_last_current = 0;
 unsigned short standalone_last_minutes = 0;
 unsigned short standalone_last_1to10 = 0;
+
+#ifdef USE_PROD_PROGRAM_ONLY_LDR
+short ldr_setpoint = 0;
+#endif
 
 const unsigned char s_sel [] = { 0x02, 0x08, 0x0f };
 
@@ -938,6 +944,158 @@ void ShowConfStandAloneResetEnd(void)
 	standalone_show_conf = STAND_ALONE_SHOW_CONF_RESET_END;
 }
 
+//Solo utilizo LDR prendo suave a maximo, luego empiezo a medir y ajustar
+unsigned char FuncStandAloneOnlyLDR (void)
+{
+	unsigned char resp = RESP_CONTINUE;
+	short ldr_error = 0;
+	unsigned short ldr_meas = 0;
+
+
+	switch (standalone_state)
+	{
+		case STAND_ALONE_LDR_INIT:
+			//un segundo de demora antes de arrancar
+			standalone_timer = 1000;
+			standalone_state++;
+			break;
+
+		case STAND_ALONE_LDR_WAIT_INIT:
+			if (!standalone_timer)
+				standalone_state++;
+
+			break;
+
+		case STAND_ALONE_LDR_RISING:
+			if (!standalone_timer)
+			{
+				standalone_timer = TT_RISING_FALLING_FIRST_TIME_ONLY_LDR;
+
+				if (standalone_ii < 255)
+				{
+					Update_TIM3_CH1 (standalone_ii);
+					standalone_ii++;
+				}
+				else
+					standalone_state = STAND_ALONE_LDR_ON;
+
+			}
+			break;
+
+		case STAND_ALONE_LDR_ON:
+			if (new_ldr_sample)
+			{
+				new_ldr_sample = 0;
+				ldr_meas = GetLDR();		//getLDR entre 6 con luz y 380 sin luz
+				if (ldr_meas > 378)
+					ldr_meas = 378;
+
+				ldr_meas = ldr_meas * 27;
+				ldr_meas = ldr_meas / 10;	//ajusto 1023
+				ldr_meas >>= 2;				//ajusto 255
+
+				ldr_meas = 255 - ldr_meas;	//invierto
+
+				//error en el setpoint
+				ldr_error = STD_ALONE_BRIGHT_SETPOINT - ldr_meas;
+//				ldr_integ = ldr_setpoint >> 3;
+//				ldr_setpoint = ldr_integ + ldr_error;
+				ldr_setpoint = (ldr_setpoint >> 2) + ldr_error;
+
+				if (ldr_setpoint < 0)
+					ldr_setpoint = 0;
+
+				if (ldr_setpoint > 255)
+					ldr_setpoint = 255;
+
+			}
+
+			if (!standalone_timer)
+			{
+				standalone_timer = TT_RISING_FALLING_FIRST_TIME_ONLY_LDR;
+
+
+				if ((standalone_ii < ldr_setpoint) && (standalone_ii < 255))
+				{
+					standalone_ii++;
+					Update_TIM3_CH1 (standalone_ii);
+				}
+
+				if ((standalone_ii > ldr_setpoint) && (standalone_ii > STD_ALONE_MIN_BRIGHT))
+				{
+					standalone_ii--;
+					Update_TIM3_CH1 (standalone_ii);
+
+				}
+			}
+			break;
+
+
+//		case STAND_ALONE_DIMMING_LAST:
+//			if (standalone_dimming_last_slope == DIM_UP)
+//				standalone_state = STAND_ALONE_DIMMING_UP;
+//			else
+//				standalone_state = STAND_ALONE_DIMMING_DOWN;
+//
+//			break;
+//
+//		case STAND_ALONE_DIMMING_UP:
+//			if (!standalone_timer)
+//			{
+//				if (StandAloneStruct_local.dimming_up_timer_value > 255)
+//					standalone_timer = (StandAloneStruct_local.dimming_up_timer_value >> 8);
+//				else
+//					standalone_timer = TT_RISING_FALLING;
+//
+//				if (CheckACSw() > S_NO)
+//				{
+//					if (standalone_ii < StandAloneStruct_local.max_dimmer_value_dmx)
+//					{
+//						standalone_ii++;
+//						Update_TIM3_CH1 (standalone_ii);
+//					}
+//				}
+//				else	//si liberaron y estoy en maximo lo doy vuelta
+//				{
+//					if (standalone_ii >= StandAloneStruct_local.max_dimmer_value_dmx)
+//						standalone_dimming_last_slope = DIM_DOWN;
+//					standalone_state = STAND_ALONE_ON;
+//				}
+//			}
+//			break;
+//
+//		case STAND_ALONE_DIMMING_DOWN:
+//			if (!standalone_timer)
+//			{
+//				if (StandAloneStruct_local.dimming_up_timer_value > 255)
+//					standalone_timer = (StandAloneStruct_local.dimming_up_timer_value >> 8);
+//				else
+//					standalone_timer = TT_RISING_FALLING;
+//
+//				if (CheckACSw() > S_NO)
+//				{
+//					if (standalone_ii > StandAloneStruct_local.min_dimmer_value_dmx)
+//					{
+//						standalone_ii--;
+//						Update_TIM3_CH1 (standalone_ii);
+//					}
+//				}
+//				else	//si liberaron y estoy en minimo lo doy vuelta
+//				{
+//					if (standalone_ii <= StandAloneStruct_local.min_dimmer_value_dmx)
+//						standalone_dimming_last_slope = DIM_UP;
+//					standalone_state = STAND_ALONE_ON;
+//				}
+//			}
+//			break;
+
+		default:
+			standalone_state = STAND_ALONE_LDR_INIT;
+			break;
+	}
+
+	return resp;
+}
 
 //muestro el menu y hago funciones (pero sin mostrar nada) hasta que pasen 30 segs
 //con standalone_menu_show

@@ -30,5 +30,6 @@ unsigned short GetTemp (void);
 void AdcConfig (void);
 short ConvertTemp (unsigned short);
 unsigned short GetLDR (void);
+void UpdateLDR(void);
 
 #endif /* ADC_H_ */

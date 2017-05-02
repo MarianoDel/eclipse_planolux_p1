@@ -17,13 +17,14 @@
 
 //-------- WiFi Configuration -------------
 //#define USE_HLK_WIFI
-#define USE_ESP_WIFI
+//#define USE_ESP_WIFI
 
 //-------- Type of Program ----------------
 //#define WIFI_TO_CEL_PHONE_PROGRAM
-#define WIFI_TO_MQTT_BROKER
+//#define WIFI_TO_MQTT_BROKER
 //#define USE_CERT_PROGRAM
 //#define USE_PROD_PROGRAM
+#define USE_PROD_PROGRAM_ONLY_LDR
 //#define MQTT_MEM_ONLY
 
 //-------- Hardware resources for Type of Program ----------------

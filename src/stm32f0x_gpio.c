@@ -68,9 +68,9 @@ void GPIO_Config (void)
 
 	temp = GPIOA->MODER;	//2 bits por pin
 	temp &= 0xFF000000;		//PA0 PA1 analog input; PA2 PA3 alternative func;
-							//PA4 out; PA5 input; PA6 alternative func; PA7 out;
+							//PA4 out; PA5 analog input; PA6 alternative func; PA7 out;
 							//PA8 - PA11 out push_pull; PA12-PA15 NC
-	temp |= 0x005561AF;
+	temp |= 0x00556CAF;
 	GPIOA->MODER = temp;
 
 	temp = GPIOA->OTYPER;	//1 bit por pin

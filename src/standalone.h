@@ -28,6 +28,16 @@ typedef struct StandAlone
 
 } StandAlone_Typedef;	//12 bytes alingned
 
+//estados del modo STAND_ALONE ONLY LDR
+enum {
+	STAND_ALONE_LDR_INIT = 0,
+	STAND_ALONE_LDR_WAIT_INIT,
+	STAND_ALONE_LDR_RISING,
+	STAND_ALONE_LDR_ON
+
+	};
+
+
 //estados del modo STAND_ALONE
 #define STAND_ALONE_INIT				0
 #define STAND_ALONE_SHOW_CONF			1
@@ -132,8 +142,16 @@ enum StandAloneMenu
 
 #define TT_RISING_FALLING	1		//update del 1 a 10V (rampa subida y bajada)
 #define TT_RISING_FALLING_FIRST_TIME	1
+
 #define TT_STARTING			400		//tarda 940 msegs en arrancar la fuente MAS O MENOS OK
 #define TT_MENU_TIMEOUT		30000
+
+//--- Defines del modo ONLY LDR ---
+#define TT_RISING_FALLING_FIRST_TIME_ONLY_LDR	6
+#define STD_ALONE_MIN_BRIGHT			20			//7.8%
+//#define STD_ALONE_BRIGHT_SETPOINT		178			//70%
+#define STD_ALONE_BRIGHT_SETPOINT		240			//70%
+
 
 //#define TT_STARTING			100		//tarda 940 msegs en arrancar la fuente
 
@@ -157,5 +175,8 @@ void ShowConfStandAloneResetEnd(void);
 unsigned char FuncStandAloneCert (void);
 void MenuStandAloneCert(void);
 void MenuStandAloneResetCert(void);
+
+//para LDR solo
+unsigned char FuncStandAloneOnlyLDR (void);
 
 #endif /* STANDALONE_H_ */

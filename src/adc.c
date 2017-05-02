@@ -15,6 +15,8 @@
 //--- VARIABLES EXTERNAS ---//
 extern volatile unsigned short adc_ch [];
 extern volatile unsigned short take_temp_sample;
+extern volatile unsigned short take_ldr_sample;
+extern unsigned char new_ldr_sample;			//la uso para avisar que se puede usar el filtro
 
 #ifdef ADC_WITH_INT
 extern volatile unsigned char seq_ready;
@@ -26,6 +28,11 @@ unsigned short board_temp [SIZEOF_BOARD_TEMP];
 unsigned short last_temp = 0;
 unsigned char board_temp_index = 0;
 unsigned char new_temp_sample = 0;			//la uso para avisar que se puede usar el filtro
+
+#define SIZEOF_LDR	16
+unsigned short vldr [SIZEOF_LDR];
+unsigned char ldr_index = 0;
+
 
 void AdcConfig (void)
 {
@@ -270,8 +277,32 @@ unsigned short ReadADC1Check (unsigned char channel)
 
 unsigned short GetLDR (void)
 {
-	return ReadADC1_SameSampleTime(ADC_Channel_5);
+	unsigned char i;
+	unsigned short total_sum = 0;
+
+	for (i = 0; i < SIZEOF_LDR; i++)
+		total_sum += vldr [i];
+
+	return (total_sum >> 4);
 }
+
+void UpdateLDR(void)
+{
+	//hago update cada 1 seg
+	if (!take_ldr_sample)
+	{
+		take_ldr_sample = 1000;
+
+		vldr [ldr_index] = ReadADC1_SameSampleTime(ADC_Channel_5);
+		if (ldr_index < SIZEOF_LDR)
+			ldr_index++;
+		else
+			ldr_index = 0;
+
+		new_ldr_sample = 1;
+	}
+}
+
 
 void UpdateTemp(void)
 {
