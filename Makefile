@@ -122,6 +122,7 @@ SRC += .\src\standalone.c
 SRC += .\src\grouped.c
 SRC += .\src\networked.c
 SRC += .\src\tcp_transceiver.c
+SRC += .\src\pid.c
 ## RDM libraries
 SRC += .\src\rdm_util.c
 ## MQTT libraries

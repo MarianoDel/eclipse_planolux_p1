@@ -18,6 +18,8 @@
 #include "adc.h"
 #include "synchro.h"
 
+#include "pid.h"
+
 
 /* Externals variables ---------------------------------------------------------*/
 extern volatile unsigned short standalone_timer;
@@ -996,17 +998,8 @@ unsigned char FuncStandAloneOnlyLDR (void)
 
 				ldr_meas = 255 - ldr_meas;	//invierto
 
-				//error en el setpoint
-				ldr_error = STD_ALONE_BRIGHT_SETPOINT - ldr_meas;
-//				ldr_integ = ldr_setpoint >> 3;
-//				ldr_setpoint = ldr_integ + ldr_error;
-				ldr_setpoint = (ldr_setpoint >> 2) + ldr_error;
+				ldr_setpoint = PidFixedSP(ldr_meas);
 
-				if (ldr_setpoint < 0)
-					ldr_setpoint = 0;
-
-				if (ldr_setpoint > 255)
-					ldr_setpoint = 255;
 
 			}
 
